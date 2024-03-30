@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,6 +29,7 @@ import presentation.screen.composable.modifier.shimmerEffect
 @Composable
 fun ChooseItem(
     title: String,
+    price: String? = null,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
@@ -56,6 +59,17 @@ fun ChooseItem(
                 fontFamily = FontFamily.Monospace,
                 fontWeight = FontWeight(500),
             )
+            Spacer(Modifier.height(8.dp))
+            price?.let {
+                Text(
+                    text = it,
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight(500),
+                )
+            }
         }
     }
 }

@@ -5,10 +5,8 @@ import org.koin.dsl.module
 import presentation.app.AppScreenModel
 import presentation.screen.dinin.DinInScreenModel
 import presentation.screen.home.HomeScreenModel
-import presentation.screen.order.items.ItemsListScreenModel
 import presentation.screen.order.modifiers.ItemModifierState
 import presentation.screen.order.modifiers.ItemModifiersListScreenModel
-import presentation.screen.order.presets.PresetsListScreenModel
 import presentation.screen.setting.SettingScreenModel
 
 val screenModelModule = module {

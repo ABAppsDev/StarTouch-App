@@ -18,6 +18,8 @@ data class OrderState(
     val itemModifiersState: List<ItemModifierState> = emptyList(),
     val itemChildrenState: List<ItemState> = emptyList(),
     val itemsState: List<ItemState> = emptyList(),
+    val selectedPresetId: Int = 0,
+    val selectedItemId: Int = 0,
 )
 
 @Immutable
