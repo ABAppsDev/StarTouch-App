@@ -39,4 +39,5 @@ data class English(
     override val bye: String = "GoodBye",
     override val itemAddedSuccess: String = "Item has been added successfully",
     override val alreadyOpenChecks: String = "There is an open check, do you want to make new check?",
+    override val comment: String = "Comment",
 ) : IStringResources

@@ -37,4 +37,5 @@ interface IStringResources {
     val bye: String
     val itemAddedSuccess: String
     val alreadyOpenChecks: String
+    val comment:String
 }

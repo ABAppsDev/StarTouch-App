@@ -13,6 +13,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import presentation.screen.order.OrderScreen
 import presentation.screen.splash.SplashScreen
 import resource.StarTouchTheme
 import util.getScreenModel

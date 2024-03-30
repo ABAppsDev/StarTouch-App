@@ -9,4 +9,12 @@ interface OrderInteractionListener {
     fun onClickFire()
     fun onClickClose()
     fun showErrorScreen()
+    fun onClickIconBack()
+    fun onClickModifyLastItem()
+    fun onDismissDialogue()
+    fun onModifyLastItemChanged(comment: String)
+    fun onClickOk()
+    fun onClickMinus(id:Int)
+    fun onClickPlus(id:Int)
+    fun onClickRemoveItem(id: Int)
 }

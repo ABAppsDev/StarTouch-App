@@ -7,11 +7,18 @@ import domain.entity.Preset
 import presentation.base.ErrorState
 import util.LanguageCode
 
+val orders = mutableListOf(
+    OrderItemState(
+        0, "smoozy", 5, 50f
+    )
+)
+
 @Immutable
 data class OrderState(
     val errorMessage: String = "",
     val errorState: ErrorState? = null,
     val isLoading: Boolean = false,
+    val isLoadingOrder: Boolean = false,
     val showErrorScreen: Boolean = false,
     val isPresetVisible: Boolean = false,
     val presetItemsState: List<PresetItemState> = emptyList(),
@@ -22,6 +29,23 @@ data class OrderState(
     val selectedItemId: Int = 0,
     val isRefresh: Boolean = false,
     val isFinishOrder: Boolean = false,
+    val modifyLastItemDialogue: ModifyLastItemDialogue = ModifyLastItemDialogue(),
+    val orderItemState: List<OrderItemState> = orders.toList(),
+)
+
+@Immutable
+data class ModifyLastItemDialogue(
+    val isVisible: Boolean = false,
+    val comment: String = "",
+)
+
+@Immutable
+data class OrderItemState(
+    val id: Int = 0,
+    val name: String = "",
+    val qty: Int = 0,
+    val unitPrice: Float = 0f,
+    val totalPrice: Float = unitPrice * qty,
 )
 
 @Immutable

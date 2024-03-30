@@ -261,4 +261,108 @@ class OrderScreenModel(
     override fun showErrorScreen() {
         updateState { it.copy(showErrorScreen = true) }
     }
+
+    override fun onClickIconBack() {
+        updateState {
+            it.copy(
+                isFinishOrder = false,
+                isPresetVisible = false,
+                itemsState = emptyList(),
+                itemChildrenState = emptyList(),
+                itemModifiersState = emptyList(),
+                selectedItemId = 0,
+                selectedPresetId = 0,
+                presetItemsState = emptyList()
+            )
+        }
+        getAllPresets()
+    }
+
+    override fun onClickModifyLastItem() {
+        updateState {
+            it.copy(
+                modifyLastItemDialogue = it.modifyLastItemDialogue.copy(
+                    isVisible = true,
+                    comment = ""
+                )
+            )
+        }
+    }
+
+    override fun onDismissDialogue() {
+        updateState {
+            it.copy(
+                modifyLastItemDialogue = it.modifyLastItemDialogue.copy(
+                    isVisible = false
+                )
+            )
+        }
+    }
+
+    override fun onModifyLastItemChanged(comment: String) {
+        updateState {
+            it.copy(
+                modifyLastItemDialogue = it.modifyLastItemDialogue.copy(
+                    comment = comment
+                )
+            )
+        }
+    }
+
+    override fun onClickOk() {
+        updateState {
+            it.copy(
+                modifyLastItemDialogue = it.modifyLastItemDialogue.copy(
+                    isVisible = false
+                )
+            )
+        }
+    }
+
+    override fun onClickMinus(id: Int) {
+        val order = orders.find { it.id == id }
+        order?.let { or ->
+            if (or.qty == 1) {
+                orders.remove(or)
+                val newList = orders
+                updateState {
+                    it.copy(
+                        orderItemState = newList.toList()
+                    )
+                }
+            } else {
+                orders[orders.indexOf(order)] = or.copy(qty = or.qty - 1)
+                val newList = orders
+                updateState {
+                    it.copy(
+                        orderItemState = newList.toList()
+                    )
+                }
+            }
+        }
+    }
+
+    override fun onClickPlus(id: Int) {
+        val order = orders.find { it.id == id }
+        order?.let { or ->
+            orders[orders.indexOf(order)] = or.copy(qty = or.qty + 1)
+            val newList = orders
+            updateState {
+                it.copy(
+                    orderItemState = newList.toList()
+                )
+            }
+        }
+    }
+
+    override fun onClickRemoveItem(id: Int) {
+        val order = orders.find { it.id == id }
+        orders.remove(order)
+        val newList = orders
+        updateState {
+            it.copy(
+                orderItemState = newList.toList()
+            )
+        }
+    }
 }
