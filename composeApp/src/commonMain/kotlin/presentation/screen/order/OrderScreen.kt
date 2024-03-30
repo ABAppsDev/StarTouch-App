@@ -115,11 +115,17 @@ class OrderScreen(private val checkId: Long) : Screen {
         }
         Scaffold(modifier = Modifier.fillMaxSize(), containerColor = Color.Transparent,
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = screenModel::onClickFloatActionButton,
-                    containerColor = Color(0xFF8D7B4B)
-                ) {
-                    Icon(Icons.Filled.ShoppingCart, contentDescription = null, tint = Color.White)
+                SlideAnimation(!state.isFinishOrder && state.itemModifiersState.isEmpty()) {
+                    FloatingActionButton(
+                        onClick = screenModel::onClickFloatActionButton,
+                        containerColor = Color(0xFF8D7B4B)
+                    ) {
+                        Icon(
+                            Icons.Filled.ShoppingCart,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
                 }
             }) {
             FadeAnimation(state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty()) {
@@ -265,7 +271,7 @@ private fun ItemChildrenList(
 private fun ItemModifiersList(
     items: List<ItemModifierState>,
     modifier: Modifier = Modifier,
-    onClickItemModifier: (Int) -> Unit,
+    onClickItemModifier: (String) -> Unit,
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
         LazyVerticalGrid(
@@ -277,7 +283,7 @@ private fun ItemModifiersList(
         ) {
             items(items) { item ->
                 ChooseItem(item.name, item.price.toString()) {
-                    onClickItemModifier(item.id)
+                    onClickItemModifier(item.name)
                 }
             }
         }
@@ -317,13 +323,13 @@ private fun OrdersList(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(orderItemState, key = { it.id }) {
+            items(orderItemState) {
                 OrderItem(it, orderInteractionListener)
             }
             item {
                 Row {
                     Text("Total Orders : ", fontSize = 20.sp)
-                    Text(orderItemState.size.toString(), fontSize = 20.sp)
+                    Text(orderItemState.sumOf { it.qty }.toString(), fontSize = 20.sp)
                 }
             }
             item {

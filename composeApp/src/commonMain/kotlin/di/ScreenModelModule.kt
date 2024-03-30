@@ -14,6 +14,6 @@ val screenModelModule = module {
     factoryOf(::DinInScreenModel)
     factoryOf(::SettingScreenModel)
     factory { (checkId: Long) ->
-        OrderScreenModel(get(), checkId)
+        OrderScreenModel(get(), get(), get(), checkId)
     }
 }

@@ -2,16 +2,14 @@ package presentation.screen.order
 
 import androidx.compose.runtime.Immutable
 import data.util.AppLanguage
+import data.util.StarTouchSetup
+import domain.entity.FireItems
 import domain.entity.Item
 import domain.entity.Preset
 import presentation.base.ErrorState
 import util.LanguageCode
 
-val orders = mutableListOf(
-    OrderItemState(
-        0, "smoozy", 5, 50f
-    )
-)
+val orders = mutableListOf<OrderItemState>()
 
 @Immutable
 data class OrderState(
@@ -46,6 +44,26 @@ data class OrderItemState(
     val qty: Int = 0,
     val unitPrice: Float = 0f,
     val totalPrice: Float = unitPrice * qty,
+    val noServiceCharge: Boolean = false,
+    val isModifier: Boolean = false,
+    val taxable: Boolean = false,
+    val pickFollowItemQty: Boolean = false,
+    val modifierGroupID: Int = 0,
+    val prePaidCard: Boolean = false,
+)
+
+fun OrderItemState.toEntity(): FireItems = FireItems(
+    id = id,
+    price = unitPrice,
+    qty = qty,
+    totalPrice = totalPrice,
+    ws = StarTouchSetup.WORK_STATION_ID,
+    isModifier = isModifier,
+    modifierGroupID = modifierGroupID,
+    noServiceCharge = noServiceCharge,
+    pickFollowItemQty = pickFollowItemQty,
+    prePaidCard = prePaidCard,
+    taxable = taxable
 )
 
 @Immutable
@@ -65,6 +83,12 @@ data class ItemModifierState(
     val id: Int = 0,
     val name: String = "",
     val price: Float = 0.0f,
+    val noServiceCharge: Boolean = false,
+    val isModifier: Boolean = false,
+    val taxable: Boolean = false,
+    val pickFollowItemQty: Boolean = false,
+    val modifierGroupID: Int = 0,
+    val prePaidCard: Boolean = false,
 )
 
 @Immutable
@@ -72,19 +96,37 @@ data class ItemState(
     val id: Int = 0,
     val name: String = "",
     val price: Float = 0.0f,
+    val noServiceCharge: Boolean = false,
+    val isModifier: Boolean = false,
+    val taxable: Boolean = false,
+    val pickFollowItemQty: Boolean = false,
+    val modifierGroupID: Int = 0,
+    val prePaidCard: Boolean = false,
 )
 
 
 fun Item.toItemModifierState(): ItemModifierState = ItemModifierState(
     id = id,
     name = if (AppLanguage.code.value == LanguageCode.EN.value) name else name2,
-    price = staticPrice
+    price = staticPrice,
+    isModifier = isModifier,
+    taxable = taxable,
+    prePaidCard = prePaidCard,
+    pickFollowItemQty = false,
+    modifierGroupID = 0,
+    noServiceCharge = noServiceCharge
 )
 
 fun Item.toItemState(): ItemState = ItemState(
     id = id,
     name = if (AppLanguage.code.value == LanguageCode.EN.value) name else name2,
-    price = staticPrice
+    price = staticPrice,
+    isModifier = isModifier,
+    taxable = taxable,
+    prePaidCard = prePaidCard,
+    pickFollowItemQty = false,
+    modifierGroupID = 0,
+    noServiceCharge = noServiceCharge
 )
 
 fun ItemState.toItemModifierState(): ItemModifierState = ItemModifierState(

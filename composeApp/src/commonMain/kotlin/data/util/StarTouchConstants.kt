@@ -13,6 +13,7 @@ object StarTouchSetup {
     var MAIN_ROOM_ID = 0
     var REST_ID = 0
     var USER_ID = 0
+    var SERVER_ID = 0
     var TOKEN = ""
     var WORK_STATION_ID = 0
     var USER_LANGUAGE = LanguageCode.EN.value

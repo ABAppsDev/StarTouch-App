@@ -113,7 +113,7 @@ class DinInScreenModel(
                         )
                     )
                 },
-                onSuccess = {check->
+                onSuccess = { check ->
                     launchDelayed(500) {
                         updateState {
                             it.copy(
@@ -234,6 +234,7 @@ class DinInScreenModel(
                 ),
             )
         }
+        StarTouchSetup.SERVER_ID = id
     }
 
     override fun onCoversCountChanged(covers: String) {

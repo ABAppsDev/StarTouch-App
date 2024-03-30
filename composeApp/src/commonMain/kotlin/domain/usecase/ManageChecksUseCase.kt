@@ -1,5 +1,6 @@
 package domain.usecase
 
+import domain.entity.FireItems
 import domain.entity.OpenCheck
 import domain.entity.OpenNewCheck
 import domain.gateway.IChecksGateway
@@ -13,9 +14,10 @@ class ManageChecksUseCase(
 
     suspend fun addItemsToCheck(
         checkID: Long,
+        serverId: Int,
         userID: String,
-        //items: List<FireItems>,
-    ) {
-        //   checksGateway.addItemsToCheck(checkID, userID, items)
+        items: List<FireItems>,
+    ): Boolean {
+        return checksGateway.fireItems(checkID, serverId, userID, items)
     }
 }

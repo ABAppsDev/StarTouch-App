@@ -2,7 +2,7 @@ package presentation.screen.order
 
 interface OrderInteractionListener {
     fun onClickPreset(presetId: Int)
-    fun onClickItemModifier(itemId: Int)
+    fun onClickItemModifier(name: String)
     fun onClickItemChild(itemId: Int)
     fun onClickItem(itemId: Int)
     fun onClickFloatActionButton()
@@ -14,7 +14,8 @@ interface OrderInteractionListener {
     fun onDismissDialogue()
     fun onModifyLastItemChanged(comment: String)
     fun onClickOk()
-    fun onClickMinus(id:Int)
-    fun onClickPlus(id:Int)
+    fun onClickMinus(id: Int)
+    fun onClickPlus(id: Int)
     fun onClickRemoveItem(id: Int)
+    fun addItem(orderItemState: OrderItemState)
 }

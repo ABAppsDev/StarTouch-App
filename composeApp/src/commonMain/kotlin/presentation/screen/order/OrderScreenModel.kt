@@ -4,13 +4,18 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import data.util.StarTouchSetup
 import domain.entity.Item
 import domain.entity.Preset
+import domain.usecase.ManageChecksUseCase
 import domain.usecase.ManageOrderUseCase
+import domain.usecase.ManageSettingUseCase
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import presentation.base.BaseScreenModel
 import presentation.base.ErrorState
 
 class OrderScreenModel(
     private val manageOrder: ManageOrderUseCase,
+    private val manageChecksUseCase: ManageChecksUseCase,
+    private val manageSetting: ManageSettingUseCase,
     private val checkId: Long,
 ) : BaseScreenModel<OrderState, OrderUiEffect>(OrderState()),
     OrderInteractionListener {
@@ -76,6 +81,7 @@ class OrderScreenModel(
                 }
             )
         }
+        println(errorState.toString())
     }
 
     private fun getAllItems(presetId: Int) {
@@ -144,7 +150,9 @@ class OrderScreenModel(
                 }
             )
         }
-        if (state.value.itemChildrenState.isEmpty()) getAllItemModifiers(state.value.selectedItemId)
+        if (state.value.itemChildrenState.isEmpty()) {
+            getAllItemModifiers(state.value.selectedItemId)
+        }
     }
 
     private fun onGetAllItemsSuccess(items: List<Item>) {
@@ -212,7 +220,26 @@ class OrderScreenModel(
         updateState { it.copy(selectedPresetId = presetId) }
     }
 
-    override fun onClickItemModifier(itemId: Int) {
+    override fun onClickItemModifier(name: String) {
+        println(state.value.itemModifiersState)
+        val item = state.value.itemModifiersState.find { it.name == name }
+        item?.let {
+            addItem(
+                OrderItemState(
+                    id = item.id,
+                    name = item.name,
+                    qty = 1,
+                    unitPrice = item.price,
+                    isModifier = item.isModifier,
+                    noServiceCharge = item.noServiceCharge,
+                    modifierGroupID = item.modifierGroupID,
+                    pickFollowItemQty = item.pickFollowItemQty,
+                    prePaidCard = item.prePaidCard,
+                    taxable = item.taxable,
+                )
+            )
+            updateState { it.copy(orderItemState = orders.toList()) }
+        }
         updateState {
             it.copy(
                 selectedPresetId = 0,
@@ -226,11 +253,47 @@ class OrderScreenModel(
     }
 
     override fun onClickItemChild(itemId: Int) {
+        val item = state.value.itemChildrenState.find { it.id == itemId }
+        item?.let {
+            addItem(
+                OrderItemState(
+                    id = item.id,
+                    name = item.name,
+                    qty = 1,
+                    unitPrice = item.price,
+                    isModifier = item.isModifier,
+                    noServiceCharge = item.noServiceCharge,
+                    modifierGroupID = item.modifierGroupID,
+                    pickFollowItemQty = item.pickFollowItemQty,
+                    prePaidCard = item.prePaidCard,
+                    taxable = item.taxable,
+                )
+            )
+            updateState { it.copy(orderItemState = orders.toList()) }
+        }
         getAllItemModifiers(itemId)
         updateState { it.copy(selectedItemId = itemId, itemChildrenState = emptyList()) }
     }
 
     override fun onClickItem(itemId: Int) {
+        val item = state.value.itemsState.find { it.id == itemId }
+        item?.let {
+            addItem(
+                OrderItemState(
+                    id = item.id,
+                    name = item.name,
+                    qty = 1,
+                    unitPrice = item.price,
+                    isModifier = item.isModifier,
+                    noServiceCharge = item.noServiceCharge,
+                    modifierGroupID = item.modifierGroupID,
+                    pickFollowItemQty = item.pickFollowItemQty,
+                    prePaidCard = item.prePaidCard,
+                    taxable = item.taxable,
+                )
+            )
+            updateState { it.copy(orderItemState = orders.toList()) }
+        }
         getAllItemChildren(itemId)
         updateState { it.copy(selectedItemId = itemId, itemsState = emptyList()) }
     }
@@ -251,7 +314,25 @@ class OrderScreenModel(
     }
 
     override fun onClickFire() {
-
+        tryToExecute(
+            function = {
+                manageChecksUseCase.addItemsToCheck(
+                    checkID = checkId,
+                    userID = StarTouchSetup.USER_ID.toString(),
+                    serverId = StarTouchSetup.REST_ID,
+                    items = state.value.orderItemState.map { it.toEntity() }
+                )
+            },
+            onSuccess = {
+                if (it)
+                    viewModelScope.launch {
+                        val fastLoop = manageSetting.getIsBackToHome()
+                        if (fastLoop) sendNewEffect(OrderUiEffect.NavigateBackToDinIn)
+                        else sendNewEffect(OrderUiEffect.NavigateBackToHome)
+                    }
+            },
+            onError = ::onError
+        )
     }
 
     override fun onClickClose() {
@@ -331,7 +412,8 @@ class OrderScreenModel(
                     )
                 }
             } else {
-                orders[orders.indexOf(order)] = or.copy(qty = or.qty - 1)
+                orders[orders.indexOf(order)] =
+                    or.copy(qty = or.qty - 1, totalPrice = (or.qty - 1) * or.unitPrice)
                 val newList = orders
                 updateState {
                     it.copy(
@@ -342,10 +424,15 @@ class OrderScreenModel(
         }
     }
 
+    override fun addItem(orderItemState: OrderItemState) {
+        orders.add(orderItemState)
+    }
+
     override fun onClickPlus(id: Int) {
         val order = orders.find { it.id == id }
         order?.let { or ->
-            orders[orders.indexOf(order)] = or.copy(qty = or.qty + 1)
+            orders[orders.indexOf(order)] =
+                or.copy(qty = or.qty + 1, totalPrice = (or.qty + 1) * or.unitPrice)
             val newList = orders
             updateState {
                 it.copy(
