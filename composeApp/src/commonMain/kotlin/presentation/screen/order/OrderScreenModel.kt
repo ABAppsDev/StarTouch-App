@@ -194,7 +194,7 @@ class OrderScreenModel(
                 errorMessage = "",
                 errorState = null,
                 showErrorScreen = false,
-                isPresetVisible = true,
+                isPresetVisible = false,
                 itemModifiersState = items.map { item ->
                     item.toItemModifierState()
                 }

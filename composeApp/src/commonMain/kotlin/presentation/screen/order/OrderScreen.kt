@@ -6,10 +6,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -74,7 +75,7 @@ class OrderScreen(private val checkId: Long) : Screen {
             )
         }
 
-        FadeAnimation(state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty()) {
+        FadeAnimation(state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty()) {
             PresetsList(
                 state.presetItemsState,
                 onClickPreset = screenModel::onClickPreset,
@@ -83,14 +84,16 @@ class OrderScreen(private val checkId: Long) : Screen {
                 isRefresh = state.isRefresh
             )
         }
-        Column {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
             FadeAnimation(state.isPresetVisible && state.presetItemsState.isNotEmpty()) {
-                Box(modifier = Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
-                    LazyHorizontalGrid(
-                        rows = GridCells.Fixed(4),
+                Box(modifier = Modifier.fillMaxWidth().pullRefresh(pullRefreshState)) {
+                    LazyRow(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(24.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
                         contentPadding = PaddingValues(8.dp)
                     ) {
                         items(state.presetItemsState) { preset ->
@@ -101,33 +104,33 @@ class OrderScreen(private val checkId: Long) : Screen {
                     }
                 }
             }
-        }
-        FadeAnimation(state.itemsState.isNotEmpty()) {
-            ItemsList(
-                state.itemsState,
-                onClickItem = screenModel::onClickItem,
-                modifier = Modifier.pullRefresh(pullRefreshState),
-                pullRefreshState = pullRefreshState,
-                isRefresh = state.isRefresh
-            )
-        }
-        FadeAnimation(state.itemChildrenState.isNotEmpty()) {
-            ItemChildrenList(
-                state.itemChildrenState,
-                onClickItemChildren = screenModel::onClickItemChild,
-                modifier = Modifier.pullRefresh(pullRefreshState),
-                pullRefreshState = pullRefreshState,
-                isRefresh = state.isRefresh
-            )
-        }
-        FadeAnimation(state.itemModifiersState.isNotEmpty()) {
-            ItemModifiersList(
-                state.itemModifiersState,
-                onClickItemModifier = screenModel::onClickItemModifier,
-                modifier = Modifier.pullRefresh(pullRefreshState),
-                pullRefreshState = pullRefreshState,
-                isRefresh = state.isRefresh
-            )
+            FadeAnimation(state.itemsState.isNotEmpty()) {
+                ItemsList(
+                    state.itemsState,
+                    onClickItem = screenModel::onClickItem,
+                    modifier = Modifier.pullRefresh(pullRefreshState),
+                    pullRefreshState = pullRefreshState,
+                    isRefresh = state.isRefresh
+                )
+            }
+            FadeAnimation(state.itemChildrenState.isNotEmpty()) {
+                ItemChildrenList(
+                    state.itemChildrenState,
+                    onClickItemChildren = screenModel::onClickItemChild,
+                    modifier = Modifier.pullRefresh(pullRefreshState),
+                    pullRefreshState = pullRefreshState,
+                    isRefresh = state.isRefresh
+                )
+            }
+            FadeAnimation(state.itemModifiersState.isNotEmpty()) {
+                ItemModifiersList(
+                    state.itemModifiersState,
+                    onClickItemModifier = screenModel::onClickItemModifier,
+                    modifier = Modifier.pullRefresh(pullRefreshState),
+                    pullRefreshState = pullRefreshState,
+                    isRefresh = state.isRefresh
+                )
+            }
         }
     }
 }
@@ -173,7 +176,7 @@ private fun ItemsList(
     pullRefreshState: PullRefreshState,
     isRefresh: Boolean,
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxWidth()) {
         PullRefreshIndicator(
             isRefresh,
             pullRefreshState,
@@ -205,7 +208,7 @@ private fun ItemChildrenList(
     pullRefreshState: PullRefreshState,
     isRefresh: Boolean,
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxWidth()) {
         PullRefreshIndicator(
             isRefresh,
             pullRefreshState,
@@ -237,7 +240,7 @@ private fun ItemModifiersList(
     pullRefreshState: PullRefreshState,
     isRefresh: Boolean,
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxWidth()) {
         PullRefreshIndicator(
             isRefresh,
             pullRefreshState,
