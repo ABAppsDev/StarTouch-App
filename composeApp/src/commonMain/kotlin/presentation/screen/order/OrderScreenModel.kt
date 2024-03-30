@@ -206,7 +206,7 @@ class OrderScreenModel(
     fun retry() {
         if (state.value.presetItemsState.isEmpty()) getAllPresets()
         else if (state.value.itemsState.isEmpty()) getAllItems(state.value.selectedPresetId)
-        else if (state.value.itemChildrenState.isEmpty()) getAllItems(state.value.selectedItemId)
+        else if (state.value.itemChildrenState.isEmpty()) getAllItemChildren(state.value.selectedItemId)
         else if (state.value.itemModifiersState.isEmpty()) getAllItemModifiers(state.value.selectedItemId)
     }
 
@@ -230,12 +230,12 @@ class OrderScreenModel(
 
     override fun onClickItemChild(itemId: Int) {
         getAllItemModifiers(itemId)
-        updateState { it.copy(selectedPresetId = itemId, itemChildrenState = emptyList()) }
+        updateState { it.copy(selectedItemId = itemId, itemChildrenState = emptyList()) }
     }
 
     override fun onClickItem(itemId: Int) {
         getAllItemChildren(itemId)
-        updateState { it.copy(selectedPresetId = itemId, itemsState = emptyList()) }
+        updateState { it.copy(selectedItemId = itemId, itemsState = emptyList()) }
     }
 
     override fun onClickFloatActionButton() {

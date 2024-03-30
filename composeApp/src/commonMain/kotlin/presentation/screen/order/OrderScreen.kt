@@ -2,12 +2,15 @@ package presentation.screen.order
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.PullRefreshState
@@ -41,8 +44,7 @@ class OrderScreen(private val checkId: Long) : Screen {
     override fun Content() {
         val screenModel: OrderScreenModel = getScreenModel(parameters = { parametersOf(checkId) })
         val state by screenModel.state.collectAsState()
-        val pullRefreshState =
-            rememberPullRefreshState(state.isRefresh, { screenModel.retry() })
+        val pullRefreshState = rememberPullRefreshState(state.isRefresh, { screenModel.retry() })
 
         EventHandler(screenModel.effect) { effect, navigator ->
             when (effect) {
@@ -72,7 +74,7 @@ class OrderScreen(private val checkId: Long) : Screen {
             )
         }
 
-        FadeAnimation(state.presetItemsState.isNotEmpty() && !state.isPresetVisible) {
+        FadeAnimation(state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty()) {
             PresetsList(
                 state.presetItemsState,
                 onClickPreset = screenModel::onClickPreset,
@@ -80,6 +82,25 @@ class OrderScreen(private val checkId: Long) : Screen {
                 pullRefreshState = pullRefreshState,
                 isRefresh = state.isRefresh
             )
+        }
+        Column {
+            FadeAnimation(state.isPresetVisible && state.presetItemsState.isNotEmpty()) {
+                Box(modifier = Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
+                    LazyHorizontalGrid(
+                        rows = GridCells.Fixed(4),
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        contentPadding = PaddingValues(8.dp)
+                    ) {
+                        items(state.presetItemsState) { preset ->
+                            ChooseItem(preset.name, shape = CircleShape) {
+                                screenModel.onClickPreset(preset.id)
+                            }
+                        }
+                    }
+                }
+            }
         }
         FadeAnimation(state.itemsState.isNotEmpty()) {
             ItemsList(
@@ -108,23 +129,6 @@ class OrderScreen(private val checkId: Long) : Screen {
                 isRefresh = state.isRefresh
             )
         }
-        //        FadeAnimation(state.isPresetVisible && state.presetItemsState.isNotEmpty()) {
-//            Box(modifier = Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
-//                LazyHorizontalGrid(
-//                    rows = GridCells.Fixed(4),
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalArrangement = Arrangement.spacedBy(24.dp),
-//                    verticalArrangement = Arrangement.spacedBy(16.dp),
-//                    contentPadding = PaddingValues(8.dp)
-//                ) {
-//                    items(state.presetItemsState) { preset ->
-//                        ChooseItem(preset.name) {
-//                            screenModel.onClickPreset(preset.id)
-//                        }
-//                    }
-//                }
-//            }
-//        }
     }
 }
 
