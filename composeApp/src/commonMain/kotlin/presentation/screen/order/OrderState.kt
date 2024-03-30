@@ -20,6 +20,7 @@ data class OrderState(
     val itemsState: List<ItemState> = emptyList(),
     val selectedPresetId: Int = 0,
     val selectedItemId: Int = 0,
+    val isRefresh: Boolean = false,
 )
 
 @Immutable

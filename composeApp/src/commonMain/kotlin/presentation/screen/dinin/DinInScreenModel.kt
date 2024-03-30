@@ -113,17 +113,17 @@ class DinInScreenModel(
                         )
                     )
                 },
-                onSuccess = {
+                onSuccess = {check->
                     launchDelayed(500) {
                         updateState {
                             it.copy(
                                 isLoading = false,
                                 errorMessage = "",
                                 errorDinInState = null,
-                                dinInDialogueState = DinInDialogueState()
+                                dinInDialogueState = DinInDialogueState(),
                             )
                         }
-                        sendNewEffect(DinInUiEffect.NavigateToPresetListScreen(it.id))
+                        sendNewEffect(DinInUiEffect.NavigateToOrderScreen(check.id))
                     }
                 },
                 onError = ::onError

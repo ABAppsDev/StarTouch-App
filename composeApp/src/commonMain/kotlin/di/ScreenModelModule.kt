@@ -13,7 +13,7 @@ val screenModelModule = module {
     factoryOf(::HomeScreenModel)
     factoryOf(::DinInScreenModel)
     factoryOf(::SettingScreenModel)
-    factory { (checkId: Int) ->
+    factory { (checkId: Long) ->
         OrderScreenModel(get(), checkId)
     }
 }

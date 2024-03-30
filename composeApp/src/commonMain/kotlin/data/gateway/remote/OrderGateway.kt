@@ -13,7 +13,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 
 class OrderGateway(client: HttpClient) : BaseGateway(client), IOrderGateway {
-    override suspend fun getAllPresets(outletID: Int, restID: Int, checkId: Int): List<Preset> {
+    override suspend fun getAllPresets(outletID: Int, restID: Int, checkId: Long): List<Preset> {
         return tryToExecute<ServerResponse<List<PresetsDto>>> {
             get("/presets") {
                 parameter("outletID", outletID)
@@ -27,7 +27,7 @@ class OrderGateway(client: HttpClient) : BaseGateway(client), IOrderGateway {
         outletID: Int,
         restID: Int,
         presetID: Int,
-        checkId: Int,
+        checkId: Long,
         priceLvlId: Int
     ): List<Item> {
         return tryToExecute<ServerResponse<List<ItemDto>>> {

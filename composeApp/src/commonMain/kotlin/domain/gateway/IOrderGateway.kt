@@ -7,14 +7,14 @@ interface IOrderGateway {
     suspend fun getAllPresets(
         outletID: Int,
         restID: Int,
-        checkId: Int
+        checkId: Long
     ): List<Preset>
 
     suspend fun getAllItems(
         outletID: Int,
         restID: Int,
         presetID: Int,
-        checkId: Int,
+        checkId: Long,
         priceLvlId: Int
     ): List<Item>
 

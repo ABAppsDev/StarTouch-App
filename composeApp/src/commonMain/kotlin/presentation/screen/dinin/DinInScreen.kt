@@ -53,7 +53,7 @@ import presentation.screen.composable.ShimmerListItem
 import presentation.screen.composable.WarningDialogue
 import presentation.screen.composable.animate.FadeAnimation
 import presentation.screen.composable.modifier.bounceClick
-import presentation.screen.order.presets.PresetsListScreen
+import presentation.screen.order.OrderScreen
 import presentation.util.EventHandler
 import resource.Resources
 import util.getScreenModel
@@ -69,8 +69,8 @@ class DinInScreen : Screen {
 
         EventHandler(dinInScreenModel.effect) { effect, navigator ->
             when (effect) {
-                is DinInUiEffect.NavigateToPresetListScreen -> {
-                    navigator.push(PresetsListScreen())
+                is DinInUiEffect.NavigateToOrderScreen -> {
+                    navigator.push(OrderScreen(effect.checkId))
                 }
             }
         }

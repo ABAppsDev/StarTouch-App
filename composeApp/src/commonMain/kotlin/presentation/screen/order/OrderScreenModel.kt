@@ -11,7 +11,7 @@ import presentation.base.ErrorState
 
 class OrderScreenModel(
     private val manageOrder: ManageOrderUseCase,
-    private val checkId: Int,
+    private val checkId: Long,
 ) : BaseScreenModel<OrderState, OrderUiEffect>(OrderState()),
     OrderInteractionListener {
     override val viewModelScope: CoroutineScope get() = screenModelScope
@@ -214,17 +214,26 @@ class OrderScreenModel(
     }
 
     override fun onClickItemModifier(itemId: Int) {
-
+        updateState {
+            it.copy(
+                selectedPresetId = 0,
+                selectedItemId = 0,
+                itemsState = emptyList(),
+                itemChildrenState = emptyList(),
+                itemModifiersState = emptyList(),
+                isPresetVisible = false,
+            )
+        }
     }
 
     override fun onClickItemChild(itemId: Int) {
         getAllItemModifiers(itemId)
-        updateState { it.copy(selectedPresetId = itemId) }
+        updateState { it.copy(selectedPresetId = itemId, itemChildrenState = emptyList()) }
     }
 
     override fun onClickItem(itemId: Int) {
         getAllItemModifiers(itemId)
-        updateState { it.copy(selectedPresetId = itemId) }
+        updateState { it.copy(selectedPresetId = itemId, itemsState = emptyList()) }
     }
 
     override fun onClickFloatActionButton() {
