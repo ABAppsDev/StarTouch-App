@@ -1,5 +1,6 @@
 package domain.usecase
 
+import data.remote.model.ReOpenCheck
 import domain.entity.FireItems
 import domain.entity.OpenCheck
 import domain.entity.OpenNewCheck
@@ -10,6 +11,16 @@ class ManageChecksUseCase(
 ) {
     suspend fun openNewCheck(openNewCheck: OpenNewCheck): OpenCheck {
         return checksGateway.openNewCheck(openNewCheck)
+    }
+
+    suspend fun getAllChecksByTableId(
+        tableId: Int,
+        outletID: Int,
+        restID: Int,
+        serverId: Int,
+        userId: Int
+    ): List<ReOpenCheck> {
+        return checksGateway.getAllCheks(tableId, outletID, restID, serverId, userId)
     }
 
     suspend fun addItemsToCheck(

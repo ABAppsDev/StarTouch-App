@@ -237,6 +237,25 @@ class DinInScreenModel(
         StarTouchSetup.SERVER_ID = id
     }
 
+    override fun onClickCheck(id: Long) {
+        updateState {
+            it.copy(
+                isLoading = false,
+                errorMessage = "",
+                errorDinInState = null,
+                dinInDialogueState = it.dinInDialogueState.copy(
+                    isVisible = false,
+                    isLoading = false,
+                    isLoadingButton = false,
+                    isSuccess = false,
+                    assignDrawers = emptyList()
+                ),
+                checkId = id
+            )
+        }
+        sendNewEffect(DinInUiEffect.NavigateToOrderScreen(id))
+    }
+
     override fun onCoversCountChanged(covers: String) {
         updateState {
             it.copy(
@@ -326,5 +345,73 @@ class DinInScreenModel(
             )
         }
         onClickTable(state.value.tableId, state.value.tableName)
+    }
+
+    override fun onLongClick(tableId: Int) {
+        updateState {
+            it.copy(
+                isLoading = false,
+                errorMessage = "",
+                errorDinInState = null,
+                dinInDialogueState = it.dinInDialogueState.copy(
+                    isVisible = true,
+                    isLoading = true,
+                    isLoadingButton = false,
+                    isSuccess = false
+                ),
+                tableId = tableId,
+            )
+        }
+        tryToExecute(
+            function = {
+                manageChecksUseCase.getAllChecksByTableId(
+                    tableId = tableId,
+                    StarTouchSetup.OUTLET_ID,
+                    StarTouchSetup.REST_ID,
+                    serverId = StarTouchSetup.USER_ID,
+                    userId = StarTouchSetup.USER_ID,
+                )
+            },
+            onSuccess = { checks ->
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "",
+                        errorDinInState = null,
+                        dinInDialogueState = it.dinInDialogueState.copy(
+                            isVisible = true,
+                            isLoading = false,
+                            isLoadingButton = false,
+                            checks = checks.map { check ->
+                                AssignDrawerState(
+                                    id = check.id,
+                                    name = check.id.toString()
+                                )
+                            }
+                        ),
+                    )
+                }
+            },
+            onError = { errorState ->
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        errorDinInState = errorState,
+                        dinInDialogueState = DinInDialogueState(),
+                        errorDialogueIsVisible = true,
+                        errorMessage = when (errorState) {
+                            is ErrorState.NetworkError -> errorState.message.toString()
+                            is ErrorState.NotFound -> errorState.message.toString()
+                            is ErrorState.ServerError -> errorState.message.toString()
+                            is ErrorState.UnknownError -> errorState.message.toString()
+                            is ErrorState.EmptyData -> errorState.message.toString()
+                            is ErrorState.ValidationError -> errorState.message.toString()
+                            is ErrorState.ValidationNetworkError -> errorState.message.toString()
+                            else -> "Unknown error"
+                        }
+                    )
+                }
+            }
+        )
     }
 }

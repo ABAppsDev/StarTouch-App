@@ -1,6 +1,8 @@
 package presentation.screen.dinin
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,6 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pageview
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.PullRefreshState
@@ -95,7 +98,8 @@ class DinInScreen : Screen {
                 isLoading = state.dinInDialogueState.isLoading,
                 dinInInteractionListener = dinInScreenModel as DinInInteractionListener,
                 assignDrawers = state.dinInDialogueState.assignDrawers,
-                isSuccess = state.dinInDialogueState.isSuccess
+                isSuccess = state.dinInDialogueState.isSuccess,
+                checks = state.dinInDialogueState.checks
             )
         }
 
@@ -139,7 +143,9 @@ private fun OnRender(
                 contentPadding = PaddingValues(8.dp)
             ) {
                 items(state.tablesDetails) { table ->
-                    ChooseTable(table) {
+                    ChooseTable(table, onLongClick = {
+                        listener.onLongClick(table.tableId)
+                    }) {
                         if (table.checksCount > 0)
                             listener.showWarningDialogue(table.tableId, table.tableNumber)
                         else
@@ -165,6 +171,7 @@ private fun DinInDialogue(
     isLoadingButton: Boolean,
     isSuccess: Boolean,
     assignDrawers: List<AssignDrawerState>,
+    checks: List<AssignDrawerState>,
     dinInInteractionListener: DinInInteractionListener,
     modifier: Modifier = Modifier,
 ) {
@@ -188,6 +195,9 @@ private fun DinInDialogue(
         FadeAnimation(assignDrawers.isNotEmpty()) {
             ChooseListAssignDrawer(dinInInteractionListener, assignDrawers)
         }
+        FadeAnimation(checks.isNotEmpty()) {
+            ChooseCheck(dinInInteractionListener, checks)
+        }
     }
 }
 
@@ -203,7 +213,25 @@ private fun ChooseListAssignDrawer(
     ) {
         items(assignDrawers) { assignDrawer ->
             AssignDrawerItem(assignDrawer.name) {
-                dinInInteractionListener.onClickAssignDrawer(assignDrawer.id)
+                dinInInteractionListener.onClickAssignDrawer(assignDrawer.id.toInt())
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChooseCheck(
+    dinInInteractionListener: DinInInteractionListener,
+    assignDrawers: List<AssignDrawerState>,
+) {
+    LazyColumn(
+        contentPadding = PaddingValues(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(assignDrawers) { assignDrawer ->
+            CheckItem(assignDrawer.name) {
+                dinInInteractionListener.onClickCheck(assignDrawer.id)
             }
         }
     }
@@ -223,6 +251,29 @@ private fun AssignDrawerItem(
             Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(Color.White)) {
                 Icon(
                     Icons.Filled.Person,
+                    contentDescription = null,
+                    Modifier.align(Alignment.Center).size(24.dp)
+                )
+            }
+            Text(name, style = MaterialTheme.typography.headlineSmall, color = Color.White)
+        }
+    }
+}
+
+@Composable
+private fun CheckItem(
+    name: String,
+    onClick: () -> Unit,
+) {
+    SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
+        Row(
+            modifier = Modifier.fillMaxWidth().bounceClick { onClick() }.padding(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(Color.White)) {
+                Icon(
+                    Icons.Filled.Pageview,
                     contentDescription = null,
                     Modifier.align(Alignment.Center).size(24.dp)
                 )
@@ -270,10 +321,12 @@ private fun EnterCoversNumber(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ChooseTable(
     table: TableDetailsState,
     modifier: Modifier = Modifier,
+    onLongClick: () -> Unit = {},
     onClick: () -> Unit = {},
 ) {
     RestaurantTableWithText(
@@ -283,6 +336,12 @@ private fun ChooseTable(
         totalAmount = table.totalOrdersPrice.toString(),
         checksCount = table.checksCount.toString(),
         hasOrders = table.covers > 0 || table.openCheckDate != "null",
-        modifier = modifier.bounceClick { onClick() }
+        modifier = modifier
+            .combinedClickable(
+                onLongClick = {
+                    if (table.covers > 0)
+                        onLongClick()
+                },
+            ) { onClick() }
     )
 }

@@ -28,7 +28,6 @@ object MainApp : Screen {
     override fun Content() {
         val appScreenModel = getScreenModel<AppScreenModel>()
         val userLanguage by appScreenModel.state.collectAsState()
-
         StarTouchTheme(languageCode = userLanguage) {
             Box(
                 Modifier.fillMaxSize()

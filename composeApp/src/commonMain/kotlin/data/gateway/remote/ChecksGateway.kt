@@ -4,6 +4,7 @@ import data.remote.mapper.toDto
 import data.remote.mapper.toEntity
 import data.remote.model.OpenCheckDto
 import data.remote.model.OpenNewCheckDto
+import data.remote.model.ReOpenCheck
 import data.remote.model.ServerResponse
 import domain.entity.FireItems
 import domain.entity.OpenCheck
@@ -11,6 +12,7 @@ import domain.entity.OpenNewCheck
 import domain.gateway.IChecksGateway
 import domain.util.NotFoundException
 import io.ktor.client.HttpClient
+import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -26,6 +28,24 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
                 body = Json.encodeToString(OpenNewCheckDto.serializer(), openNewCheckDto)
             }
         }.data?.toEntity() ?: throw NotFoundException("Check not found")
+    }
+
+    override suspend fun getAllCheks(
+        tableId: Int,
+        outletID: Int,
+        restID: Int,
+        serverId: Int,
+        userId: Int
+    ): List<ReOpenCheck> {
+        return tryToExecute<ServerResponse<List<ReOpenCheck>>> {
+            get("/takeaway/checks") {
+                parameter("tableId", tableId)
+                parameter("outletID", outletID)
+                parameter("restID", restID)
+                parameter("userId", userId)
+                parameter("serverId", serverId)
+            }
+        }.data ?: throw NotFoundException("Check not found")
     }
 
     override suspend fun fireItems(

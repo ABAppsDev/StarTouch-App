@@ -1,6 +1,7 @@
 package presentation.screen.order
 
 import cafe.adriel.voyager.core.model.screenModelScope
+import data.util.AppLanguage
 import data.util.StarTouchSetup
 import domain.entity.Item
 import domain.entity.Preset
@@ -328,7 +329,10 @@ class OrderScreenModel(
                     viewModelScope.launch {
                         val fastLoop = manageSetting.getIsBackToHome()
                         if (fastLoop) sendNewEffect(OrderUiEffect.NavigateBackToDinIn)
-                        else sendNewEffect(OrderUiEffect.NavigateBackToHome)
+                        else {
+                            AppLanguage.code.emit(StarTouchSetup.USER_LANGUAGE)
+                            sendNewEffect(OrderUiEffect.NavigateBackToHome)
+                        }
                     }
             },
             onError = ::onError

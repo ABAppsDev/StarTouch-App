@@ -19,6 +19,7 @@ data class DinInState(
     val warningDialogueIsVisible: Boolean = false,
     val isRefreshing: Boolean = false,
     val showErrorScreen: Boolean = false,
+    val checkId: Long = 0,
 )
 
 @Immutable
@@ -41,12 +42,13 @@ data class DinInDialogueState(
     val coversCount: String = "",
     val serverId: Int = 0,
     val assignDrawers: List<AssignDrawerState> = emptyList(),
+    val checks: List<AssignDrawerState> = emptyList(),
     val isSuccess: Boolean = false,
 )
 
 @Immutable
 data class AssignDrawerState(
-    val id: Int = 0,
+    val id: Long = 0,
     val name: String = "",
 )
 
@@ -63,5 +65,5 @@ fun TableData.toTableDetailsState(): TableDetailsState = TableDetailsState(
 )
 
 fun AssignDrawer.toAssignDrawerState(): AssignDrawerState = AssignDrawerState(
-    id, name
+    id.toLong(), name
 )
