@@ -204,10 +204,7 @@ class OrderScreenModel(
     }
 
     fun retry() {
-        if (state.value.presetItemsState.isEmpty()) getAllPresets()
-        else if (state.value.itemsState.isEmpty()) getAllItems(state.value.selectedPresetId)
-        else if (state.value.itemChildrenState.isEmpty()) getAllItemChildren(state.value.selectedItemId)
-        else if (state.value.itemModifiersState.isEmpty()) getAllItemModifiers(state.value.selectedItemId)
+        getAllPresets()
     }
 
     override fun onClickPreset(presetId: Int) {

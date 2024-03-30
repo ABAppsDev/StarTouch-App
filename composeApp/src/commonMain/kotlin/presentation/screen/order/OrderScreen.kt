@@ -109,8 +109,6 @@ class OrderScreen(private val checkId: Long) : Screen {
                     state.itemsState,
                     onClickItem = screenModel::onClickItem,
                     modifier = Modifier.pullRefresh(pullRefreshState),
-                    pullRefreshState = pullRefreshState,
-                    isRefresh = state.isRefresh
                 )
             }
             FadeAnimation(state.itemChildrenState.isNotEmpty()) {
@@ -118,8 +116,6 @@ class OrderScreen(private val checkId: Long) : Screen {
                     state.itemChildrenState,
                     onClickItemChildren = screenModel::onClickItemChild,
                     modifier = Modifier.pullRefresh(pullRefreshState),
-                    pullRefreshState = pullRefreshState,
-                    isRefresh = state.isRefresh
                 )
             }
             FadeAnimation(state.itemModifiersState.isNotEmpty()) {
@@ -127,8 +123,6 @@ class OrderScreen(private val checkId: Long) : Screen {
                     state.itemModifiersState,
                     onClickItemModifier = screenModel::onClickItemModifier,
                     modifier = Modifier.pullRefresh(pullRefreshState),
-                    pullRefreshState = pullRefreshState,
-                    isRefresh = state.isRefresh
                 )
             }
         }
@@ -167,22 +161,13 @@ private fun PresetsList(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ItemsList(
     items: List<ItemState>,
     modifier: Modifier = Modifier,
     onClickItem: (Int) -> Unit,
-    pullRefreshState: PullRefreshState,
-    isRefresh: Boolean,
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
-        PullRefreshIndicator(
-            isRefresh,
-            pullRefreshState,
-            modifier = Modifier.align(Alignment.TopCenter),
-            contentColor = Color(0xFF8D7B4B)
-        )
         LazyVerticalGrid(
             columns = GridCells.Fixed(4),
             modifier = Modifier.fillMaxWidth(),
@@ -199,22 +184,13 @@ private fun ItemsList(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ItemChildrenList(
     items: List<ItemState>,
     modifier: Modifier = Modifier,
     onClickItemChildren: (Int) -> Unit,
-    pullRefreshState: PullRefreshState,
-    isRefresh: Boolean,
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
-        PullRefreshIndicator(
-            isRefresh,
-            pullRefreshState,
-            modifier = Modifier.align(Alignment.TopCenter),
-            contentColor = Color(0xFF8D7B4B)
-        )
         LazyVerticalGrid(
             columns = GridCells.Fixed(4),
             modifier = Modifier.fillMaxWidth(),
@@ -231,22 +207,13 @@ private fun ItemChildrenList(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ItemModifiersList(
     items: List<ItemModifierState>,
     modifier: Modifier = Modifier,
     onClickItemModifier: (Int) -> Unit,
-    pullRefreshState: PullRefreshState,
-    isRefresh: Boolean,
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
-        PullRefreshIndicator(
-            isRefresh,
-            pullRefreshState,
-            modifier = Modifier.align(Alignment.TopCenter),
-            contentColor = Color(0xFF8D7B4B)
-        )
         LazyVerticalGrid(
             columns = GridCells.Fixed(4),
             modifier = Modifier.fillMaxWidth(),
@@ -260,5 +227,14 @@ private fun ItemModifiersList(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun OrdersList(
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier.fillMaxSize()) {
+        
     }
 }
