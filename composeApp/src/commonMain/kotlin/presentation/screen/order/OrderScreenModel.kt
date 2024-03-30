@@ -236,7 +236,18 @@ class OrderScreenModel(
     }
 
     override fun onClickFloatActionButton() {
-
+        updateState {
+            it.copy(
+                isFinishOrder = true,
+                isPresetVisible = false,
+                itemsState = emptyList(),
+                itemChildrenState = emptyList(),
+                itemModifiersState = emptyList(),
+                selectedItemId = 0,
+                selectedPresetId = 0,
+                presetItemsState = emptyList()
+            )
+        }
     }
 
     override fun onClickFire() {

@@ -1,37 +1,51 @@
 package presentation.screen.order
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.stack.popUntil
+import kms
 import org.koin.core.parameter.parametersOf
 import presentation.base.ErrorState
 import presentation.screen.composable.HandleErrorState
 import presentation.screen.composable.ShimmerListItem
 import presentation.screen.composable.animate.FadeAnimation
+import presentation.screen.composable.animate.SlideAnimation
 import presentation.screen.home.HomeScreen
 import presentation.screen.order.composable.ChooseItem
 import presentation.screen.order.composable.ChooseItemLoading
@@ -74,56 +88,68 @@ class OrderScreen(private val checkId: Long) : Screen {
                 onClick = screenModel::retry
             )
         }
-
-        FadeAnimation(state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty()) {
-            PresetsList(
-                state.presetItemsState,
-                onClickPreset = screenModel::onClickPreset,
-                modifier = Modifier.pullRefresh(pullRefreshState),
-                pullRefreshState = pullRefreshState,
-                isRefresh = state.isRefresh
-            )
-        }
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            FadeAnimation(state.isPresetVisible && state.presetItemsState.isNotEmpty()) {
-                Box(modifier = Modifier.fillMaxWidth().pullRefresh(pullRefreshState)) {
-                    LazyRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(24.dp),
-                        contentPadding = PaddingValues(8.dp)
-                    ) {
-                        items(state.presetItemsState) { preset ->
-                            ChooseItem(preset.name, shape = CircleShape) {
-                                screenModel.onClickPreset(preset.id)
+        Scaffold(modifier = Modifier.fillMaxSize(), containerColor = Color.Transparent,
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = screenModel::onClickFloatActionButton,
+                    containerColor = Color(0xFF8D7B4B)
+                ) {
+                    Icon(Icons.Filled.ShoppingCart, contentDescription = null, tint = Color.White)
+                }
+            }) {
+            FadeAnimation(state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty()) {
+                PresetsList(
+                    state.presetItemsState,
+                    onClickPreset = screenModel::onClickPreset,
+                    modifier = Modifier.pullRefresh(pullRefreshState),
+                    pullRefreshState = pullRefreshState,
+                    isRefresh = state.isRefresh
+                )
+            }
+            SlideAnimation(state.isFinishOrder) {
+                OrdersList()
+            }
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                FadeAnimation(state.isPresetVisible && state.presetItemsState.isNotEmpty()) {
+                    Box(modifier = Modifier.fillMaxWidth().pullRefresh(pullRefreshState)) {
+                        LazyRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(24.dp),
+                            contentPadding = PaddingValues(8.dp)
+                        ) {
+                            items(state.presetItemsState) { preset ->
+                                ChooseItem(preset.name, shape = CircleShape) {
+                                    screenModel.onClickPreset(preset.id)
+                                }
                             }
                         }
                     }
                 }
-            }
-            FadeAnimation(state.itemsState.isNotEmpty()) {
-                ItemsList(
-                    state.itemsState,
-                    onClickItem = screenModel::onClickItem,
-                    modifier = Modifier.pullRefresh(pullRefreshState),
-                )
-            }
-            FadeAnimation(state.itemChildrenState.isNotEmpty()) {
-                ItemChildrenList(
-                    state.itemChildrenState,
-                    onClickItemChildren = screenModel::onClickItemChild,
-                    modifier = Modifier.pullRefresh(pullRefreshState),
-                )
-            }
-            FadeAnimation(state.itemModifiersState.isNotEmpty()) {
-                ItemModifiersList(
-                    state.itemModifiersState,
-                    onClickItemModifier = screenModel::onClickItemModifier,
-                    modifier = Modifier.pullRefresh(pullRefreshState),
-                )
+                FadeAnimation(state.itemsState.isNotEmpty()) {
+                    ItemsList(
+                        state.itemsState,
+                        onClickItem = screenModel::onClickItem,
+                        modifier = Modifier.pullRefresh(pullRefreshState),
+                    )
+                }
+                FadeAnimation(state.itemChildrenState.isNotEmpty()) {
+                    ItemChildrenList(
+                        state.itemChildrenState,
+                        onClickItemChildren = screenModel::onClickItemChild,
+                        modifier = Modifier.pullRefresh(pullRefreshState),
+                    )
+                }
+                FadeAnimation(state.itemModifiersState.isNotEmpty()) {
+                    ItemModifiersList(
+                        state.itemModifiersState,
+                        onClickItemModifier = screenModel::onClickItemModifier,
+                        modifier = Modifier.pullRefresh(pullRefreshState),
+                    )
+                }
             }
         }
     }
@@ -234,7 +260,25 @@ private fun ItemModifiersList(
 private fun OrdersList(
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
-        
+    Column(
+        modifier = modifier.fillMaxSize().background(Color.White),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Box(
+            modifier = modifier
+                .padding(top = 8.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(Color.White)
+                .border(width = 1.kms, color = Color.White, shape = RoundedCornerShape(16.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                modifier = Modifier.size(32.dp).padding(6.kms),
+                imageVector = Icons.Filled.ArrowBackIosNew,
+                contentDescription = null,
+                tint = Color.Black
+            )
+        }
     }
 }

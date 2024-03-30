@@ -21,6 +21,7 @@ data class OrderState(
     val selectedPresetId: Int = 0,
     val selectedItemId: Int = 0,
     val isRefresh: Boolean = false,
+    val isFinishOrder: Boolean = false,
 )
 
 @Immutable
