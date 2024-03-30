@@ -124,7 +124,7 @@ class OrderScreenModel(
                     priceLvlId = StarTouchSetup.PRICE_LVL_ID,
                 )
             },
-            onSuccess = ::onGetAllItemsSuccess,
+            onSuccess = ::onGetAllItemChildrenSuccess,
             onError = { error ->
                 updateState { it.copy(itemChildrenState = emptyList()) }
                 onError(error)
@@ -144,6 +144,7 @@ class OrderScreenModel(
                 }
             )
         }
+        if (state.value.itemChildrenState.isEmpty()) getAllItemModifiers(state.value.selectedItemId)
     }
 
     private fun onGetAllItemsSuccess(items: List<Item>) {
@@ -199,6 +200,7 @@ class OrderScreenModel(
                 }
             )
         }
+        if (state.value.itemModifiersState.isEmpty()) updateState { it.copy(isPresetVisible = false) }
     }
 
     fun retry() {
@@ -232,7 +234,7 @@ class OrderScreenModel(
     }
 
     override fun onClickItem(itemId: Int) {
-        getAllItemModifiers(itemId)
+        getAllItemChildren(itemId)
         updateState { it.copy(selectedPresetId = itemId, itemsState = emptyList()) }
     }
 
