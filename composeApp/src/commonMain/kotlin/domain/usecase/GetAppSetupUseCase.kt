@@ -20,7 +20,8 @@ class GetAppSetupUseCase(
                     LocalTime(0, 0, 0)
                 ),
                 outletName = "ABApps",
-                defaultLanguage = "English"
+                defaultLanguage = "English",
+                priceLvlId = 0,
             )
         else setupGateway.getAppSetup(outletID, restID)
     }

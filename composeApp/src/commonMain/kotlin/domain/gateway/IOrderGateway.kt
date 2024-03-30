@@ -19,7 +19,8 @@ interface IOrderGateway {
     ): List<Item>
 
     suspend fun checkItemHasModifiers(
-        restID: Int, itemID: Int,
+        restID: Int,
+        itemID: Int,
         priceLvlId: Int
     ): List<Item>
 
