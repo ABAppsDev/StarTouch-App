@@ -16,7 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Dp
-import com.beepbeep.designSystem.ui.theme.Theme
 import kms
 
 @Composable
@@ -41,6 +40,7 @@ fun IconWithBackground(
             modifier = Modifier.size(iconSize).padding(8.kms),
             painter = icon,
             contentDescription = contentDescription,
+            tint = Color(0xFF1E1E1E)
         )
     }
 }
