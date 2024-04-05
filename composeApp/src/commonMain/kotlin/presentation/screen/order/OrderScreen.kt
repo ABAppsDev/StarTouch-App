@@ -62,8 +62,8 @@ import presentation.screen.composable.AppTextField
 import presentation.screen.composable.HandleErrorState
 import presentation.screen.composable.SetLayoutDirection
 import presentation.screen.composable.ShimmerListItem
-import presentation.screen.composable.animate.FadeAnimation
-import presentation.screen.composable.animate.SlideAnimation
+import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
+import com.beepbeep.designSystem.ui.composable.animate.SlideAnimation
 import presentation.screen.composable.modifier.bounceClick
 import presentation.screen.home.HomeScreen
 import presentation.screen.order.composable.ChooseItem

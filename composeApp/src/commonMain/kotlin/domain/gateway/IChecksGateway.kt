@@ -14,11 +14,15 @@ interface IChecksGateway {
         userID: String, items: List<FireItems>
     ): Boolean
 
-    suspend fun getAllCheks(
+    suspend fun getAllChecksByTableId(
         tableId: Int,
         outletID: Int,
         restID: Int,
         serverId: Int,
         userId: Int
     ): List<ReOpenCheck>
+
+    suspend fun makeCheckAborted(checkId: Long, outletID: Int, restID: Int)
+
+    suspend fun reOpenCheck(checkId: Long): List<FireItems>
 }

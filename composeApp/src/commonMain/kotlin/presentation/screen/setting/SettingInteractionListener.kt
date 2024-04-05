@@ -10,4 +10,5 @@ interface SettingInteractionListener {
     fun onWorkStationIdChanged(wsId: String)
     fun onSelectedCallCenter(isSelected: Boolean)
     fun onQuickLoopBackSelected(isSelected: Boolean)
+    fun onClickBack()
 }

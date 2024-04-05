@@ -54,7 +54,7 @@ import presentation.screen.composable.RestaurantTableWithTextLoading
 import presentation.screen.composable.SetLayoutDirection
 import presentation.screen.composable.ShimmerListItem
 import presentation.screen.composable.WarningDialogue
-import presentation.screen.composable.animate.FadeAnimation
+import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
 import presentation.screen.composable.modifier.bounceClick
 import presentation.screen.order.OrderScreen
 import presentation.util.EventHandler

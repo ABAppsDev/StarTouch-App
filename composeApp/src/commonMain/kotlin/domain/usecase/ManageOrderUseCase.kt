@@ -19,24 +19,22 @@ class ManageOrderUseCase(
         restID: Int,
         presetID: Int,
         checkId: Long,
-        priceLvlId: Int
     ): List<Item> {
-        return orderGateway.getAllItems(outletID, restID, presetID, checkId, priceLvlId)
+        return orderGateway.getAllItems(outletID, restID, presetID, checkId)
     }
 
     suspend fun checkItemHasModifiers(
         restID: Int,
         itemID: Int,
-        priceLvlId: Int
+        outletID: Int,
     ): List<Item> {
-        return orderGateway.checkItemHasModifiers(restID, itemID, priceLvlId)
+        return orderGateway.checkItemHasModifiers(restID, itemID,outletID)
     }
 
     suspend fun checkItemHasChildren(
-        restID: Int,
+        outletID: Int,
         itemID: Int,
-        priceLvlId: Int
     ): List<Item> {
-        return orderGateway.checkItemHasChildren(restID, itemID, priceLvlId)
+        return orderGateway.checkItemHasChildren(outletID, itemID)
     }
 }

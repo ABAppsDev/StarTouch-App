@@ -21,7 +21,6 @@ class GetAppSetupUseCase(
                 ),
                 outletName = "ABApps",
                 defaultLanguage = "English",
-                priceLvlId = 0,
             )
         else setupGateway.getAppSetup(outletID, restID)
     }

@@ -23,14 +23,14 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
     @OptIn(InternalAPI::class)
     override suspend fun openNewCheck(openNewCheck: OpenNewCheck): OpenCheck {
         return tryToExecute<ServerResponse<OpenCheckDto>> {
-            post("/takeaway/new-check") {
+            post("/check/new") {
                 val openNewCheckDto = openNewCheck.toDto()
                 body = Json.encodeToString(OpenNewCheckDto.serializer(), openNewCheckDto)
             }
         }.data?.toEntity() ?: throw NotFoundException("Check not found")
     }
 
-    override suspend fun getAllCheks(
+    override suspend fun getAllChecksByTableId(
         tableId: Int,
         outletID: Int,
         restID: Int,
@@ -38,12 +38,30 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
         userId: Int
     ): List<ReOpenCheck> {
         return tryToExecute<ServerResponse<List<ReOpenCheck>>> {
-            get("/takeaway/checks") {
+            get("/check/opened-checks") {
                 parameter("tableId", tableId)
                 parameter("outletID", outletID)
                 parameter("restID", restID)
                 parameter("userId", userId)
                 parameter("serverId", serverId)
+            }
+        }.data ?: throw NotFoundException("Check not found")
+    }
+
+    override suspend fun makeCheckAborted(checkId: Long, outletID: Int, restID: Int) {
+        tryToExecute<Unit> {
+            post("/check/abort") {
+                parameter("checkId", checkId)
+                parameter("outletID", outletID)
+                parameter("restID", restID)
+            }
+        }
+    }
+
+    override suspend fun reOpenCheck(checkId: Long): List<FireItems> {
+        return tryToExecute<ServerResponse<List<FireItems>>> {
+            get("/check/reopen") {
+                parameter("checkId", checkId)
             }
         }.data ?: throw NotFoundException("Check not found")
     }
@@ -54,7 +72,7 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
         userID: String, items: List<FireItems>
     ): Boolean {
         return tryToExecute<ServerResponse<Boolean>> {
-            post("/fire") {
+            post("/check/fire") {
                 setBody(items.map { it.toDto() })
                 parameter("checkID", checkID)
                 parameter("userID", serverId)

@@ -6,5 +6,4 @@ data class AppSetup(
     val systemDate: LocalDateTime,
     val outletName: String,
     val defaultLanguage: String,
-    val priceLvlId: Int,
 )

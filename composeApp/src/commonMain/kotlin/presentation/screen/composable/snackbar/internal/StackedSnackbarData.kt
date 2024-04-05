@@ -4,12 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import presentation.screen.composable.snackbar.internal.icons.SnackbarIcon
-import presentation.screen.composable.snackbar.internal.icons.snackbaricon.IcError
-import presentation.screen.composable.snackbar.internal.icons.snackbaricon.IcInfo
-import presentation.screen.composable.snackbar.internal.icons.snackbaricon.IcSuccess
-import presentation.screen.composable.snackbar.internal.icons.snackbaricon.IcWarning
-import presentation.screen.composable.snackbar.StackedSnackbarDuration
+import com.beepbeep.designSystem.ui.composable.snackbar.internal.icons.SnackbarIcon
+import com.beepbeep.designSystem.ui.composable.snackbar.internal.icons.snackbaricon.IcError
+import com.beepbeep.designSystem.ui.composable.snackbar.internal.icons.snackbaricon.IcInfo
+import com.beepbeep.designSystem.ui.composable.snackbar.internal.icons.snackbaricon.IcSuccess
+import com.beepbeep.designSystem.ui.composable.snackbar.internal.icons.snackbaricon.IcWarning
+import com.beepbeep.designSystem.ui.composable.snackbar.StackedSnackbarDuration
+import com.beepbeep.designSystem.ui.composable.snackbar.internal.SnackbarColor
 
 @Stable
 internal sealed class StackedSnackbarData(val showDuration: StackedSnackbarDuration) {

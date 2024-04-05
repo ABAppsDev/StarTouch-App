@@ -278,4 +278,8 @@ class SettingScreenModel(
     override fun onQuickLoopBackSelected(isSelected: Boolean) {
         updateState { it.copy(isQuickSaleLoopBack = isSelected) }
     }
+
+    override fun onClickBack() {
+        sendNewEffect(SettingUiEffect.NavigateBackToHome)
+    }
 }

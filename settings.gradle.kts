@@ -19,3 +19,5 @@ dependencyResolutionManagement {
 }
 
 include(":composeApp")
+include(":design_system")
+include(":design_system:shared")

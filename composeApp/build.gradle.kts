@@ -47,7 +47,7 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.materialIconsExtended)
             implementation(compose.ui)
-            @OptIn(ExperimentalComposeLibrary::class)
+            implementation(project(":design_system:shared"))
             implementation(compose.components.resources)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.composeIcons.featherIcons)

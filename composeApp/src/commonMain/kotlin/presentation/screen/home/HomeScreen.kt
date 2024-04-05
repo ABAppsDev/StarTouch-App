@@ -32,6 +32,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
+import com.beepbeep.designSystem.ui.composable.snackbar.StackedSnackbarDuration
 import exitApplication
 import kms
 import kotlinx.coroutines.delay
@@ -45,9 +47,7 @@ import presentation.screen.composable.ErrorDialogue
 import presentation.screen.composable.IconWithBackground
 import presentation.screen.composable.SetLayoutDirection
 import presentation.screen.composable.WarningDialogue
-import presentation.screen.composable.animate.FadeAnimation
 import presentation.screen.composable.modifier.bounceClick
-import presentation.screen.composable.snackbar.StackedSnackbarDuration
 import presentation.screen.composable.snackbar.rememberStackedSnackbarHostState
 import presentation.screen.dinin.DinInScreen
 import presentation.screen.home.util.AttendanceType

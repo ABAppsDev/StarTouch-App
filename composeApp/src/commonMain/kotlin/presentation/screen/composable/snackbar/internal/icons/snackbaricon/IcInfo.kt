@@ -8,8 +8,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.ImageVector.Builder
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
-import presentation.screen.composable.snackbar.internal.SnackbarColor
-import presentation.screen.composable.snackbar.internal.icons.SnackbarIcon
+import com.beepbeep.designSystem.ui.composable.snackbar.internal.SnackbarColor
+import com.beepbeep.designSystem.ui.composable.snackbar.internal.icons.SnackbarIcon
 
 public val SnackbarIcon.IcInfo: ImageVector
     get() {
@@ -22,8 +22,8 @@ public val SnackbarIcon.IcInfo: ImageVector
                 viewportWidth = 512.0f, viewportHeight = 512.0f,
             ).apply {
                 path(
-                    fill = SolidColor(presentation.screen.composable.snackbar.internal.SnackbarColor.Info), stroke = SolidColor(
-                        presentation.screen.composable.snackbar.internal.SnackbarColor.Info),
+                    fill = SolidColor(SnackbarColor.Info), stroke = SolidColor(
+                        SnackbarColor.Info),
                     strokeLineWidth = 1.0f, strokeLineCap = Butt, strokeLineJoin = Miter,
                     strokeLineMiter = 4.0f, pathFillType = EvenOdd,
                 ) {

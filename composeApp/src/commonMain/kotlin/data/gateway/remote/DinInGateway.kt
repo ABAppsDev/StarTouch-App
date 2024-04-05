@@ -1,10 +1,10 @@
 package data.gateway.remote
 
 import data.remote.mapper.toEntity
-import data.remote.model.AssignDrawerDto
+import data.remote.model.AssignCheckDto
 import data.remote.model.ServerResponse
 import data.remote.model.TableDataDto
-import domain.entity.AssignDrawer
+import domain.entity.AssignCheck
 import domain.entity.TableData
 import domain.gateway.IDinInGateway
 import domain.util.NotFoundException
@@ -22,12 +22,25 @@ class DinInGateway(client: HttpClient) : BaseGateway(client), IDinInGateway {
         }.data?.map { it.toEntity() } ?: throw NotFoundException("Tables not found")
     }
 
-    override suspend fun getAllOnlineUsers(outletId: Int, restId: Int): List<AssignDrawer> {
-        return tryToExecute<ServerResponse<List<AssignDrawerDto>>> {
-            get("/dinin/assign-drawer") {
+    override suspend fun getAllOnlineUsers(outletId: Int, restId: Int): List<AssignCheck> {
+        return tryToExecute<ServerResponse<List<AssignCheckDto>>> {
+            get("/check/assign") {
                 parameter("outletID", outletId)
                 parameter("restID", restId)
             }
         }.data?.map { it.toEntity() } ?: throw NotFoundException("Users not found")
+    }
+
+    override suspend fun getTablesDataByRoomId(
+        outletID: Int,
+        restID: Int,
+        roomID: Int
+    ): List<TableData> {
+        return tryToExecute<ServerResponse<List<TableDataDto>>> {
+            get("/dinin/room/$roomID/tables") {
+                parameter("outletID", outletID)
+                parameter("restID", restID)
+            }
+        }.data?.map { it.toEntity() } ?: throw NotFoundException("Tables not found")
     }
 }

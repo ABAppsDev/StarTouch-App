@@ -14,7 +14,6 @@ fun AppSetupDto.toEntity(): AppSetup = AppSetup(
     outletName = outletName ?: "",
     systemDate = systemDate ?: getDateNow(),
     defaultLanguage = defaultLanguage ?: "English",
-    priceLvlId = priceLvlId?:0,
 
 )
 

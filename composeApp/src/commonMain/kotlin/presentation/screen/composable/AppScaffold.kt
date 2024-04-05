@@ -6,8 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import presentation.base.ErrorState
-import presentation.screen.composable.animate.FadeAnimation
-import presentation.screen.composable.animate.SlideAnimation
+import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
+import com.beepbeep.designSystem.ui.composable.animate.SlideAnimation
 import presentation.screen.composable.snackbar.StackedSnackbarHost
 import presentation.screen.composable.snackbar.StackedSnakbarHostState
 import resource.Resources

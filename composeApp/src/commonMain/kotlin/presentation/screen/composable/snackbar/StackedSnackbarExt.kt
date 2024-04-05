@@ -3,6 +3,7 @@ package presentation.screen.composable.snackbar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import com.beepbeep.designSystem.ui.composable.snackbar.StackedSnackbarAnimation
 
 @Composable
 inline fun rememberStackedSnackbarHostState(

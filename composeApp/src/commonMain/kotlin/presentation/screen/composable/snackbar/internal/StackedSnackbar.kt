@@ -42,9 +42,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.beepbeep.designSystem.ui.composable.snackbar.StackedSnackbarAnimation
 import presentation.screen.composable.modifier.bounceClick
-import presentation.screen.composable.snackbar.Constant
-import presentation.screen.composable.snackbar.StackedSnackbarAnimation
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -61,10 +60,13 @@ internal fun StackedSnackbar(
     Box(contentAlignment = Alignment.BottomCenter, modifier = modifier) {
         snackbarData.forEachIndexed { index, data ->
             val multiplier = abs(index.toFloat() - snackbarDataSize.dec().toFloat())
-            val scale = 1f.minus((multiplier).times(Constant.SCALE_DECREMENT))
+            val scale =
+                1f.minus((multiplier).times(presentation.screen.composable.snackbar.Constant.SCALE_DECREMENT))
 
             val padding =
-                ((multiplier.times(Constant.PADDING_INCREMENT)).plus(Constant.PADDING_INCREMENT)).dp
+                ((multiplier.times(presentation.screen.composable.snackbar.Constant.PADDING_INCREMENT)).plus(
+                    presentation.screen.composable.snackbar.Constant.PADDING_INCREMENT
+                )).dp
 
             val scaleAnimation by animateFloatAsState(
                 scale,
@@ -86,19 +88,29 @@ internal fun StackedSnackbar(
                 enter =
                 slideIn(
                     initialOffset =
-                    { IntOffset(0, Constant.Y_TARGET_ENTER) },
+                    {
+                        IntOffset(
+                            0,
+                            presentation.screen.composable.snackbar.Constant.Y_TARGET_ENTER
+                        )
+                    },
                     animationSpec = animation.enterAnimationSpec,
                 ),
                 exit =
                 if (offsetX == -1f) {
                     slideOut(
                         targetOffset =
-                        { IntOffset(0, Constant.Y_TARGET_EXIT) },
+                        {
+                            IntOffset(
+                                0,
+                                presentation.screen.composable.snackbar.Constant.Y_TARGET_EXIT
+                            )
+                        },
                         animationSpec = animation.exitAnimationSpec,
                     )
                 } else {
                     slideOutHorizontally(
-                        targetOffsetX = { if (offsetX > 0) Constant.X_TARGET_EXIT_RIGHT else Constant.X_TARGET_EXIT_LEFT },
+                        targetOffsetX = { if (offsetX > 0) presentation.screen.composable.snackbar.Constant.X_TARGET_EXIT_RIGHT else presentation.screen.composable.snackbar.Constant.X_TARGET_EXIT_LEFT },
                         animationSpec =
                         tween(
                             easing = LinearEasing,
@@ -117,7 +129,7 @@ internal fun StackedSnackbar(
                                     offsetX += delta
                                 },
                                 onDragStopped = {
-                                    if (offsetX >= Constant.OFFSET_THRESHOLD_EXIT_RIGHT || offsetX <= Constant.OFFSET_THRESHOLD_EXIT_LEFT) {
+                                    if (offsetX >= presentation.screen.composable.snackbar.Constant.OFFSET_THRESHOLD_EXIT_RIGHT || offsetX <= presentation.screen.composable.snackbar.Constant.OFFSET_THRESHOLD_EXIT_LEFT) {
                                         onSnackbarRemoved.invoke()
                                     } else {
                                         offsetX = initialPos

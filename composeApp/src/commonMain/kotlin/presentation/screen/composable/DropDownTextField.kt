@@ -13,6 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.beepbeep.designSystem.ui.composable.StTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -21,6 +22,7 @@ fun DropDownTextField(
     modifier: Modifier = Modifier.fillMaxWidth(),
     selectedItem: DropDownState,
     enabled: Boolean = true,
+    label: String = "",
     onClick: (Int) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -31,10 +33,11 @@ fun DropDownTextField(
             expanded = !expanded
         }
     ) {
-        AppTextField(
+        StTextField(
+            label = label,
             text = selectedOptionText.name,
-            enabled = enabled,
             onValueChange = {},
+            enabled = enabled,
             readOnly = true,
             modifier = modifier.menuAnchor(),
             trailingIcon = {

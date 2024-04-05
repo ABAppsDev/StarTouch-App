@@ -91,7 +91,6 @@ class HomeScreenModel(
             AppLanguage.code.emit(state.value.homeDetailsState.appLanguage.value)
             StarTouchSetup.DEFAULT_LANGUAGE = state.value.homeDetailsState.appLanguage.value
             StarTouchSetup.SYSTEM_DATE = appSetup.systemDate
-            StarTouchSetup.PRICE_LVL_ID = appSetup.priceLvlId
             localMessage = LocalizationManager.getStringResources(
                 LanguageCode.entries.find { code ->
                     code.value == AppLanguage.code.value

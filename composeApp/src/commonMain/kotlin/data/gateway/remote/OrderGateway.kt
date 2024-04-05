@@ -28,27 +28,23 @@ class OrderGateway(client: HttpClient) : BaseGateway(client), IOrderGateway {
         restID: Int,
         presetID: Int,
         checkId: Long,
-        priceLvlId: Int
     ): List<Item> {
         return tryToExecute<ServerResponse<List<ItemDto>>> {
             get("/presets/$presetID") {
                 parameter("outletID", outletID)
                 parameter("restID", restID)
                 parameter("checkId", checkId)
-                parameter("priceLvlId", priceLvlId)
             }
         }.data?.map { it.toEntity() } ?: throw NotFoundException("Items not found")
     }
 
     override suspend fun checkItemHasChildren(
-        restID: Int,
+        outletID: Int,
         itemID: Int,
-        priceLvlId: Int
     ): List<Item> {
         return tryToExecute<ServerResponse<List<ItemDto>>> {
             get("/item/child/$itemID") {
-                parameter("restID", restID)
-                parameter("priceLvlId", priceLvlId)
+                parameter("outletID", outletID)
             }
         }.data?.map { it.toEntity() } ?: throw NotFoundException("Item not found")
     }
@@ -56,12 +52,12 @@ class OrderGateway(client: HttpClient) : BaseGateway(client), IOrderGateway {
     override suspend fun checkItemHasModifiers(
         restID: Int,
         itemID: Int,
-        priceLvlId: Int
+        outletID: Int,
     ): List<Item> {
         return tryToExecute<ServerResponse<List<ItemDto>>> {
             get("/item/$itemID") {
                 parameter("restID", restID)
-                parameter("priceLvlId", priceLvlId)
+                parameter("outletID", outletID)
             }
         }.data?.map { it.toEntity() } ?: throw NotFoundException("Item not found")
     }

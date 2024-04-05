@@ -8,5 +8,4 @@ data class AppSetupDto(
     val systemDate: LocalDateTime? = null,
     val outletName: String? = null,
     val defaultLanguage: String? = null,
-    val priceLvlId: Int? = null,
 )

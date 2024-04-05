@@ -1,7 +1,7 @@
 package presentation.screen.dinin
 
 import androidx.compose.runtime.Immutable
-import domain.entity.AssignDrawer
+import domain.entity.AssignCheck
 import domain.entity.TableData
 import presentation.base.ErrorState
 
@@ -64,6 +64,6 @@ fun TableData.toTableDetailsState(): TableDetailsState = TableDetailsState(
     checksCount = this.countChecks
 )
 
-fun AssignDrawer.toAssignDrawerState(): AssignDrawerState = AssignDrawerState(
+fun AssignCheck.toAssignDrawerState(): AssignDrawerState = AssignDrawerState(
     id.toLong(), name
 )

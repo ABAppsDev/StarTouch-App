@@ -17,9 +17,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kms
-import presentation.screen.composable.snackbar.internal.SnackbarColor
-import presentation.screen.composable.snackbar.internal.icons.SnackbarIcon
-import presentation.screen.composable.snackbar.internal.icons.snackbaricon.IcWarning
+import com.beepbeep.designSystem.ui.composable.snackbar.internal.SnackbarColor
+import com.beepbeep.designSystem.ui.composable.snackbar.internal.icons.SnackbarIcon
+import com.beepbeep.designSystem.ui.composable.snackbar.internal.icons.snackbaricon.IcWarning
 import resource.Resources
 
 @Composable

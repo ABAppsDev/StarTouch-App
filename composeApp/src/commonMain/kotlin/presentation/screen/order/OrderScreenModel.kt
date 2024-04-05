@@ -102,7 +102,6 @@ class OrderScreenModel(
                     StarTouchSetup.REST_ID,
                     presetID = presetId,
                     checkId = checkId,
-                    priceLvlId = StarTouchSetup.PRICE_LVL_ID,
                 )
             },
             onSuccess = ::onGetAllItemsSuccess,
@@ -126,9 +125,8 @@ class OrderScreenModel(
         tryToExecute(
             function = {
                 manageOrder.checkItemHasChildren(
-                    StarTouchSetup.REST_ID,
+                    StarTouchSetup.OUTLET_ID,
                     itemID = itemId,
-                    priceLvlId = StarTouchSetup.PRICE_LVL_ID,
                 )
             },
             onSuccess = ::onGetAllItemChildrenSuccess,
@@ -185,7 +183,7 @@ class OrderScreenModel(
                 manageOrder.checkItemHasModifiers(
                     restID = StarTouchSetup.REST_ID,
                     itemID = selectedItemId,
-                    priceLvlId = StarTouchSetup.PRICE_LVL_ID
+                    outletID = StarTouchSetup.OUTLET_ID
                 )
             },
             onSuccess = ::onGetAllItemsModifierSuccess,

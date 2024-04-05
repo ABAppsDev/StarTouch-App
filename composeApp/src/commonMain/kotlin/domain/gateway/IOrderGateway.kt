@@ -15,18 +15,16 @@ interface IOrderGateway {
         restID: Int,
         presetID: Int,
         checkId: Long,
-        priceLvlId: Int
     ): List<Item>
 
     suspend fun checkItemHasModifiers(
         restID: Int,
         itemID: Int,
-        priceLvlId: Int
+        outletID: Int,
     ): List<Item>
 
     suspend fun checkItemHasChildren(
-        restID: Int,
+        outletID: Int,
         itemID: Int,
-        priceLvlId: Int
     ): List<Item>
 }
