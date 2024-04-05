@@ -1,10 +1,13 @@
 package presentation.screen.dinin
 
+import abapps_startouch.composeapp.generated.resources.Res
+import abapps_startouch.composeapp.generated.resources.table
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +16,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -42,7 +46,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import com.beepbeep.designSystem.ui.composable.StChip
+import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
+import com.beepbeep.designSystem.ui.theme.Theme
 import kms
+import org.jetbrains.compose.resources.painterResource
 import presentation.screen.composable.AppButton
 import presentation.screen.composable.AppDialogue
 import presentation.screen.composable.AppScaffold
@@ -54,7 +62,7 @@ import presentation.screen.composable.RestaurantTableWithTextLoading
 import presentation.screen.composable.SetLayoutDirection
 import presentation.screen.composable.ShimmerListItem
 import presentation.screen.composable.WarningDialogue
-import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
+import presentation.screen.composable.extensions.bottomBorder
 import presentation.screen.composable.modifier.bounceClick
 import presentation.screen.order.OrderScreen
 import presentation.util.EventHandler
@@ -135,31 +143,61 @@ private fun OnRender(
 ) {
     Box(Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
         SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.spacedBy(24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(8.dp)
-            ) {
-                items(state.tablesDetails) { table ->
-                    ChooseTable(table, onLongClick = {
-                        listener.onLongClick(table.tableId)
-                    }) {
-                        if (table.checksCount > 0)
-                            listener.showWarningDialogue(table.tableId, table.tableNumber)
-                        else
-                            listener.onClickTable(table.tableId, table.tableNumber)
+            Column(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+                Row(
+                    Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 4.dp)
+                        .bottomBorder(1.dp, Theme.colors.divider),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    StChip(
+                        "Table Guest",
+                        isSelected = true,
+                        onClick = {},
+                        painter = painterResource(Res.drawable.table)
+                    )
+                    LazyRow(
+                        contentPadding = PaddingValues(8.dp),
+                        modifier = Modifier.fillMaxWidth(0.70f),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        items(3) {
+                            StChip(
+                                "Table $it",
+                                isSelected = true,
+                                onClick = {},
+                                painter = painterResource(Res.drawable.table)
+                            )
+                        }
+                    }
+                }
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.spacedBy(24.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(8.dp)
+                ) {
+                    items(state.tablesDetails) { table ->
+                        ChooseTable(table, onLongClick = {
+                            listener.onLongClick(table.tableId)
+                        }) {
+                            if (table.checksCount > 0)
+                                listener.showWarningDialogue(table.tableId, table.tableNumber)
+                            else
+                                listener.onClickTable(table.tableId, table.tableNumber)
+                        }
                     }
                 }
             }
-            PullRefreshIndicator(
-                state.isRefreshing,
-                pullRefreshState,
-                modifier = Modifier.align(Alignment.TopCenter),
-                contentColor = Color(0xFF8D7B4B)
-            )
         }
+        PullRefreshIndicator(
+            state.isRefreshing,
+            pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter),
+            contentColor = Color(0xFF8D7B4B)
+        )
     }
 }
 
