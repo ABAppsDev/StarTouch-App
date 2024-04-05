@@ -249,11 +249,24 @@ class HomeScreenModel(
     }
 
     override fun onDismissErrorDialogue() {
-        updateState { it.copy(errorDialogueIsVisible = false, warningDialogueIsVisible = false) }
+        updateState {
+            it.copy(
+                errorDialogueIsVisible = false,
+                warningDialogueIsVisible = false,
+                errorState = null,
+                errorMessage = ""
+            )
+        }
     }
 
     override fun onDismissWarningDialogue() {
-        updateState { it.copy(warningDialogueIsVisible = false) }
+        updateState {
+            it.copy(
+                warningDialogueIsVisible = false,
+                errorState = null,
+                errorMessage = ""
+            )
+        }
     }
 
     override fun onDismissSettingsDialogue() {
@@ -461,6 +474,12 @@ class HomeScreenModel(
                 }
             }
             sendNewEffect(HomeUiEffect.NavigateToSetting)
+        } else updateState {
+            it.copy(
+                errorMessage = "Logon Error",
+                errorState = ErrorState.PermissionDenied("Logon Error"),
+                settingsDialogueState = it.settingsDialogueState.copy(isLoading = false),
+            )
         }
     }
 
@@ -473,18 +492,22 @@ class HomeScreenModel(
                 warningDialogueIsVisible = false
             )
         }
-        tryToExecute(
-            function = {
-                validationAuth.validatePermissionPasscode(passcode)
-                controlPermission.checkExitAppPermission(
-                    StarTouchSetup.OUTLET_ID,
-                    StarTouchSetup.REST_ID,
-                    passcode
-                )
-            },
-            onSuccess = ::onExitAppSuccess,
-            onError = ::onFailed
-        )
+        if (passcode.isNotEmpty() && adminSystemUseCase.checkPermissionWithPasscode(passcode.toInt())) {
+            onExitAppSuccess(true)
+        } else {
+            tryToExecute(
+                function = {
+                    validationAuth.validatePermissionPasscode(passcode)
+                    controlPermission.checkExitAppPermission(
+                        StarTouchSetup.OUTLET_ID,
+                        StarTouchSetup.REST_ID,
+                        passcode
+                    )
+                },
+                onSuccess = ::onExitAppSuccess,
+                onError = ::onFailed
+            )
+        }
     }
 
     private fun onExitAppSuccess(isSuccess: Boolean) {

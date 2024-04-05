@@ -25,51 +25,11 @@ fun StDialogue(
             modifier = modifier
                 .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                 .shadow(elevation = 5.dp)
-                .background(Theme.colors.surface, RoundedCornerShape(Theme.radius.medium))
+                .background(Theme.colors.background, RoundedCornerShape(Theme.radius.medium))
                 .padding(24.dp),
             horizontalAlignment = horizontalAlignment
         ) {
             content()
-//            Text(
-//                text = "Your info",
-//                style = Theme.typography.headlineLarge,
-//                color = Theme.colors.contentPrimary,
-//            )
-//
-//            StTextField(
-//                modifier = Modifier.padding(top = 40.dp),
-//                label = "User name",
-//                onValueChange = {},
-//                text = "",
-//                errorMessage = "",
-//                isError = false
-//            )
-//
-//            StTextField(
-//                modifier = Modifier.padding(top = 24.dp),
-//                label = "Password",
-//                onValueChange = {},
-//                text = "",
-//                errorMessage = "",
-//                isError = false
-//            )
-//            Row(
-//                modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
-//                horizontalArrangement = Arrangement.spacedBy(16.dp)
-//            ) {
-//
-//                StOutlinedButton(
-//                    "Cancel",
-//                    onClick = {},
-//                    modifier = Modifier.width(120.dp)
-//                )
-//                StButton(
-//                    title = "Ok",
-//                    onClick = {},
-//                    modifier = Modifier.fillMaxWidth(),
-//                    enabled = true
-//                )
-//            }
         }
     }
 }

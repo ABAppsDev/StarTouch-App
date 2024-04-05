@@ -22,7 +22,7 @@ data class English(
     override val noInternetDescription: String = "Please make sure you are connected to the internet and try again",
     override val nullDataMessage: String = "There are no data",
     override val nullDataDescription: String = "Enjoy adding items to your app and get ready to enjoy",
-    override val enterYourInfo: String = "Enter your information",
+    override val enterYourInfo: String = "Your information",
     override val warning: String = "Warning",
     override val error: String = "Error",
     override val userNotFound: String = "User not found",

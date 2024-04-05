@@ -1,5 +1,13 @@
 package presentation.screen.home
 
+import abapps_startouch.composeapp.generated.resources.Res
+import abapps_startouch.composeapp.generated.resources.admin
+import abapps_startouch.composeapp.generated.resources.dinin
+import abapps_startouch.composeapp.generated.resources.exit
+import abapps_startouch.composeapp.generated.resources.login
+import abapps_startouch.composeapp.generated.resources.logo
+import abapps_startouch.composeapp.generated.resources.logout
+import abapps_startouch.composeapp.generated.resources.take_away
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,13 +19,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,23 +35,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import com.beepbeep.designSystem.ui.composable.StButton
+import com.beepbeep.designSystem.ui.composable.StDialogue
+import com.beepbeep.designSystem.ui.composable.StOutlinedButton
+import com.beepbeep.designSystem.ui.composable.StTextField
 import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
 import com.beepbeep.designSystem.ui.composable.snackbar.StackedSnackbarDuration
+import com.beepbeep.designSystem.ui.theme.Theme
 import exitApplication
 import kms
 import kotlinx.coroutines.delay
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-import presentation.screen.composable.AppButton
-import presentation.screen.composable.AppDialogue
 import presentation.screen.composable.AppScaffold
-import presentation.screen.composable.AppTextField
 import presentation.screen.composable.ErrorDialogue
 import presentation.screen.composable.IconWithBackground
 import presentation.screen.composable.SetLayoutDirection
@@ -180,30 +190,30 @@ private fun OnRender(
                     verticalArrangement = Arrangement.spacedBy(32.kms)
                 ) {
                     IconWithBackground(
-                        icon = painterResource(DrawableResource("login.xml")),
+                        icon = painterResource(Res.drawable.login),
                         contentDescription = Resources.strings.login,
                         modifier = Modifier.size(80.kms)
                             .bounceClick { listener.onClickLogOn() },
-                        iconSize = 65.kms
+                        iconSize = 65.kms,
                     )
                     IconWithBackground(
-                        icon = painterResource(DrawableResource("logout.xml")),
+                        icon = painterResource(Res.drawable.logout),
                         contentDescription = Resources.strings.logout,
                         modifier = Modifier.size(80.kms)
                             .bounceClick { listener.onClickLogOff() },
-                        iconSize = 65.kms
+                        iconSize = 65.kms,
                     )
                     IconWithBackground(
-                        icon = painterResource(DrawableResource("admin.xml")),
+                        icon = painterResource(Res.drawable.admin),
                         contentDescription = Resources.strings.admin,
                         modifier = Modifier.size(80.kms)
                             .bounceClick { listener.onClickSettings() },
-                        iconSize = 65.kms
+                        iconSize = 65.kms,
                     )
                 }
 
                 Image(
-                    painter = painterResource(DrawableResource("logo.png")),
+                    painter = painterResource(Res.drawable.logo),
                     contentDescription = Resources.strings.logo,
                     modifier = Modifier.size(128.kms),
                 )
@@ -211,21 +221,21 @@ private fun OnRender(
                     verticalArrangement = Arrangement.spacedBy(32.kms)
                 ) {
                     IconWithBackground(
-                        icon = painterResource(DrawableResource("dinin.png")),
+                        icon = painterResource(Res.drawable.dinin),
                         contentDescription = Resources.strings.dinningIn,
                         modifier = Modifier.size(80.kms)
                             .bounceClick { listener.onClickDinIn() },
-                        iconSize = 65.kms
+                        iconSize = 65.kms,
                     )
                     IconWithBackground(
-                        icon = painterResource(DrawableResource("take_away.png")),
+                        icon = painterResource(Res.drawable.take_away),
                         contentDescription = Resources.strings.settings,
                         modifier = Modifier.size(80.kms)
                             .bounceClick { /*ToDo*/ },
-                        iconSize = 65.kms
+                        iconSize = 65.kms,
                     )
                     IconWithBackground(
-                        icon = painterResource(DrawableResource("exit.xml")),
+                        icon = painterResource(Res.drawable.exit),
                         contentDescription = Resources.strings.exit,
                         modifier = Modifier.size(80.kms)
                             .bounceClick { listener.onClickExitApp() },
@@ -244,15 +254,15 @@ private fun OnRender(
         ) {
             Text(
                 text = "${Resources.strings.outlet}: ${state.homeDetailsState.outletName}",
-                fontSize = 32.sp,
-                color = Color.White,
+                style = Theme.typography.headlineLarge,
+                color = Theme.colors.contentPrimary,
                 textAlign = TextAlign.Center
             )
 
             Text(
                 text = state.homeDetailsState.systemDate,
-                fontSize = 32.sp,
-                color = Color.White,
+                style = Theme.typography.headlineLarge,
+                color = Theme.colors.contentPrimary,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
@@ -261,6 +271,7 @@ private fun OnRender(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AttendanceDialogue(
     username: String,
@@ -270,52 +281,63 @@ private fun AttendanceDialogue(
     homeInteractionListener: HomeInteractionListener,
     modifier: Modifier = Modifier,
 ) {
-    AppDialogue(
+    StDialogue(
         onDismissRequest = homeInteractionListener::onDismissAttendanceDialogue,
         modifier = modifier
     ) {
         Text(
-            Resources.strings.enterYourInfo,
-            modifier = Modifier.padding(vertical = 8.kms),
-            style = MaterialTheme.typography.headlineSmall
+            text = Resources.strings.enterYourInfo,
+            style = Theme.typography.headline,
+            color = Theme.colors.contentPrimary,
         )
-        AppTextField(
+        StTextField(
+            modifier = Modifier.padding(top = 40.dp),
+            label = Resources.strings.userName,
             text = username,
-            onValueChange = homeInteractionListener::onUserNameChanged,
             hint = Resources.strings.userName,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.kms, vertical = 8.kms),
+            onValueChange = homeInteractionListener::onUserNameChanged,
+            imeAction = ImeAction.Next,
         )
-        AppTextField(
+        StTextField(
+            modifier = Modifier.padding(top = 24.dp),
+            label = Resources.strings.password,
             text = password,
-            onValueChange = homeInteractionListener::onPasswordChanged,
             hint = Resources.strings.password,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.kms),
+            onValueChange = homeInteractionListener::onPasswordChanged,
             keyboardType = KeyboardType.Password,
+            imeAction = ImeAction.Go,
+            keyboardActions = KeyboardActions(onGo = {
+                if (attendanceType == AttendanceType.LOGIN.name) homeInteractionListener.onClickLogin()
+                else homeInteractionListener.onClickLogout()
+            })
         )
         SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
             Row(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(horizontal = 16.kms, vertical = 16.kms),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.kms)
+                modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                AppButton(
-                    Resources.strings.cancel,
-                    modifier = Modifier.weight(1f),
-                ) { homeInteractionListener.onDismissAttendanceDialogue() }
-                AppButton(
-                    Resources.strings.ok,
+                StOutlinedButton(
+                    title = Resources.strings.cancel,
+                    onClick = {
+                        homeInteractionListener.onDismissAttendanceDialogue()
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+                StButton(
+                    title = Resources.strings.ok,
+                    onClick = {
+                        if (attendanceType == AttendanceType.LOGIN.name) homeInteractionListener.onClickLogin()
+                        else homeInteractionListener.onClickLogout()
+                    },
                     modifier = Modifier.weight(1f),
                     isLoading = isLoading,
-                ) {
-                    if (attendanceType == AttendanceType.LOGIN.name) homeInteractionListener.onClickLogin()
-                    else homeInteractionListener.onClickLogout()
-                }
+                )
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SettingsDialogue(
     username: String,
@@ -324,51 +346,60 @@ private fun SettingsDialogue(
     homeInteractionListener: HomeInteractionListener,
     modifier: Modifier = Modifier,
 ) {
-    AppDialogue(
+    StDialogue(
         onDismissRequest = homeInteractionListener::onDismissSettingsDialogue,
         modifier = modifier
     ) {
         Text(
-            Resources.strings.enterYourInfo,
-            modifier = Modifier.padding(vertical = 8.kms),
-            style = MaterialTheme.typography.headlineSmall
+            text = Resources.strings.enterYourInfo,
+            style = Theme.typography.headline,
+            color = Theme.colors.contentPrimary,
         )
-        AppTextField(
+        StTextField(
+            modifier = Modifier.padding(top = 40.dp),
+            label = Resources.strings.userName,
             text = username,
-            onValueChange = homeInteractionListener::onUserNameChanged,
             hint = Resources.strings.userName,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.kms, vertical = 8.kms),
+            onValueChange = homeInteractionListener::onUserNameChanged,
         )
-        AppTextField(
+        StTextField(
+            modifier = Modifier.padding(top = 24.dp),
+            label = Resources.strings.password,
             text = password,
-            onValueChange = homeInteractionListener::onPasswordChanged,
             hint = Resources.strings.password,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.kms),
+            onValueChange = homeInteractionListener::onPasswordChanged,
             keyboardType = KeyboardType.Password,
+            imeAction = ImeAction.Go,
+            keyboardActions = KeyboardActions(onGo = {
+                homeInteractionListener.onClickSettingsOk()
+            })
         )
         SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
             Row(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(horizontal = 16.kms, vertical = 16.kms),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.kms)
+                modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                AppButton(
-                    Resources.strings.cancel,
-                    modifier = Modifier.weight(1f),
-                ) { homeInteractionListener.onDismissSettingsDialogue() }
-                AppButton(
-                    Resources.strings.ok,
+                StOutlinedButton(
+                    title = Resources.strings.cancel,
+                    onClick = {
+                        homeInteractionListener.onDismissSettingsDialogue()
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+                StButton(
+                    title = Resources.strings.ok,
+                    onClick = {
+                        homeInteractionListener.onClickSettingsOk()
+                    },
                     modifier = Modifier.weight(1f),
                     isLoading = isLoading,
-                ) {
-                    homeInteractionListener.onClickSettingsOk()
-                }
+                )
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PassCodeDialogue(
     passcode: String,
@@ -376,38 +407,47 @@ private fun PassCodeDialogue(
     homeInteractionListener: HomeInteractionListener,
     modifier: Modifier = Modifier,
 ) {
-    AppDialogue(
+    StDialogue(
         onDismissRequest = homeInteractionListener::onDismissPermissionDialogue,
         modifier = modifier
     ) {
         Text(
-            Resources.strings.enterYourPasscode,
-            modifier = Modifier.padding(vertical = 8.kms),
-            style = MaterialTheme.typography.headlineSmall
+            text = Resources.strings.enterYourPasscode,
+            style = Theme.typography.headline,
+            color = Theme.colors.contentPrimary,
         )
-        AppTextField(
+        StTextField(
+            modifier = Modifier.padding(top = 24.dp),
+            label = Resources.strings.passcode,
             text = passcode,
-            onValueChange = homeInteractionListener::onPassCodeChanged,
             hint = Resources.strings.passcode,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.kms),
+            onValueChange = homeInteractionListener::onPassCodeChanged,
             keyboardType = KeyboardType.NumberPassword,
+            imeAction = ImeAction.Go,
+            keyboardActions = KeyboardActions(onGo = {
+                homeInteractionListener.onClickEnterPasscode()
+            })
         )
         SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
             Row(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(horizontal = 16.kms, vertical = 16.kms),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.kms)
+                modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                AppButton(
-                    Resources.strings.cancel,
-                    modifier = Modifier.weight(1f),
-                ) { homeInteractionListener.onDismissPermissionDialogue() }
-                AppButton(
-                    Resources.strings.ok,
+                StOutlinedButton(
+                    title = Resources.strings.cancel,
+                    onClick = {
+                        homeInteractionListener.onDismissPermissionDialogue()
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+                StButton(
+                    title = Resources.strings.ok,
+                    onClick = {
+                        homeInteractionListener.onClickEnterPasscode()
+                    },
                     modifier = Modifier.weight(1f),
                     isLoading = isLoading,
-                ) { homeInteractionListener.onClickEnterPasscode() }
+                )
             }
         }
     }
