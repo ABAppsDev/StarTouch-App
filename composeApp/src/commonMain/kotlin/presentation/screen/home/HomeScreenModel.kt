@@ -254,7 +254,6 @@ class HomeScreenModel(
                 errorDialogueIsVisible = false,
                 warningDialogueIsVisible = false,
                 errorState = null,
-                errorMessage = ""
             )
         }
     }
@@ -264,7 +263,6 @@ class HomeScreenModel(
             it.copy(
                 warningDialogueIsVisible = false,
                 errorState = null,
-                errorMessage = ""
             )
         }
     }
