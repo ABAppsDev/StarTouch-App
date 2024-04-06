@@ -483,6 +483,25 @@ class OrderScreenModel(
     }
 
     override fun onClickOk() {
+        addItem(
+            OrderItemState(
+                id = 0,
+                name = state.value.modifyLastItemDialogue.comment,
+                qty = 0,
+                unitPrice = 0f,
+                isModifier = true,
+                noServiceCharge = false,
+                modifierGroupID = 0,
+                pickFollowItemQty = false,
+                prePaidCard = false,
+                taxable = false,
+                refModItem = 0,
+                pOnCheck = true,
+                pOnReport = true,
+                totalPrice = 0f
+            )
+        )
+        updateState { it.copy(orderItemState = orders.toList()) }
         updateState {
             it.copy(
                 modifyLastItemDialogue = it.modifyLastItemDialogue.copy(
