@@ -85,7 +85,11 @@ import presentation.util.EventHandler
 import resource.Resources
 import util.getScreenModel
 
-class OrderScreen(private val checkId: Long, private val items: List<FireItems>) : Screen {
+class OrderScreen(
+    private val checkId: Long,
+    private val items: List<FireItems>,
+    private val isReopened: Boolean
+) : Screen {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
@@ -138,12 +142,22 @@ class OrderScreen(private val checkId: Long, private val items: List<FireItems>)
             )
         }
 
+        FadeAnimation(state.warningItemIsVisible) {
+            WarningDialogue(
+                Resources.strings.warning,
+                "Item already exist do you want to add it again or alone",
+                onDismissRequest = screenModel::onDismissWarningDialogue,
+                onClickConfirmButton = { screenModel.add() },
+                onClickDismissButton = screenModel::onDismissItemDialogue
+            )
+        }
+
         SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
             Scaffold(modifier = Modifier.fillMaxSize(), containerColor = Color.Transparent,
                 topBar = {
                     StAppBar(
                         onNavigateUp = {
-                            if (state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && items.isEmpty())
+                            if (state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && !isReopened)
                                 screenModel.showWarningDialogue()
                             else if (state.isFinishOrder) screenModel.onClickIconBack()
                             else if (!state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && items.isNotEmpty()) nav.replace(
@@ -458,7 +472,9 @@ private fun OrderItem(
             .fillMaxWidth()
             .heightIn(128.dp)
             .padding(8.dp),
-        colors = CardDefaults.cardColors(Color.White),
+        colors = if (!orderItemState.fired) CardDefaults.cardColors(Color.White) else CardDefaults.cardColors(
+            Theme.colors.primary
+        ),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.elevatedCardElevation(8.dp)
     ) {

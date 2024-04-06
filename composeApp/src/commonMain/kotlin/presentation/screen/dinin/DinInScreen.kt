@@ -83,7 +83,7 @@ class DinInScreen : Screen {
         EventHandler(dinInScreenModel.effect) { effect, navigator ->
             when (effect) {
                 is DinInUiEffect.NavigateToOrderScreen -> {
-                    navigator.replace(OrderScreen(effect.checkId, effect.items))
+                    navigator.replace(OrderScreen(effect.checkId, effect.items, effect.isReopened))
                 }
 
                 DinInUiEffect.NavigateBackToHome -> navigator.pop()

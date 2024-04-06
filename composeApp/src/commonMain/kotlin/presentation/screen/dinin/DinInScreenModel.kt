@@ -131,7 +131,13 @@ class DinInScreenModel(
                                 dinInDialogueState = DinInDialogueState(),
                             )
                         }
-                        sendNewEffect(DinInUiEffect.NavigateToOrderScreen(check.id, emptyList()))
+                        sendNewEffect(
+                            DinInUiEffect.NavigateToOrderScreen(
+                                check.id,
+                                emptyList(),
+                                false
+                            )
+                        )
                     }
                 },
                 onError = ::onError
@@ -267,7 +273,7 @@ class DinInScreenModel(
                         checkId = id
                     )
                 }
-                sendNewEffect(DinInUiEffect.NavigateToOrderScreen(id, items))
+                sendNewEffect(DinInUiEffect.NavigateToOrderScreen(id, items, true))
             },
             onError = ::onError
         )
@@ -466,7 +472,7 @@ class DinInScreenModel(
                             checkId = tableId
                         )
                     }
-                    sendNewEffect(DinInUiEffect.NavigateToOrderScreen(tableId, items))
+                    sendNewEffect(DinInUiEffect.NavigateToOrderScreen(tableId, items, true))
                 },
                 onError = ::onError
             )

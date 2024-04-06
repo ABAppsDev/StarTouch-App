@@ -265,39 +265,69 @@ class OrderScreenModel(
     override fun onClickItemModifier(name: String) {
         println(state.value.itemModifiersState)
         val item = state.value.itemModifiersState.find { it.name == name }
-        item?.let {
-            addItem(
-                OrderItemState(
-                    id = item.id,
-                    name = item.name,
-                    qty = 1,
-                    unitPrice = item.price,
-                    isModifier = item.isModifier,
-                    noServiceCharge = item.noServiceCharge,
-                    modifierGroupID = item.modifierGroupID,
-                    pickFollowItemQty = item.pickFollowItemQty,
-                    prePaidCard = item.prePaidCard,
-                    taxable = item.taxable,
-                    pOnReport = item.pOnReport,
-                    fired = true
+        if (orders.contains(orders.find { it.id == item?.id }))
+            showWarningItem()
+        else {
+            item?.let {
+                addItem(
+                    OrderItemState(
+                        id = item.id,
+                        name = item.name,
+                        qty = 1,
+                        unitPrice = item.price,
+                        isModifier = item.isModifier,
+                        noServiceCharge = item.noServiceCharge,
+                        modifierGroupID = item.modifierGroupID,
+                        pickFollowItemQty = item.pickFollowItemQty,
+                        prePaidCard = item.prePaidCard,
+                        taxable = item.taxable,
+                        pOnReport = item.pOnReport,
+                    )
                 )
-            )
-            updateState { it.copy(orderItemState = orders.toList()) }
-        }
-        updateState {
-            it.copy(
-                selectedPresetId = 0,
-                selectedItemId = 0,
-                itemsState = emptyList(),
-                itemChildrenState = emptyList(),
-                itemModifiersState = emptyList(),
-                isPresetVisible = false,
-            )
+                updateState { it.copy(orderItemState = orders.toList()) }
+            }
+            updateState {
+                it.copy(
+                    selectedPresetId = 0,
+                    selectedItemId = 0,
+                    itemsState = emptyList(),
+                    itemChildrenState = emptyList(),
+                    itemModifiersState = emptyList(),
+                    isPresetVisible = false,
+                )
+            }
         }
     }
 
     override fun onClickItemChild(itemId: Int) {
         val item = state.value.itemChildrenState.find { it.id == itemId }
+        if (orders.contains(orders.find { it.id == item?.id }))
+            showWarningItem()
+        else {
+            item?.let {
+                addItem(
+                    OrderItemState(
+                        id = item.id,
+                        name = item.name,
+                        qty = 1,
+                        unitPrice = item.price,
+                        isModifier = item.isModifier,
+                        noServiceCharge = item.noServiceCharge,
+                        modifierGroupID = item.modifierGroupID,
+                        pickFollowItemQty = item.pickFollowItemQty,
+                        prePaidCard = item.prePaidCard,
+                        taxable = item.taxable,
+                    )
+                )
+                updateState { it.copy(orderItemState = orders.toList()) }
+            }
+            getAllItemModifiers(itemId)
+            updateState { it.copy(selectedItemId = itemId, itemChildrenState = emptyList()) }
+        }
+    }
+
+    fun add() {
+        val item = state.value.itemsState.find { it.id == state.value.itemId }
         item?.let {
             addItem(
                 OrderItemState(
@@ -313,33 +343,46 @@ class OrderScreenModel(
                     taxable = item.taxable,
                 )
             )
-            updateState { it.copy(orderItemState = orders.toList()) }
+            updateState {
+                it.copy(
+                    orderItemState = orders.toList(),
+                    warningItemIsVisible = false,
+                    itemsState = emptyList(),
+                    itemModifiersState = emptyList(),
+                    itemChildrenState = emptyList(),
+                    selectedItemId = state.value.itemId,
+                    isPresetVisible = false
+                )
+            }
         }
-        getAllItemModifiers(itemId)
-        updateState { it.copy(selectedItemId = itemId, itemChildrenState = emptyList()) }
     }
 
     override fun onClickItem(itemId: Int) {
         val item = state.value.itemsState.find { it.id == itemId }
-        item?.let {
-            addItem(
-                OrderItemState(
-                    id = item.id,
-                    name = item.name,
-                    qty = 1,
-                    unitPrice = item.price,
-                    isModifier = item.isModifier,
-                    noServiceCharge = item.noServiceCharge,
-                    modifierGroupID = item.modifierGroupID,
-                    pickFollowItemQty = item.pickFollowItemQty,
-                    prePaidCard = item.prePaidCard,
-                    taxable = item.taxable,
+        updateState { it.copy(itemId = itemId) }
+        if (orders.contains(orders.find { it.id == item?.id }))
+            showWarningItem()
+        else {
+            item?.let {
+                addItem(
+                    OrderItemState(
+                        id = item.id,
+                        name = item.name,
+                        qty = 1,
+                        unitPrice = item.price,
+                        isModifier = item.isModifier,
+                        noServiceCharge = item.noServiceCharge,
+                        modifierGroupID = item.modifierGroupID,
+                        pickFollowItemQty = item.pickFollowItemQty,
+                        prePaidCard = item.prePaidCard,
+                        taxable = item.taxable,
+                    )
                 )
-            )
-            updateState { it.copy(orderItemState = orders.toList()) }
+                updateState { it.copy(orderItemState = orders.toList()) }
+            }
+            getAllItemChildren(itemId)
+            updateState { it.copy(selectedItemId = itemId, itemsState = emptyList()) }
         }
-        getAllItemChildren(itemId)
-        updateState { it.copy(selectedItemId = itemId, itemsState = emptyList()) }
     }
 
     override fun onClickFloatActionButton() {
@@ -364,7 +407,7 @@ class OrderScreenModel(
                     checkID = checkId,
                     userID = StarTouchSetup.USER_ID.toString(),
                     serverId = StarTouchSetup.REST_ID,
-                    items = state.value.orderItemState.map { it.toEntity() }
+                    items = state.value.orderItemState.filter { !it.fired }.map { it.toEntity() }
                 )
             },
             onSuccess = {
@@ -483,6 +526,14 @@ class OrderScreenModel(
 
     override fun onDismissWarningDialogue() {
         updateState { it.copy(warningDialogueIsVisible = false) }
+    }
+
+    override fun onDismissItemDialogue() {
+        updateState { it.copy(warningItemIsVisible = false) }
+    }
+
+    override fun showWarningItem() {
+        updateState { it.copy(warningItemIsVisible = true) }
     }
 
     override fun onClickPlus(id: Int) {

@@ -20,4 +20,6 @@ interface OrderInteractionListener {
     fun addItem(orderItemState: OrderItemState)
     fun showWarningDialogue()
     fun onDismissWarningDialogue()
+    fun onDismissItemDialogue()
+    fun showWarningItem()
 }

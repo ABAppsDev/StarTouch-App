@@ -30,6 +30,8 @@ data class OrderState(
     val modifyLastItemDialogue: ModifyLastItemDialogue = ModifyLastItemDialogue(),
     val orderItemState: List<OrderItemState> = orders.toList(),
     val warningDialogueIsVisible: Boolean = false,
+    val warningItemIsVisible: Boolean = false,
+    val itemId: Int = 0,
 )
 
 @Immutable
@@ -90,7 +92,7 @@ fun FireItems.toState(): OrderItemState = OrderItemState(
     pOnCheck = pOnCheck ?: false,
     pOnReport = pOnReport ?: false,
     fired = fired ?: false,
-    refModItem = refModItem?:0
+    refModItem = refModItem ?: 0
 )
 
 @Immutable
