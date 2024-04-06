@@ -51,6 +51,10 @@ data class OrderItemState(
     val pickFollowItemQty: Boolean = false,
     val modifierGroupID: Int = 0,
     val prePaidCard: Boolean = false,
+    val pOnReport: Boolean = false,
+    val fired: Boolean = false,
+    val pOnCheck: Boolean = false,
+    val refModItem: Int = 0,
 )
 
 fun OrderItemState.toEntity(): FireItems = FireItems(
@@ -64,7 +68,29 @@ fun OrderItemState.toEntity(): FireItems = FireItems(
     noServiceCharge = noServiceCharge,
     pickFollowItemQty = pickFollowItemQty,
     prePaidCard = prePaidCard,
-    taxable = taxable
+    taxable = taxable,
+    pOnReport = pOnReport,
+    fired = fired,
+    pOnCheck = pOnCheck,
+    refModItem = refModItem
+)
+
+fun FireItems.toState(): OrderItemState = OrderItemState(
+    id = id,
+    name = name ?: "",
+    unitPrice = price,
+    qty = qty,
+    totalPrice = totalPrice,
+    isModifier = isModifier,
+    modifierGroupID = modifierGroupID,
+    noServiceCharge = noServiceCharge,
+    pickFollowItemQty = pickFollowItemQty,
+    prePaidCard = prePaidCard,
+    taxable = taxable,
+    pOnCheck = pOnCheck ?: false,
+    pOnReport = pOnReport ?: false,
+    fired = fired ?: false,
+    refModItem = refModItem?:0
 )
 
 @Immutable
@@ -90,6 +116,9 @@ data class ItemModifierState(
     val pickFollowItemQty: Boolean = false,
     val modifierGroupID: Int = 0,
     val prePaidCard: Boolean = false,
+    val pOnReport: Boolean = false,
+    val pOnCheck: Boolean = false,
+    val refModItem: Int = 0,
 )
 
 @Immutable
@@ -103,6 +132,8 @@ data class ItemState(
     val pickFollowItemQty: Boolean = false,
     val modifierGroupID: Int = 0,
     val prePaidCard: Boolean = false,
+    val pOnReport: Boolean = false,
+    val pOnCheck: Boolean = false,
 )
 
 
@@ -115,7 +146,9 @@ fun Item.toItemModifierState(): ItemModifierState = ItemModifierState(
     prePaidCard = prePaidCard,
     pickFollowItemQty = false,
     modifierGroupID = 0,
-    noServiceCharge = noServiceCharge
+    noServiceCharge = noServiceCharge,
+    pOnReport = printOnReport,
+    pOnCheck = printItemOnCheck
 )
 
 fun Item.toItemState(): ItemState = ItemState(
@@ -127,11 +160,14 @@ fun Item.toItemState(): ItemState = ItemState(
     prePaidCard = prePaidCard,
     pickFollowItemQty = false,
     modifierGroupID = 0,
-    noServiceCharge = noServiceCharge
+    noServiceCharge = noServiceCharge,
+    pOnReport = printOnReport,
+    pOnCheck = printItemOnCheck
 )
 
 fun ItemState.toItemModifierState(): ItemModifierState = ItemModifierState(
     id = id,
     name = name,
-    price = price
+    price = price,
+    pOnCheck = pOnCheck
 )

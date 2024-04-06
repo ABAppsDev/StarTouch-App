@@ -25,8 +25,11 @@ class OrderScreenModel(
     override val viewModelScope: CoroutineScope get() = screenModelScope
 
     init {
+        orders.addAll(items.map { it.toState() })
+        val newList = orders
+        updateState { it.copy(orderItemState = newList) }
         getAllPresets()
-        println("kiko$items")
+        println(orders + "hi")
     }
 
     fun backToPresets() {
@@ -275,6 +278,8 @@ class OrderScreenModel(
                     pickFollowItemQty = item.pickFollowItemQty,
                     prePaidCard = item.prePaidCard,
                     taxable = item.taxable,
+                    pOnReport = item.pOnReport,
+                    fired = true
                 )
             )
             updateState { it.copy(orderItemState = orders.toList()) }
