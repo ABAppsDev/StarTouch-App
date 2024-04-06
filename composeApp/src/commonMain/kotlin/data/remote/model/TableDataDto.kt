@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TableDataDto(
     val id: Int? = null,
-    val name: Int? = null,
+    val name: String? = null,
     val coversCapacity: Int? = null,
     val covers: Int? = null,
     val countChecks: Int? = null,

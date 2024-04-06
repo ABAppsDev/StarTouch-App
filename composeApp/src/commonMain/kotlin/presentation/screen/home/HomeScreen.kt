@@ -48,6 +48,7 @@ import com.beepbeep.designSystem.ui.composable.StTextField
 import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
 import com.beepbeep.designSystem.ui.composable.snackbar.StackedSnackbarDuration
 import com.beepbeep.designSystem.ui.theme.Theme
+import data.util.StarTouchSetup
 import exitApplication
 import kms
 import kotlinx.coroutines.delay
@@ -258,7 +259,12 @@ private fun OnRender(
                 color = Theme.colors.contentPrimary,
                 textAlign = TextAlign.Center
             )
-
+            Text(
+                text = "Station : ${StarTouchSetup.WORK_STATION_ID}",
+                style = Theme.typography.headlineLarge,
+                color = Theme.colors.contentPrimary,
+                textAlign = TextAlign.Center
+            )
             Text(
                 text = state.homeDetailsState.systemDate,
                 style = Theme.typography.headlineLarge,

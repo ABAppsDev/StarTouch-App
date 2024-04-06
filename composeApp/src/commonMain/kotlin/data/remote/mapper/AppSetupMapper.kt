@@ -26,5 +26,5 @@ fun OutletSetupDto.toEntity(): OutletSetup = OutletSetup(
 )
 
 fun RoomSetupDto.toEntity(): RoomSetup = RoomSetup(
-    id ?: 0, code ?: 0, name ?: ""
+    id ?: 0, code ?: 0, name ?: "",name2?:""
 )

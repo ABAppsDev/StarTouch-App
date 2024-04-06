@@ -40,4 +40,7 @@ data class Arabic(
     override val itemAddedSuccess: String = "تم اضافة العنصر بنجاح",
     override val alreadyOpenChecks: String = "في شيك مفتوح بالفعل عايز واحد جديد ؟",
     override val comment: String = "تعليق",
+    override val createTableGuest: String = "فتح طرابيزه مخصوص",
+    override val showAllTableGuest: String = "عرض كل الطرابيزات المخصوصة",
+    override val tableName: String = "اسم الطرابيزة",
 ) : IStringResources

@@ -5,7 +5,7 @@ import domain.entity.TableData
 
 fun TableDataDto.toEntity(): TableData = TableData(
     id = id ?: 0,
-    name = name ?: 0,
+    name = name ?: "0",
     covers = covers ?: 0,
     coversCapacity = coversCapacity ?: 0,
     checkId = checkId,

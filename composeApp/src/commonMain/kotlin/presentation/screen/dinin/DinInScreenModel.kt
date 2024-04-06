@@ -1,25 +1,30 @@
 package presentation.screen.dinin
 
 import cafe.adriel.voyager.core.model.screenModelScope
+import data.util.AppLanguage
 import data.util.StarTouchSetup
 import domain.entity.OpenNewCheck
 import domain.entity.TableData
-import domain.usecase.GetRestaurantTablesUseCase
+import domain.usecase.GetAppSetupUseCase
 import domain.usecase.ManageChecksUseCase
 import domain.usecase.ManageDinInUseCase
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.launch
 import presentation.base.BaseScreenModel
 import presentation.base.ErrorState
 
 class DinInScreenModel(
-    private val getRestaurantTablesUseCase: GetRestaurantTablesUseCase,
     private val manageDinInUseCase: ManageDinInUseCase,
-    private val manageChecksUseCase: ManageChecksUseCase
+    private val manageChecksUseCase: ManageChecksUseCase,
+    private val setupUseCase: GetAppSetupUseCase,
 ) : BaseScreenModel<DinInState, DinInUiEffect>(DinInState()), DinInInteractionListener {
     override val viewModelScope: CoroutineScope get() = screenModelScope
 
     init {
         getTables()
+        getAllRooms()
     }
 
     private fun getTables() {
@@ -32,9 +37,10 @@ class DinInScreenModel(
         }
         tryToExecute(
             function = {
-                getRestaurantTablesUseCase(
+                manageDinInUseCase.getTablesDataByRoomId(
                     StarTouchSetup.OUTLET_ID,
-                    StarTouchSetup.REST_ID
+                    StarTouchSetup.REST_ID,
+                    StarTouchSetup.MAIN_ROOM_ID
                 )
             },
             onSuccess = ::onGetTablesSuccess,
@@ -77,6 +83,8 @@ class DinInScreenModel(
 
     fun retry() {
         getTables()
+        getAllRooms()
+        updateState { it.copy(roomId = StarTouchSetup.MAIN_ROOM_ID) }
     }
 
     override fun onClickOk() {
@@ -102,7 +110,7 @@ class DinInScreenModel(
                     manageChecksUseCase.openNewCheck(
                         OpenNewCheck(
                             tableId = value.tableId,
-                            tableName = value.tableName.toString(),
+                            tableName = value.tableName,
                             serverId = value.dinInDialogueState.serverId,
                             workStationId = StarTouchSetup.WORK_STATION_ID,
                             outletId = StarTouchSetup.OUTLET_ID,
@@ -131,7 +139,7 @@ class DinInScreenModel(
         }
     }
 
-    override fun onClickTable(tableId: Int, tableName: Int) {
+    override fun onClickTable(tableId: Int, tableName: String) {
         updateState {
             it.copy(
                 isLoading = false,
@@ -218,7 +226,7 @@ class DinInScreenModel(
         }
     }
 
-    override fun onClickAssignDrawer(id: Int) {
+    override fun onClickAssignCheck(id: Int) {
         updateState {
             it.copy(
                 isLoading = false,
@@ -269,13 +277,26 @@ class DinInScreenModel(
         }
     }
 
+    override fun onTableNameChanged(tableName: String) {
+        updateState {
+            it.copy(
+                isLoading = false,
+                errorMessage = "",
+                errorDinInState = null,
+                dinInDialogueState = it.dinInDialogueState.copy(
+                    tableName = tableName
+                )
+            )
+        }
+    }
+
     override fun onDismissDinInDialogue() {
         updateState {
             it.copy(
                 isLoading = false,
                 dinInDialogueState = DinInDialogueState(),
                 tableId = 0,
-                tableName = 0,
+                tableName = "0",
             )
         }
     }
@@ -302,7 +323,7 @@ class DinInScreenModel(
         updateState { it.copy(isLoading = false, showErrorScreen = true) }
     }
 
-    override fun showWarningDialogue(tableId: Int, tableName: Int) {
+    override fun showWarningDialogue(tableId: Int, tableName: String) {
         updateState {
             it.copy(
                 isLoading = false,
@@ -322,7 +343,7 @@ class DinInScreenModel(
                 errorMessage = "",
                 errorDinInState = null,
                 warningDialogueIsVisible = false,
-                tableName = 0,
+                tableName = "0",
                 tableId = 0
             )
         }
@@ -337,17 +358,17 @@ class DinInScreenModel(
                 warningDialogueIsVisible = false,
                 dinInDialogueState = it.dinInDialogueState.copy(
                     isVisible = true,
-                    isLoading = true,
+                    isLoading = false,
                     isSuccess = false,
                     isLoadingButton = false,
-                    serverId = 0
+                    serverId = 0,
+                    isNamedTable = true
                 )
             )
         }
-        onClickTable(state.value.tableId, state.value.tableName)
     }
 
-    override fun onLongClick(tableId: Int) {
+    override fun onLongClick(tableId: Long) {
         updateState {
             it.copy(
                 isLoading = false,
@@ -359,36 +380,252 @@ class DinInScreenModel(
                     isLoadingButton = false,
                     isSuccess = false
                 ),
-                tableId = tableId,
+                tableId = tableId.toInt(),
+            )
+        }
+        if (state.value.roomId != 0)
+            tryToExecute(
+                function = {
+                    manageChecksUseCase.getAllChecksByTableId(
+                        tableId = tableId.toInt(),
+                        StarTouchSetup.OUTLET_ID,
+                        StarTouchSetup.REST_ID,
+                        serverId = StarTouchSetup.USER_ID,
+                        userId = StarTouchSetup.USER_ID,
+                    )
+                },
+                onSuccess = { checks ->
+                    updateState {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "",
+                            errorDinInState = null,
+                            dinInDialogueState = it.dinInDialogueState.copy(
+                                isVisible = true,
+                                isLoading = false,
+                                isLoadingButton = false,
+                                checks = checks.map { check ->
+                                    AssignCheckState(
+                                        id = check.id,
+                                        name = check.id.toString()
+                                    )
+                                }
+                            ),
+                        )
+                    }
+                },
+                onError = { errorState ->
+                    updateState {
+                        it.copy(
+                            isLoading = false,
+                            errorDinInState = errorState,
+                            dinInDialogueState = DinInDialogueState(),
+                            errorDialogueIsVisible = true,
+                            errorMessage = when (errorState) {
+                                is ErrorState.NetworkError -> errorState.message.toString()
+                                is ErrorState.NotFound -> errorState.message.toString()
+                                is ErrorState.ServerError -> errorState.message.toString()
+                                is ErrorState.UnknownError -> errorState.message.toString()
+                                is ErrorState.EmptyData -> errorState.message.toString()
+                                is ErrorState.ValidationError -> errorState.message.toString()
+                                is ErrorState.ValidationNetworkError -> errorState.message.toString()
+                                else -> "Unknown error"
+                            }
+                        )
+                    }
+                }
+            )
+        else {
+            updateState {
+                it.copy(
+                    isLoading = false,
+                    errorMessage = "",
+                    errorDinInState = null,
+                    dinInDialogueState = it.dinInDialogueState.copy(
+                        isVisible = false,
+                        isLoading = false,
+                        isLoadingButton = false,
+                        isSuccess = false,
+                        assignDrawers = emptyList()
+                    ),
+                    checkId = tableId
+                )
+            }
+            sendNewEffect(DinInUiEffect.NavigateToOrderScreen(tableId))
+        }
+    }
+
+    override fun onClickBack() {
+        viewModelScope.launch(Dispatchers.IO) {
+            AppLanguage.code.emit(StarTouchSetup.DEFAULT_LANGUAGE)
+            sendNewEffect(DinInUiEffect.NavigateBackToHome)
+        }
+    }
+
+    override fun onClickTableGuest() {
+        updateState {
+            it.copy(
+                isLoading = true,
+                errorDinInState = null,
+                errorMessage = "",
             )
         }
         tryToExecute(
             function = {
-                manageChecksUseCase.getAllChecksByTableId(
-                    tableId = tableId,
+                manageDinInUseCase.getAllTablesGuest(
                     StarTouchSetup.OUTLET_ID,
-                    StarTouchSetup.REST_ID,
-                    serverId = StarTouchSetup.USER_ID,
-                    userId = StarTouchSetup.USER_ID,
+                    StarTouchSetup.REST_ID
                 )
             },
-            onSuccess = { checks ->
+            onSuccess = { tables ->
                 updateState {
                     it.copy(
                         isLoading = false,
                         errorMessage = "",
                         errorDinInState = null,
-                        dinInDialogueState = it.dinInDialogueState.copy(
-                            isVisible = true,
-                            isLoading = false,
-                            isLoadingButton = false,
-                            checks = checks.map { check ->
-                                AssignDrawerState(
-                                    id = check.id,
-                                    name = check.id.toString()
-                                )
-                            }
-                        ),
+                        showErrorScreen = false,
+                        tablesDetails = tables.map { table ->
+                            table.toTableDetailsState()
+                        },
+                        roomId = 0
+                    )
+                }
+            },
+            onError = { errorState ->
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        errorDinInState = errorState,
+                        tablesDetails = emptyList(),
+                        errorMessage = when (errorState) {
+                            is ErrorState.NetworkError -> errorState.message.toString()
+                            is ErrorState.NotFound -> errorState.message.toString()
+                            is ErrorState.ServerError -> errorState.message.toString()
+                            is ErrorState.UnknownError -> errorState.message.toString()
+                            is ErrorState.EmptyData -> errorState.message.toString()
+                            is ErrorState.ValidationNetworkError -> errorState.message.toString()
+                            else -> "Unknown error"
+                        }
+                    )
+                }
+            }
+        )
+    }
+
+    override fun onCreateTableGuest() {
+        updateState {
+            it.copy(
+                isLoading = false,
+                errorMessage = "",
+                errorDinInState = null,
+                dinInDialogueState = it.dinInDialogueState.copy(
+                    isVisible = true,
+                    isLoading = false,
+                    isNamedTable = true
+                ),
+                tableId = 0,
+            )
+        }
+    }
+
+    override fun onClickRoom(id: Int) {
+        updateState {
+            it.copy(
+                isLoading = true,
+                errorDinInState = null,
+                errorMessage = "",
+            )
+        }
+        tryToExecute(
+            function = {
+                manageDinInUseCase.getTablesDataByRoomId(
+                    StarTouchSetup.OUTLET_ID,
+                    StarTouchSetup.REST_ID,
+                    id
+                )
+            },
+            onSuccess = { tables ->
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "",
+                        errorDinInState = null,
+                        showErrorScreen = false,
+                        tablesDetails = tables.map { table ->
+                            table.toTableDetailsState()
+                        },
+                        roomId = id
+                    )
+                }
+            },
+            onError = { errorState ->
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        errorDinInState = errorState,
+                        tablesDetails = emptyList(),
+                        errorMessage = when (errorState) {
+                            is ErrorState.NetworkError -> errorState.message.toString()
+                            is ErrorState.NotFound -> errorState.message.toString()
+                            is ErrorState.ServerError -> errorState.message.toString()
+                            is ErrorState.UnknownError -> errorState.message.toString()
+                            is ErrorState.EmptyData -> errorState.message.toString()
+                            is ErrorState.ValidationNetworkError -> errorState.message.toString()
+                            else -> "Unknown error"
+                        }
+                    )
+                }
+            }
+        )
+    }
+
+    override fun onEnterTableName() {
+        if (state.value.dinInDialogueState.tableName.isEmpty())
+            onError(errorState = ErrorState.ValidationError("Enter table name"))
+        else {
+            updateState {
+                it.copy(
+                    isLoading = false,
+                    errorMessage = "",
+                    errorDinInState = null,
+                    dinInDialogueState = it.dinInDialogueState.copy(
+                        isLoadingButton = true,
+                        isLoading = false,
+                        isNamedTable = false,
+                    ),
+                    tableName = state.value.dinInDialogueState.tableName
+                )
+            }
+            onClickTable(state.value.tableId, state.value.dinInDialogueState.tableName)
+        }
+    }
+
+    private fun getAllRooms() {
+        updateState {
+            it.copy(
+                isLoading = true,
+                errorDinInState = null,
+                errorMessage = "",
+            )
+        }
+        tryToExecute(
+            function = {
+                setupUseCase.getAllRoomsByOutletAndRestId(
+                    StarTouchSetup.OUTLET_ID,
+                    StarTouchSetup.REST_ID
+                )
+            },
+            onSuccess = { rooms ->
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        errorDinInState = null,
+                        errorMessage = "",
+                        rooms = rooms.map { room ->
+                            room.toState()
+                        }.sortedByDescending { roomSorted ->
+                            roomSorted.id == StarTouchSetup.MAIN_ROOM_ID
+                        }
                     )
                 }
             },

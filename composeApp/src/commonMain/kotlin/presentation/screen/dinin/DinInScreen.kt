@@ -1,6 +1,7 @@
 package presentation.screen.dinin
 
 import abapps_startouch.composeapp.generated.resources.Res
+import abapps_startouch.composeapp.generated.resources.ic_back
 import abapps_startouch.composeapp.generated.resources.table
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,16 +22,17 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Pageview
+import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,21 +42,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import com.beepbeep.designSystem.ui.composable.StAppBar
+import com.beepbeep.designSystem.ui.composable.StButton
 import com.beepbeep.designSystem.ui.composable.StChip
+import com.beepbeep.designSystem.ui.composable.StDialogue
+import com.beepbeep.designSystem.ui.composable.StOutlinedButton
+import com.beepbeep.designSystem.ui.composable.StTextField
+import com.beepbeep.designSystem.ui.composable.StThreeDotLoadingIndicator
 import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
 import com.beepbeep.designSystem.ui.theme.Theme
-import kms
 import org.jetbrains.compose.resources.painterResource
-import presentation.screen.composable.AppButton
-import presentation.screen.composable.AppDialogue
 import presentation.screen.composable.AppScaffold
-import presentation.screen.composable.AppTextField
-import presentation.screen.composable.AppThreeDotLoadingIndicator
 import presentation.screen.composable.ErrorDialogue
 import presentation.screen.composable.RestaurantTableWithText
 import presentation.screen.composable.RestaurantTableWithTextLoading
@@ -83,6 +85,8 @@ class DinInScreen : Screen {
                 is DinInUiEffect.NavigateToOrderScreen -> {
                     navigator.push(OrderScreen(effect.checkId))
                 }
+
+                DinInUiEffect.NavigateBackToHome -> navigator.pop()
             }
         }
 
@@ -105,9 +109,11 @@ class DinInScreen : Screen {
                 isLoadingButton = state.dinInDialogueState.isLoadingButton,
                 isLoading = state.dinInDialogueState.isLoading,
                 dinInInteractionListener = dinInScreenModel as DinInInteractionListener,
-                assignDrawers = state.dinInDialogueState.assignDrawers,
+                assignChecks = state.dinInDialogueState.assignDrawers,
                 isSuccess = state.dinInDialogueState.isSuccess,
-                checks = state.dinInDialogueState.checks
+                checks = state.dinInDialogueState.checks,
+                isNamedTable = state.dinInDialogueState.isNamedTable,
+                tableName = state.dinInDialogueState.tableName
             )
         }
 
@@ -143,33 +149,45 @@ private fun OnRender(
 ) {
     Box(Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
         SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
-            Column(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+            Column(Modifier.fillMaxSize()) {
+                StAppBar(
+                    onNavigateUp = listener::onClickBack,
+                    painterResource = painterResource(Res.drawable.ic_back),
+                    title = Resources.strings.dinningIn,
+                )
                 Row(
-                    Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 4.dp)
-                        .bottomBorder(1.dp, Theme.colors.divider),
+                    Modifier.fillMaxWidth()
+                        .padding(top = 16.dp, bottom = 4.dp, start = 16.dp, end = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     StChip(
-                        "Table Guest",
+                        label = Resources.strings.createTableGuest,
                         isSelected = true,
-                        onClick = {},
+                        onClick = { listener.onCreateTableGuest() },
                         painter = painterResource(Res.drawable.table)
                     )
-                    LazyRow(
-                        contentPadding = PaddingValues(8.dp),
-                        modifier = Modifier.fillMaxWidth(0.70f),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        items(3) {
-                            StChip(
-                                "Table $it",
-                                isSelected = true,
-                                onClick = {},
-                                painter = painterResource(Res.drawable.table)
-                            )
-                        }
+                    StChip(
+                        label = Resources.strings.showAllTableGuest,
+                        isSelected = true,
+                        onClick = { if (state.roomId != 0) listener.onClickTableGuest() },
+                    )
+                }
+                LazyRow(
+                    contentPadding = PaddingValues(16.dp),
+                    modifier = Modifier.align(Alignment.End)
+                        .bottomBorder(1.dp, Theme.colors.divider),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    reverseLayout = true
+                ) {
+                    items(state.rooms) { room ->
+                        StChip(
+                            room.name,
+                            isSelected = room.id == state.roomId,
+                            onClick = { if (room.id != state.roomId) listener.onClickRoom(room.id) },
+                            painter = painterResource(Res.drawable.table)
+                        )
                     }
                 }
                 LazyVerticalGrid(
@@ -180,9 +198,15 @@ private fun OnRender(
                     contentPadding = PaddingValues(8.dp)
                 ) {
                     items(state.tablesDetails) { table ->
-                        ChooseTable(table, onLongClick = {
-                            listener.onLongClick(table.tableId)
-                        }) {
+                        ChooseTable(
+                            table,
+                            onLongClick = {
+                                if (state.roomId != 0)
+                                    listener.onLongClick(table.tableId.toLong())
+                                else listener.onLongClick(table.checkId ?: 0L)
+                            },
+                            id = state.roomId
+                        ) {
                             if (table.checksCount > 0)
                                 listener.showWarningDialogue(table.tableId, table.tableNumber)
                             else
@@ -205,33 +229,31 @@ private fun OnRender(
 @Composable
 private fun DinInDialogue(
     covers: String,
+    tableName: String,
     isLoading: Boolean,
     isLoadingButton: Boolean,
     isSuccess: Boolean,
-    assignDrawers: List<AssignDrawerState>,
-    checks: List<AssignDrawerState>,
+    isNamedTable: Boolean,
+    assignChecks: List<AssignCheckState>,
+    checks: List<AssignCheckState>,
     dinInInteractionListener: DinInInteractionListener,
     modifier: Modifier = Modifier,
 ) {
-    AppDialogue(
+    StDialogue(
         onDismissRequest = dinInInteractionListener::onDismissDinInDialogue,
         modifier = modifier
     ) {
         FadeAnimation(isLoading) {
-            Box(
-                Modifier.fillMaxWidth(LocalDensity.current.density / 1.5f)
-                    .heightIn(min = 100.dp), contentAlignment = Alignment.Center
-            ) {
-                AppThreeDotLoadingIndicator(
-                    dotColor = Color.White
-                )
-            }
+            StThreeDotLoadingIndicator()
         }
         if (isSuccess) {
             EnterCoversNumber(covers, isLoadingButton, dinInInteractionListener)
         }
-        FadeAnimation(assignDrawers.isNotEmpty()) {
-            ChooseListAssignDrawer(dinInInteractionListener, assignDrawers)
+        if (isNamedTable) {
+            EnterTableName(tableName, isLoadingButton, dinInInteractionListener)
+        }
+        FadeAnimation(assignChecks.isNotEmpty()) {
+            ChooseListAssignCheck(dinInInteractionListener, assignChecks)
         }
         FadeAnimation(checks.isNotEmpty()) {
             ChooseCheck(dinInInteractionListener, checks)
@@ -239,19 +261,66 @@ private fun DinInDialogue(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ChooseListAssignDrawer(
+private fun EnterTableName(
+    tableName: String,
+    loadingButton: Boolean,
+    dinInInteractionListener: DinInInteractionListener
+) {
+    Text(
+        text = Resources.strings.tableName,
+        style = Theme.typography.headline,
+        color = Theme.colors.contentPrimary,
+    )
+    StTextField(
+        modifier = Modifier.padding(top = 24.dp),
+        label = Resources.strings.tableName,
+        text = tableName,
+        hint = Resources.strings.tableName,
+        onValueChange = dinInInteractionListener::onTableNameChanged,
+        keyboardType = KeyboardType.Text,
+        imeAction = ImeAction.Go,
+        keyboardActions = KeyboardActions(onGo = {
+            dinInInteractionListener.onClickOk()
+        })
+    )
+    SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            StOutlinedButton(
+                title = Resources.strings.cancel,
+                onClick = {
+                    dinInInteractionListener.onDismissDinInDialogue()
+                },
+                modifier = Modifier.weight(1f)
+            )
+            StButton(
+                title = Resources.strings.ok,
+                onClick = {
+                    dinInInteractionListener.onEnterTableName()
+                },
+                modifier = Modifier.weight(1f),
+                isLoading = loadingButton,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ChooseListAssignCheck(
     dinInInteractionListener: DinInInteractionListener,
-    assignDrawers: List<AssignDrawerState>,
+    assignChecks: List<AssignCheckState>,
 ) {
     LazyColumn(
-        contentPadding = PaddingValues(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(assignDrawers) { assignDrawer ->
-            AssignDrawerItem(assignDrawer.name) {
-                dinInInteractionListener.onClickAssignDrawer(assignDrawer.id.toInt())
+        items(assignChecks) { assignCheck ->
+            AssignCheckItem(assignCheck.name) {
+                dinInInteractionListener.onClickAssignCheck(assignCheck.id.toInt())
             }
         }
     }
@@ -260,40 +329,44 @@ private fun ChooseListAssignDrawer(
 @Composable
 private fun ChooseCheck(
     dinInInteractionListener: DinInInteractionListener,
-    assignDrawers: List<AssignDrawerState>,
+    checks: List<AssignCheckState>,
 ) {
     LazyColumn(
-        contentPadding = PaddingValues(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(assignDrawers) { assignDrawer ->
-            CheckItem(assignDrawer.name) {
-                dinInInteractionListener.onClickCheck(assignDrawer.id)
+        items(checks) { check ->
+            CheckItem(check.name) {
+                dinInInteractionListener.onClickCheck(check.id)
             }
         }
     }
 }
 
 @Composable
-private fun AssignDrawerItem(
+private fun AssignCheckItem(
     name: String,
     onClick: () -> Unit,
 ) {
     SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
         Row(
-            modifier = Modifier.fillMaxWidth().bounceClick { onClick() }.padding(8.dp),
+            modifier = Modifier.fillMaxWidth().bounceClick { onClick() }.padding(8.dp)
+                .bottomBorder(1.dp, Theme.colors.divider),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(Color.White)) {
+            Box(
+                Modifier.size(48.dp).padding(bottom = 8.dp)
+                    .clip(RoundedCornerShape(Theme.radius.large))
+                    .background(Theme.colors.contentPrimary)
+            ) {
                 Icon(
                     Icons.Filled.Person,
                     contentDescription = null,
                     Modifier.align(Alignment.Center).size(24.dp)
                 )
             }
-            Text(name, style = MaterialTheme.typography.headlineSmall, color = Color.White)
+            Text(name, style = Theme.typography.headline, color = Theme.colors.contentPrimary)
         }
     }
 }
@@ -305,22 +378,28 @@ private fun CheckItem(
 ) {
     SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
         Row(
-            modifier = Modifier.fillMaxWidth().bounceClick { onClick() }.padding(8.dp),
+            modifier = Modifier.fillMaxWidth().bounceClick { onClick() }.padding(8.dp)
+                .bottomBorder(1.dp, Theme.colors.divider),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(Color.White)) {
+            Box(
+                Modifier.size(48.dp).padding(bottom = 8.dp)
+                    .clip(RoundedCornerShape(Theme.radius.large))
+                    .background(Theme.colors.contentPrimary)
+            ) {
                 Icon(
-                    Icons.Filled.Pageview,
+                    Icons.Filled.AttachMoney,
                     contentDescription = null,
                     Modifier.align(Alignment.Center).size(24.dp)
                 )
             }
-            Text(name, style = MaterialTheme.typography.headlineSmall, color = Color.White)
+            Text(name, style = Theme.typography.headline, color = Theme.colors.contentPrimary)
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EnterCoversNumber(
     covers: String,
@@ -328,33 +407,42 @@ private fun EnterCoversNumber(
     dinInInteractionListener: DinInInteractionListener,
 ) {
     Text(
-        Resources.strings.covers,
-        modifier = Modifier.padding(vertical = 8.kms),
-        style = MaterialTheme.typography.headlineSmall
+        text = Resources.strings.covers,
+        style = Theme.typography.headline,
+        color = Theme.colors.contentPrimary,
     )
-    AppTextField(
+    StTextField(
+        modifier = Modifier.padding(top = 24.dp),
+        label = Resources.strings.covers,
         text = covers,
-        onValueChange = dinInInteractionListener::onCoversCountChanged,
         hint = Resources.strings.covers,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.kms),
+        onValueChange = dinInInteractionListener::onCoversCountChanged,
         keyboardType = KeyboardType.Number,
+        imeAction = ImeAction.Go,
+        keyboardActions = KeyboardActions(onGo = {
+            dinInInteractionListener.onClickOk()
+        })
     )
     SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
         Row(
-            modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = 16.kms, vertical = 16.kms),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.kms)
+            modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            AppButton(
-                Resources.strings.cancel,
-                modifier = Modifier.weight(1f),
-            ) { dinInInteractionListener.onDismissDinInDialogue() }
-            AppButton(
-                Resources.strings.ok,
+            StOutlinedButton(
+                title = Resources.strings.cancel,
+                onClick = {
+                    dinInInteractionListener.onDismissDinInDialogue()
+                },
+                modifier = Modifier.weight(1f)
+            )
+            StButton(
+                title = Resources.strings.ok,
+                onClick = {
+                    dinInInteractionListener.onClickOk()
+                },
                 modifier = Modifier.weight(1f),
                 isLoading = isLoading,
-            ) { dinInInteractionListener.onClickOk() }
+            )
         }
     }
 }
@@ -363,6 +451,7 @@ private fun EnterCoversNumber(
 @Composable
 private fun ChooseTable(
     table: TableDetailsState,
+    id: Int,
     modifier: Modifier = Modifier,
     onLongClick: () -> Unit = {},
     onClick: () -> Unit = {},
@@ -370,16 +459,18 @@ private fun ChooseTable(
     RestaurantTableWithText(
         covers = table.covers.toString(),
         openTime = table.openCheckDate ?: "",
-        tableCode = table.tableNumber.toString(),
+        tableCode = table.tableNumber,
         totalAmount = table.totalOrdersPrice.toString(),
         checksCount = table.checksCount.toString(),
         hasOrders = table.covers > 0 || table.openCheckDate != "null",
         modifier = modifier
             .combinedClickable(
                 onLongClick = {
-                    if (table.covers > 0)
-                        onLongClick()
+                    if (table.covers > 0 && id != 0)
+                        onClick()
                 },
-            ) { onClick() }
+            ) {
+                if (table.covers > 0) onLongClick() else if (id != 0) onClick()
+            }
     )
 }

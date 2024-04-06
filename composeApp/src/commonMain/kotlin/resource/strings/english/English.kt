@@ -40,4 +40,7 @@ data class English(
     override val itemAddedSuccess: String = "Item has been added successfully",
     override val alreadyOpenChecks: String = "There is an open check, do you want to make new check?",
     override val comment: String = "Comment",
+    override val createTableGuest: String = "Create Table Guest",
+    override val showAllTableGuest: String = "Show All Tables Guest",
+    override val tableName: String = "Table name",
 ) : IStringResources

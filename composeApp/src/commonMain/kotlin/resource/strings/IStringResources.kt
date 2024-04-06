@@ -38,4 +38,7 @@ interface IStringResources {
     val itemAddedSuccess: String
     val alreadyOpenChecks: String
     val comment:String
+    val createTableGuest:String
+    val showAllTableGuest:String
+    val tableName:String
 }

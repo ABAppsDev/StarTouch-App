@@ -22,6 +22,15 @@ class DinInGateway(client: HttpClient) : BaseGateway(client), IDinInGateway {
         }.data?.map { it.toEntity() } ?: throw NotFoundException("Tables not found")
     }
 
+    override suspend fun getAllTablesGuest(outletID: Int, restID: Int): List<TableData> {
+        return tryToExecute<ServerResponse<List<TableDataDto>>> {
+            get("/dinin/tables-guest") {
+                parameter("outletID", outletID)
+                parameter("restID", restID)
+            }
+        }.data?.map { it.toEntity() } ?: throw NotFoundException("Tables not found")
+    }
+
     override suspend fun getAllOnlineUsers(outletId: Int, restId: Int): List<AssignCheck> {
         return tryToExecute<ServerResponse<List<AssignCheckDto>>> {
             get("/check/assign") {
