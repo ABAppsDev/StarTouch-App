@@ -73,8 +73,8 @@ class HomeScreenModel(
         if (restId != 0 && outletId != 0 && wsd != 0 && apiUrl != "") {
             StarTouchSetup.REST_ID = restId
             StarTouchSetup.OUTLET_ID = outletId
-            StarTouchSetup.WORK_STATION_ID = tableId
-            StarTouchSetup.MAIN_ROOM_ID = wsd
+            StarTouchSetup.WORK_STATION_ID = wsd
+            StarTouchSetup.MAIN_ROOM_ID = tableId
         } else throw Exception("Please setup app first then try again")
     }
 
