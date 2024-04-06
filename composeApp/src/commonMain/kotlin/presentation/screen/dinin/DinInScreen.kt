@@ -25,7 +25,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.PullRefreshState
@@ -83,7 +82,14 @@ class DinInScreen : Screen {
         EventHandler(dinInScreenModel.effect) { effect, navigator ->
             when (effect) {
                 is DinInUiEffect.NavigateToOrderScreen -> {
-                    navigator.replace(OrderScreen(effect.checkId, effect.items, effect.isReopened))
+                    navigator.replace(
+                        OrderScreen(
+                            effect.checkId,
+                            effect.checkNumber,
+                            effect.items,
+                            effect.isReopened
+                        )
+                    )
                 }
 
                 DinInUiEffect.NavigateBackToHome -> navigator.pop()
@@ -337,7 +343,7 @@ private fun ChooseCheck(
     ) {
         items(checks) { check ->
             CheckItem(check.name) {
-                dinInInteractionListener.onClickCheck(check.id)
+                dinInInteractionListener.onClickCheck(check.id, check.name.toInt())
             }
         }
     }
@@ -383,18 +389,27 @@ private fun CheckItem(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                Modifier.size(48.dp).padding(bottom = 8.dp)
-                    .clip(RoundedCornerShape(Theme.radius.large))
-                    .background(Theme.colors.contentPrimary)
-            ) {
-                Icon(
-                    Icons.Filled.AttachMoney,
-                    contentDescription = null,
-                    Modifier.align(Alignment.Center).size(24.dp)
-                )
-            }
-            Text(name, style = Theme.typography.headline, color = Theme.colors.contentPrimary)
+//            Box(
+//                Modifier.size(48.dp).padding(bottom = 8.dp)
+//                    .clip(RoundedCornerShape(Theme.radius.large))
+//                    .background(Theme.colors.contentPrimary)
+//            ) {
+////                Icon(
+////                    Icons.Filled.Pageview,
+////                    contentDescription = null,
+////                    Modifier.align(Alignment.Center).size(24.dp)
+////                )
+////                Text(
+////                    "Check number : ",
+////                    style = Theme.typography.headline,
+////                    color = Theme.colors.contentPrimary
+////                )
+//            }
+            Text(
+                "Check number : $name",
+                style = Theme.typography.headline,
+                color = Theme.colors.contentPrimary
+            )
         }
     }
 }

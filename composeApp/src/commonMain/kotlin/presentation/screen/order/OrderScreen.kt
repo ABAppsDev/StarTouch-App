@@ -87,6 +87,7 @@ import util.getScreenModel
 
 class OrderScreen(
     private val checkId: Long,
+    private val checkNumber: Int,
     private val items: List<FireItems>,
     private val isReopened: Boolean
 ) : Screen {
@@ -160,12 +161,12 @@ class OrderScreen(
                             if (state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && !isReopened)
                                 screenModel.showWarningDialogue()
                             else if (state.isFinishOrder) screenModel.onClickIconBack()
-                            else if (!state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && items.isNotEmpty()) nav.replace(
+                            else if (!state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && isReopened) nav.replace(
                                 DinInScreen()
                             )
                             else screenModel.backToPresets()
                         },
-                        title = "Order #$checkId",
+                        title = "Check number : $checkNumber",
                         isBackIconVisible = state.itemModifiersState.isEmpty(),
                         painterResource = painterResource(Res.drawable.ic_back)
                     )

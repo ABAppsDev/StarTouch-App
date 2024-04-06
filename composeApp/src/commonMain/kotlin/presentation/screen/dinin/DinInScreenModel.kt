@@ -135,7 +135,8 @@ class DinInScreenModel(
                             DinInUiEffect.NavigateToOrderScreen(
                                 check.id,
                                 emptyList(),
-                                false
+                                false,
+                                check.serial
                             )
                         )
                     }
@@ -251,7 +252,7 @@ class DinInScreenModel(
         StarTouchSetup.SERVER_ID = id
     }
 
-    override fun onClickCheck(id: Long) {
+    override fun onClickCheck(id: Long, serial: Int) {
         tryToExecute(
             function = {
                 manageChecksUseCase.reOpenCheck(id)
@@ -273,7 +274,7 @@ class DinInScreenModel(
                         checkId = id
                     )
                 }
-                sendNewEffect(DinInUiEffect.NavigateToOrderScreen(id, items, true))
+                sendNewEffect(DinInUiEffect.NavigateToOrderScreen(id, items, true, serial))
             },
             onError = ::onError
         )
@@ -422,7 +423,7 @@ class DinInScreenModel(
                                 checks = checks.map { check ->
                                     AssignCheckState(
                                         id = check.id,
-                                        name = check.id.toString()
+                                        name = check.checkSerial.toString()
                                     )
                                 }
                             ),
@@ -469,10 +470,17 @@ class DinInScreenModel(
                                 assignDrawers = emptyList(),
                                 checks = emptyList()
                             ),
-                            checkId = tableId
+                            checkId = tableId,
                         )
                     }
-                    sendNewEffect(DinInUiEffect.NavigateToOrderScreen(tableId, items, true))
+                    sendNewEffect(
+                        DinInUiEffect.NavigateToOrderScreen(
+                            tableId,
+                            items,
+                            true,
+                            tableId.toString().substring(6, tableId.toString().length).toInt()
+                        )
+                    )
                 },
                 onError = ::onError
             )

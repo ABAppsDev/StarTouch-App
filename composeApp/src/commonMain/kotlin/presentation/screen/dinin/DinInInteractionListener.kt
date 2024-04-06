@@ -4,7 +4,7 @@ interface DinInInteractionListener {
     fun onClickOk()
     fun onClickTable(tableId: Int, tableName: String)
     fun onClickAssignCheck(id: Int)
-    fun onClickCheck(id: Long)
+    fun onClickCheck(id: Long, serial: Int)
     fun onCoversCountChanged(covers: String)
     fun onTableNameChanged(tableName: String)
     fun onDismissDinInDialogue()

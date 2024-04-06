@@ -19,17 +19,18 @@ class OrderScreenModel(
     private val manageChecksUseCase: ManageChecksUseCase,
     private val manageSetting: ManageSettingUseCase,
     private val checkId: Long,
-    private val items: List<FireItems>,
+    items: List<FireItems>,
 ) : BaseScreenModel<OrderState, OrderUiEffect>(OrderState()),
     OrderInteractionListener {
     override val viewModelScope: CoroutineScope get() = screenModelScope
 
     init {
+        orders.clear()
+        updateState { it.copy(orderItemState = emptyList()) }
+        getAllPresets()
         orders.addAll(items.map { it.toState() })
         val newList = orders
         updateState { it.copy(orderItemState = newList) }
-        getAllPresets()
-        println(orders + "hi")
     }
 
     fun backToPresets() {
@@ -77,7 +78,7 @@ class OrderScreenModel(
                 errorState = null,
                 showErrorScreen = false,
                 isPresetVisible = false,
-                presetItemsState = emptyList()
+                presetItemsState = emptyList(),
             )
         }
         tryToExecute(
