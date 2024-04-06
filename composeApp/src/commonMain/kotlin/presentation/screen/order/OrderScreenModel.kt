@@ -3,6 +3,7 @@ package presentation.screen.order
 import cafe.adriel.voyager.core.model.screenModelScope
 import data.util.AppLanguage
 import data.util.StarTouchSetup
+import domain.entity.FireItems
 import domain.entity.Item
 import domain.entity.Preset
 import domain.usecase.ManageChecksUseCase
@@ -18,12 +19,51 @@ class OrderScreenModel(
     private val manageChecksUseCase: ManageChecksUseCase,
     private val manageSetting: ManageSettingUseCase,
     private val checkId: Long,
+    private val items: List<FireItems>,
 ) : BaseScreenModel<OrderState, OrderUiEffect>(OrderState()),
     OrderInteractionListener {
     override val viewModelScope: CoroutineScope get() = screenModelScope
 
     init {
         getAllPresets()
+        println("kiko$items")
+    }
+
+    fun backToPresets() {
+        updateState {
+            it.copy(
+                selectedPresetId = 0,
+                selectedItemId = 0,
+                itemsState = emptyList(),
+                itemChildrenState = emptyList(),
+                itemModifiersState = emptyList(),
+                isPresetVisible = false,
+            )
+        }
+    }
+
+    fun abortedCheck(checkId: Long) {
+        tryToExecute(
+            function = {
+                manageChecksUseCase.makeCheckAborted(
+                    checkId,
+                    StarTouchSetup.OUTLET_ID,
+                    StarTouchSetup.REST_ID
+                )
+            },
+            onSuccess = {
+                updateState { it.copy(orderItemState = emptyList()) }
+                viewModelScope.launch {
+                    val fastLoop = manageSetting.getIsBackToHome()
+                    if (fastLoop) sendNewEffect(OrderUiEffect.NavigateBackToDinIn)
+                    else {
+                        AppLanguage.code.emit(StarTouchSetup.USER_LANGUAGE)
+                        sendNewEffect(OrderUiEffect.NavigateBackToHome)
+                    }
+                }
+            },
+            onError = ::onError
+        )
     }
 
     private fun getAllPresets() {
@@ -325,6 +365,8 @@ class OrderScreenModel(
             onSuccess = {
                 if (it)
                     viewModelScope.launch {
+                        updateState { state -> state.copy(orderItemState = emptyList()) }
+                        orders.clear()
                         val fastLoop = manageSetting.getIsBackToHome()
                         if (fastLoop) sendNewEffect(OrderUiEffect.NavigateBackToDinIn)
                         else {
@@ -428,6 +470,14 @@ class OrderScreenModel(
 
     override fun addItem(orderItemState: OrderItemState) {
         orders.add(orderItemState)
+    }
+
+    override fun showWarningDialogue() {
+        updateState { it.copy(warningDialogueIsVisible = true) }
+    }
+
+    override fun onDismissWarningDialogue() {
+        updateState { it.copy(warningDialogueIsVisible = false) }
     }
 
     override fun onClickPlus(id: Int) {

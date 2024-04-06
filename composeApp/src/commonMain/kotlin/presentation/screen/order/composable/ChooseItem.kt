@@ -5,10 +5,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -19,11 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.beepbeep.designSystem.ui.theme.Theme
 import presentation.screen.composable.modifier.bounceClick
 import presentation.screen.composable.modifier.shimmerEffect
 
@@ -39,10 +40,10 @@ fun ChooseItem(
         modifier = modifier
             .clip(shape)
             .bounceClick { onClick() }
-            .size(94.dp),
+            .size(128.dp),
         shape = shape,
         colors = CardDefaults.cardColors(
-            containerColor = Color.Black
+            containerColor = Theme.colors.surface
         ),
         elevation = CardDefaults.cardElevation(16.dp)
     ) {
@@ -56,20 +57,16 @@ fun ChooseItem(
             Text(
                 text = title,
                 textAlign = TextAlign.Center,
-                color = Color.White,
-                fontSize = 14.sp,
-                fontFamily = FontFamily.Monospace,
-                fontWeight = FontWeight(500),
+                color = Theme.colors.contentPrimary,
+                style = Theme.typography.titleLarge,
             )
             Spacer(Modifier.height(8.dp))
             price?.let {
                 Text(
                     text = it,
                     textAlign = TextAlign.Center,
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight(500),
+                    color = Theme.colors.contentPrimary,
+                    style = Theme.typography.titleLarge,
                 )
             }
         }
@@ -87,4 +84,46 @@ fun ChooseItemLoading(
             .background(Color.White)
             .shimmerEffect(),
     )
+}
+
+@Composable
+fun ChoosePresetLoading(modifier: Modifier = Modifier) {
+    Box(modifier.height(260.dp).width(192.dp).bounceClick {}) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.8f)
+                .align(Alignment.BottomCenter)
+                .clip(RoundedCornerShape(16.dp, 16.dp, 16.dp, 16.dp))
+                .shimmerEffect(),
+
+            )
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(132.dp)
+                    .shimmerEffect(),
+            )
+            Text(
+                text = "",
+                modifier = Modifier
+                    .fillMaxWidth(0.8f).shimmerEffect(),
+                color = Theme.colors.contentPrimary,
+                textAlign = TextAlign.Center,
+                style = Theme.typography.headline,
+            )
+            Text(
+                text = "",
+                modifier = Modifier
+                    .fillMaxWidth(0.8f).shimmerEffect(),
+                color = Theme.colors.contentPrimary,
+                textAlign = TextAlign.Center,
+                style = Theme.typography.headline,
+            )
+        }
+    }
 }

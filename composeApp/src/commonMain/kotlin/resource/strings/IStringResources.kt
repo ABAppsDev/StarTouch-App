@@ -32,13 +32,14 @@ interface IStringResources {
     val passcodeEmptyException: String
     val authEmptyException: String
     val doYouWantToCloseApp: String
+    val doYouWantToAbortCheck: String
     val covers: String
     val welcome: String
     val bye: String
     val itemAddedSuccess: String
     val alreadyOpenChecks: String
-    val comment:String
-    val createTableGuest:String
-    val showAllTableGuest:String
-    val tableName:String
+    val comment: String
+    val createTableGuest: String
+    val showAllTableGuest: String
+    val tableName: String
 }

@@ -131,7 +131,7 @@ class DinInScreenModel(
                                 dinInDialogueState = DinInDialogueState(),
                             )
                         }
-                        sendNewEffect(DinInUiEffect.NavigateToOrderScreen(check.id))
+                        sendNewEffect(DinInUiEffect.NavigateToOrderScreen(check.id, emptyList()))
                     }
                 },
                 onError = ::onError
@@ -246,22 +246,31 @@ class DinInScreenModel(
     }
 
     override fun onClickCheck(id: Long) {
-        updateState {
-            it.copy(
-                isLoading = false,
-                errorMessage = "",
-                errorDinInState = null,
-                dinInDialogueState = it.dinInDialogueState.copy(
-                    isVisible = false,
-                    isLoading = false,
-                    isLoadingButton = false,
-                    isSuccess = false,
-                    assignDrawers = emptyList()
-                ),
-                checkId = id
-            )
-        }
-        sendNewEffect(DinInUiEffect.NavigateToOrderScreen(id))
+        tryToExecute(
+            function = {
+                manageChecksUseCase.reOpenCheck(id)
+            },
+            onSuccess = { items ->
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "",
+                        errorDinInState = null,
+                        dinInDialogueState = it.dinInDialogueState.copy(
+                            isVisible = false,
+                            isLoading = false,
+                            isLoadingButton = false,
+                            isSuccess = false,
+                            assignDrawers = emptyList(),
+                            checks = emptyList()
+                        ),
+                        checkId = id
+                    )
+                }
+                sendNewEffect(DinInUiEffect.NavigateToOrderScreen(id, items))
+            },
+            onError = ::onError
+        )
     }
 
     override fun onCoversCountChanged(covers: String) {
@@ -383,7 +392,7 @@ class DinInScreenModel(
                 tableId = tableId.toInt(),
             )
         }
-        if (state.value.roomId != 0)
+        if (state.value.roomId != 0) {
             tryToExecute(
                 function = {
                     manageChecksUseCase.getAllChecksByTableId(
@@ -435,23 +444,32 @@ class DinInScreenModel(
                     }
                 }
             )
-        else {
-            updateState {
-                it.copy(
-                    isLoading = false,
-                    errorMessage = "",
-                    errorDinInState = null,
-                    dinInDialogueState = it.dinInDialogueState.copy(
-                        isVisible = false,
-                        isLoading = false,
-                        isLoadingButton = false,
-                        isSuccess = false,
-                        assignDrawers = emptyList()
-                    ),
-                    checkId = tableId
-                )
-            }
-            sendNewEffect(DinInUiEffect.NavigateToOrderScreen(tableId))
+        } else {
+            tryToExecute(
+                function = {
+                    manageChecksUseCase.reOpenCheck(tableId)
+                },
+                onSuccess = { items ->
+                    updateState {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "",
+                            errorDinInState = null,
+                            dinInDialogueState = it.dinInDialogueState.copy(
+                                isVisible = false,
+                                isLoading = false,
+                                isLoadingButton = false,
+                                isSuccess = false,
+                                assignDrawers = emptyList(),
+                                checks = emptyList()
+                            ),
+                            checkId = tableId
+                        )
+                    }
+                    sendNewEffect(DinInUiEffect.NavigateToOrderScreen(tableId, items))
+                },
+                onError = ::onError
+            )
         }
     }
 

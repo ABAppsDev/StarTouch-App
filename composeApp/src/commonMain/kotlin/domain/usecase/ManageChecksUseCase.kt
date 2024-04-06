@@ -13,6 +13,12 @@ class ManageChecksUseCase(
         return checksGateway.openNewCheck(openNewCheck)
     }
 
+    suspend fun makeCheckAborted(checkId: Long, outletID: Int, restID: Int) {
+        checksGateway.makeCheckAborted(checkId, outletID, restID)
+    }
+
+    suspend fun reOpenCheck(checkId: Long): List<FireItems> = checksGateway.reOpenCheck(checkId)
+
     suspend fun getAllChecksByTableId(
         tableId: Int,
         outletID: Int,

@@ -83,7 +83,7 @@ class DinInScreen : Screen {
         EventHandler(dinInScreenModel.effect) { effect, navigator ->
             when (effect) {
                 is DinInUiEffect.NavigateToOrderScreen -> {
-                    navigator.push(OrderScreen(effect.checkId))
+                    navigator.replace(OrderScreen(effect.checkId, effect.items))
                 }
 
                 DinInUiEffect.NavigateBackToHome -> navigator.pop()
@@ -358,7 +358,7 @@ private fun AssignCheckItem(
             Box(
                 Modifier.size(48.dp).padding(bottom = 8.dp)
                     .clip(RoundedCornerShape(Theme.radius.large))
-                    .background(Theme.colors.contentPrimary)
+                    .background(Theme.colors.surface)
             ) {
                 Icon(
                     Icons.Filled.Person,

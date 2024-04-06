@@ -29,6 +29,7 @@ data class OrderState(
     val isFinishOrder: Boolean = false,
     val modifyLastItemDialogue: ModifyLastItemDialogue = ModifyLastItemDialogue(),
     val orderItemState: List<OrderItemState> = orders.toList(),
+    val warningDialogueIsVisible: Boolean = false,
 )
 
 @Immutable

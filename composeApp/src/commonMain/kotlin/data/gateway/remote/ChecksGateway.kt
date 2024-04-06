@@ -2,6 +2,7 @@ package data.gateway.remote
 
 import data.remote.mapper.toDto
 import data.remote.mapper.toEntity
+import data.remote.model.FireItemsDto
 import data.remote.model.OpenCheckDto
 import data.remote.model.OpenNewCheckDto
 import data.remote.model.ReOpenCheck
@@ -59,11 +60,11 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
     }
 
     override suspend fun reOpenCheck(checkId: Long): List<FireItems> {
-        return tryToExecute<ServerResponse<List<FireItems>>> {
+        return tryToExecute<ServerResponse<List<FireItemsDto>>> {
             get("/check/reopen") {
                 parameter("checkId", checkId)
             }
-        }.data ?: throw NotFoundException("Check not found")
+        }.data?.map { it.toEntity() } ?: throw NotFoundException("Check not found")
     }
 
     override suspend fun fireItems(

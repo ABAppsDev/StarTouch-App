@@ -1,5 +1,6 @@
 package di
 
+import domain.entity.FireItems
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 import presentation.app.AppScreenModel
@@ -13,7 +14,7 @@ val screenModelModule = module {
     factoryOf(::HomeScreenModel)
     factoryOf(::DinInScreenModel)
     factoryOf(::SettingScreenModel)
-    factory { (checkId: Long) ->
-        OrderScreenModel(get(), get(), get(), checkId)
+    factory { (checkId: Long,items:List<FireItems>) ->
+        OrderScreenModel(get(), get(), get(), checkId,items)
     }
 }

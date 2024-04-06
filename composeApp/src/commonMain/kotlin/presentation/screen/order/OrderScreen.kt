@@ -1,5 +1,8 @@
 package presentation.screen.order
 
+import abapps_startouch.composeapp.generated.resources.Res
+import abapps_startouch.composeapp.generated.resources.ic_back
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,7 +28,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -45,6 +48,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -53,7 +57,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.stack.popUntil
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import com.beepbeep.designSystem.ui.composable.StAppBar
+import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
+import com.beepbeep.designSystem.ui.composable.animate.SlideAnimation
+import com.beepbeep.designSystem.ui.theme.Theme
+import domain.entity.FireItems
 import kms
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 import org.koin.core.parameter.parametersOf
 import presentation.base.ErrorState
 import presentation.screen.composable.AppButton
@@ -62,28 +75,30 @@ import presentation.screen.composable.AppTextField
 import presentation.screen.composable.HandleErrorState
 import presentation.screen.composable.SetLayoutDirection
 import presentation.screen.composable.ShimmerListItem
-import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
-import com.beepbeep.designSystem.ui.composable.animate.SlideAnimation
+import presentation.screen.composable.WarningDialogue
 import presentation.screen.composable.modifier.bounceClick
+import presentation.screen.dinin.DinInScreen
 import presentation.screen.home.HomeScreen
 import presentation.screen.order.composable.ChooseItem
-import presentation.screen.order.composable.ChooseItemLoading
+import presentation.screen.order.composable.ChoosePresetLoading
 import presentation.util.EventHandler
 import resource.Resources
 import util.getScreenModel
 
-class OrderScreen(private val checkId: Long) : Screen {
+class OrderScreen(private val checkId: Long, private val items: List<FireItems>) : Screen {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
-        val screenModel: OrderScreenModel = getScreenModel(parameters = { parametersOf(checkId) })
+        val screenModel: OrderScreenModel =
+            getScreenModel(parameters = { parametersOf(checkId, items) })
         val state by screenModel.state.collectAsState()
         val pullRefreshState = rememberPullRefreshState(state.isRefresh, { screenModel.retry() })
+        val nav = LocalNavigator.currentOrThrow
 
         EventHandler(screenModel.effect) { effect, navigator ->
             when (effect) {
                 is OrderUiEffect.NavigateBackToDinIn -> {
-                    navigator.pop()
+                    navigator.replace(DinInScreen())
                 }
 
                 is OrderUiEffect.NavigateBackToHome -> {
@@ -93,7 +108,7 @@ class OrderScreen(private val checkId: Long) : Screen {
         }
 
         FadeAnimation(visible = state.isLoading) {
-            ShimmerListItem(columnsCount = 4) { ChooseItemLoading() }
+            ShimmerListItem(columnsCount = 4) { ChoosePresetLoading() }
         }
         FadeAnimation(state.modifyLastItemDialogue.isVisible) {
             EnterModifyLastItemDialogue(
@@ -113,76 +128,113 @@ class OrderScreen(private val checkId: Long) : Screen {
                 onClick = screenModel::retry
             )
         }
-        Scaffold(modifier = Modifier.fillMaxSize(), containerColor = Color.Transparent,
-            floatingActionButton = {
-                SlideAnimation(!state.isFinishOrder && state.itemModifiersState.isEmpty()) {
-                    FloatingActionButton(
-                        onClick = screenModel::onClickFloatActionButton,
-                        containerColor = Color(0xFF8D7B4B)
-                    ) {
-                        Icon(
-                            Icons.Filled.ShoppingCart,
-                            contentDescription = null,
-                            tint = Color.White
-                        )
-                    }
-                }
-            }) {
-            FadeAnimation(state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty()) {
-                PresetsList(
-                    state.presetItemsState,
-                    onClickPreset = screenModel::onClickPreset,
-                    modifier = Modifier.pullRefresh(pullRefreshState),
-                    pullRefreshState = pullRefreshState,
-                    isRefresh = state.isRefresh
-                )
-            }
-            SlideAnimation(state.isFinishOrder) {
-                OrdersList(
-                    orderItemState = state.orderItemState,
-                    screenModel as OrderInteractionListener
-                ) { screenModel.onClickIconBack() }
-            }
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                FadeAnimation(state.isPresetVisible && state.presetItemsState.isNotEmpty()) {
-                    Box(modifier = Modifier.fillMaxWidth().pullRefresh(pullRefreshState)) {
-                        LazyRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(24.dp),
-                            contentPadding = PaddingValues(8.dp)
+        FadeAnimation(state.warningDialogueIsVisible) {
+            WarningDialogue(
+                Resources.strings.warning,
+                Resources.strings.doYouWantToAbortCheck,
+                onDismissRequest = screenModel::onDismissWarningDialogue,
+                onClickConfirmButton = { screenModel.abortedCheck(checkId) },
+                onClickDismissButton = screenModel::onDismissWarningDialogue
+            )
+        }
+
+        SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
+            Scaffold(modifier = Modifier.fillMaxSize(), containerColor = Color.Transparent,
+                topBar = {
+                    StAppBar(
+                        onNavigateUp = {
+                            if (state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && items.isEmpty())
+                                screenModel.showWarningDialogue()
+                            else if (state.isFinishOrder) screenModel.onClickIconBack()
+                            else if (!state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && items.isNotEmpty()) nav.replace(
+                                DinInScreen()
+                            )
+                            else screenModel.backToPresets()
+                        },
+                        title = "Order #$checkId",
+                        isBackIconVisible = state.itemModifiersState.isEmpty(),
+                        painterResource = painterResource(Res.drawable.ic_back)
+                    )
+                },
+                floatingActionButton = {
+                    SlideAnimation(!state.isFinishOrder && state.itemModifiersState.isEmpty()) {
+                        FloatingActionButton(
+                            onClick = screenModel::onClickFloatActionButton,
+                            containerColor = Theme.colors.primary
                         ) {
-                            items(state.presetItemsState) { preset ->
-                                ChooseItem(preset.name, shape = CircleShape) {
-                                    screenModel.onClickPreset(preset.id)
+                            Icon(
+                                Icons.Filled.ShoppingCart,
+                                contentDescription = null,
+                                tint = Theme.colors.contentPrimary
+                            )
+                        }
+                    }
+                }) {
+                FadeAnimation(state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty()) {
+                    PresetsList(
+                        state.presetItemsState,
+                        onClickPreset = screenModel::onClickPreset,
+                        modifier = Modifier.padding(top = it.calculateTopPadding())
+                            .pullRefresh(pullRefreshState),
+                        pullRefreshState = pullRefreshState,
+                        isRefresh = state.isRefresh
+                    )
+                }
+                SlideAnimation(state.isFinishOrder) {
+                    OrdersList(
+                        orderItemState = state.orderItemState,
+                        screenModel as OrderInteractionListener,
+                        modifier = Modifier.padding(top = it.calculateTopPadding())
+                    )
+                }
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    FadeAnimation(state.isPresetVisible && state.presetItemsState.isNotEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth()
+                                .padding(top = it.calculateTopPadding())
+                                .pullRefresh(pullRefreshState)
+                        ) {
+                            LazyRow(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(24.dp),
+                                contentPadding = PaddingValues(8.dp)
+                            ) {
+                                items(state.presetItemsState) { preset ->
+                                    ChooseItem(preset.name, shape = CircleShape) {
+                                        screenModel.onClickPreset(preset.id)
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                FadeAnimation(state.itemsState.isNotEmpty()) {
-                    ItemsList(
-                        state.itemsState,
-                        onClickItem = screenModel::onClickItem,
-                        modifier = Modifier.pullRefresh(pullRefreshState),
-                    )
-                }
-                FadeAnimation(state.itemChildrenState.isNotEmpty()) {
-                    ItemChildrenList(
-                        state.itemChildrenState,
-                        onClickItemChildren = screenModel::onClickItemChild,
-                        modifier = Modifier.pullRefresh(pullRefreshState),
-                    )
-                }
-                FadeAnimation(state.itemModifiersState.isNotEmpty()) {
-                    ItemModifiersList(
-                        state.itemModifiersState,
-                        onClickItemModifier = screenModel::onClickItemModifier,
-                        modifier = Modifier.pullRefresh(pullRefreshState),
-                    )
+                    FadeAnimation(state.itemsState.isNotEmpty()) {
+                        ItemsList(
+                            state.itemsState,
+                            onClickItem = screenModel::onClickItem,
+                            modifier = Modifier.padding(top = it.calculateTopPadding())
+                                .pullRefresh(pullRefreshState),
+                        )
+                    }
+                    FadeAnimation(state.itemChildrenState.isNotEmpty()) {
+                        ItemChildrenList(
+                            state.itemChildrenState,
+                            onClickItemChildren = screenModel::onClickItemChild,
+                            modifier = Modifier.padding(top = it.calculateTopPadding())
+                                .pullRefresh(pullRefreshState),
+                        )
+                    }
+                    FadeAnimation(state.itemModifiersState.isNotEmpty()) {
+                        ItemModifiersList(
+                            state.itemModifiersState,
+                            onClickItemModifier = screenModel::onClickItemModifier,
+                            modifier = Modifier.padding(top = it.calculateTopPadding())
+                                .pullRefresh(pullRefreshState),
+                        )
+                    }
                 }
             }
         }
@@ -206,7 +258,7 @@ private fun PresetsList(
             contentColor = Color(0xFF8D7B4B)
         )
         LazyVerticalGrid(
-            columns = GridCells.Fixed(4),
+            columns = GridCells.Fixed(3),
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -222,6 +274,53 @@ private fun PresetsList(
 }
 
 @Composable
+fun ItemCard(
+    name: String,
+    price: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Box(modifier.heightIn(260.dp).width(192.dp).bounceClick { onClick() }) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.8f)
+                .align(Alignment.BottomCenter)
+                .clip(RoundedCornerShape(16.dp, 16.dp, 16.dp, 16.dp))
+                .background(Theme.colors.background)
+        )
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Image(
+                painter = painterResource(DrawableResource("dish.png")),
+                contentDescription = "",
+                modifier = Modifier
+                    .size(132.dp)
+            )
+            Text(
+                text = name,
+                modifier = Modifier
+                    .fillMaxWidth(0.8f),
+                color = Theme.colors.contentPrimary,
+                textAlign = TextAlign.Center,
+                style = Theme.typography.titleLarge,
+            )
+            Text(
+                text = price,
+                modifier = Modifier
+                    .fillMaxWidth(0.8f),
+                color = Theme.colors.contentPrimary,
+                textAlign = TextAlign.Center,
+                style = Theme.typography.titleLarge,
+            )
+        }
+    }
+}
+
+@Composable
 private fun ItemsList(
     items: List<ItemState>,
     modifier: Modifier = Modifier,
@@ -229,14 +328,14 @@ private fun ItemsList(
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
         LazyVerticalGrid(
-            columns = GridCells.Fixed(4),
+            columns = GridCells.Fixed(3),
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(8.dp)
         ) {
             items(items) { item ->
-                ChooseItem(item.name, item.price.toString()) {
+                ItemCard(item.name, item.price.toString()) {
                     onClickItem(item.id)
                 }
             }
@@ -252,14 +351,14 @@ private fun ItemChildrenList(
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
         LazyVerticalGrid(
-            columns = GridCells.Fixed(4),
+            columns = GridCells.Fixed(3),
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(8.dp)
         ) {
             items(items) { item ->
-                ChooseItem(item.name, item.price.toString()) {
+                ItemCard(item.name, item.price.toString()) {
                     onClickItemChildren(item.id)
                 }
             }
@@ -275,14 +374,14 @@ private fun ItemModifiersList(
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
         LazyVerticalGrid(
-            columns = GridCells.Fixed(4),
+            columns = GridCells.Fixed(3),
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(8.dp)
         ) {
             items(items) { item ->
-                ChooseItem(item.name, item.price.toString()) {
+                ItemCard(item.name, item.price.toString()) {
                     onClickItemModifier(item.name)
                 }
             }
@@ -295,28 +394,11 @@ private fun OrdersList(
     orderItemState: List<OrderItemState>,
     orderInteractionListener: OrderInteractionListener,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxSize().background(Color.White),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Card(
-            modifier = modifier
-                .size(56.dp)
-                .bounceClick { onClick() }
-                .padding(8.dp),
-            colors = CardDefaults.cardColors(Color.White),
-            shape = RoundedCornerShape(8.dp),
-            elevation = CardDefaults.elevatedCardElevation(8.dp)
-        ) {
-            Icon(
-                modifier = Modifier.size(32.dp).padding(4.dp).align(Alignment.CenterHorizontally),
-                imageVector = Icons.Filled.ArrowBackIosNew,
-                contentDescription = null,
-                tint = Color.Black
-            )
-        }
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(8.dp),

@@ -43,4 +43,5 @@ data class Arabic(
     override val createTableGuest: String = "فتح طرابيزه مخصوص",
     override val showAllTableGuest: String = "عرض كل الطرابيزات المخصوصة",
     override val tableName: String = "اسم الطرابيزة",
+    override val doYouWantToAbortCheck: String = "هل تريد غلق الشيك",
 ) : IStringResources

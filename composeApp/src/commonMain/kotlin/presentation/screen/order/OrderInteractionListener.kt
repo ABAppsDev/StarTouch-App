@@ -18,4 +18,6 @@ interface OrderInteractionListener {
     fun onClickPlus(id: Int)
     fun onClickRemoveItem(id: Int)
     fun addItem(orderItemState: OrderItemState)
+    fun showWarningDialogue()
+    fun onDismissWarningDialogue()
 }

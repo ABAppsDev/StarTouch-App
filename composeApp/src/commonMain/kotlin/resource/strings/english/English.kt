@@ -43,4 +43,5 @@ data class English(
     override val createTableGuest: String = "Create Table Guest",
     override val showAllTableGuest: String = "Show All Tables Guest",
     override val tableName: String = "Table name",
+    override val doYouWantToAbortCheck: String = "Do you want to abort check",
 ) : IStringResources
