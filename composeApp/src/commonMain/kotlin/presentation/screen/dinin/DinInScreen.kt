@@ -2,6 +2,8 @@ package presentation.screen.dinin
 
 import abapps_startouch.composeapp.generated.resources.Res
 import abapps_startouch.composeapp.generated.resources.ic_back
+import abapps_startouch.composeapp.generated.resources.ic_profile_filled
+import abapps_startouch.composeapp.generated.resources.invoice
 import abapps_startouch.composeapp.generated.resources.table
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -24,8 +26,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -367,9 +367,10 @@ private fun AssignCheckItem(
                     .background(Theme.colors.surface)
             ) {
                 Icon(
-                    Icons.Filled.Person,
+                    painterResource(Res.drawable.ic_profile_filled),
                     contentDescription = null,
-                    Modifier.align(Alignment.Center).size(24.dp)
+                    Modifier.align(Alignment.Center).size(24.dp),
+                    tint = Theme.colors.primary
                 )
             }
             Text(name, style = Theme.typography.headline, color = Theme.colors.contentPrimary)
@@ -389,22 +390,17 @@ private fun CheckItem(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-//            Box(
-//                Modifier.size(48.dp).padding(bottom = 8.dp)
-//                    .clip(RoundedCornerShape(Theme.radius.large))
-//                    .background(Theme.colors.contentPrimary)
-//            ) {
-////                Icon(
-////                    Icons.Filled.Pageview,
-////                    contentDescription = null,
-////                    Modifier.align(Alignment.Center).size(24.dp)
-////                )
-////                Text(
-////                    "Check number : ",
-////                    style = Theme.typography.headline,
-////                    color = Theme.colors.contentPrimary
-////                )
-//            }
+            Box(
+                Modifier.size(48.dp).padding(bottom = 8.dp)
+                    .clip(RoundedCornerShape(Theme.radius.large))
+                    .background(Theme.colors.surface)
+            ) {
+                Icon(
+                    painterResource(Res.drawable.invoice),
+                    contentDescription = null,
+                    Modifier.align(Alignment.Center).size(24.dp),
+                )
+            }
             Text(
                 "Check number : $name",
                 style = Theme.typography.headline,
