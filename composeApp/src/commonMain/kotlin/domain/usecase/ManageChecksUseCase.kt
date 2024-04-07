@@ -19,6 +19,15 @@ class ManageChecksUseCase(
 
     suspend fun reOpenCheck(checkId: Long): List<FireItems> = checksGateway.reOpenCheck(checkId)
 
+    suspend fun addItemsToExistCheck(
+        checkID: Long,
+        serverId: Int,
+        userID: String,
+        items: List<FireItems>
+    ): Boolean {
+        return checksGateway.addItemsToExistCheck(checkID, serverId, userID, items)
+    }
+
     suspend fun getAllChecksByTableId(
         tableId: Int,
         outletID: Int,

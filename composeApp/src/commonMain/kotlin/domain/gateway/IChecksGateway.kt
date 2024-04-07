@@ -25,4 +25,5 @@ interface IChecksGateway {
     suspend fun makeCheckAborted(checkId: Long, outletID: Int, restID: Int)
 
     suspend fun reOpenCheck(checkId: Long): List<FireItems>
+    suspend fun addItemsToExistCheck(checkID: Long, serverId: Int, userID: String, items: List<FireItems>): Boolean
 }

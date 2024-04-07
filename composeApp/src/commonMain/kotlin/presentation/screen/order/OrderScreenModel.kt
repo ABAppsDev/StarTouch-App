@@ -20,16 +20,17 @@ class OrderScreenModel(
     private val manageSetting: ManageSettingUseCase,
     private val checkId: Long,
     items: List<FireItems>,
+    private val isReopened: Boolean,
 ) : BaseScreenModel<OrderState, OrderUiEffect>(OrderState()),
     OrderInteractionListener {
     override val viewModelScope: CoroutineScope get() = screenModelScope
 
     init {
         orders.clear()
-        updateState { it.copy(orderItemState = emptyList()) }
+        updateState { it.copy(orderItemState = orders.toList()) }
         getAllPresets()
         orders.addAll(items.map { it.toState() })
-        val newList = orders
+        val newList = orders.toList()
         updateState { it.copy(orderItemState = newList) }
     }
 
@@ -402,14 +403,23 @@ class OrderScreenModel(
     }
 
     override fun onClickFire() {
+        updateState { it.copy(isLoadingButton = true) }
         tryToExecute(
             function = {
-                manageChecksUseCase.addItemsToCheck(
+                val fireItems =
+                    state.value.orderItemState.filter { !it.fired }.map { it.toEntity() }
+                if (isReopened) manageChecksUseCase.addItemsToExistCheck(
                     checkID = checkId,
                     userID = StarTouchSetup.USER_ID.toString(),
                     serverId = StarTouchSetup.REST_ID,
-                    items = state.value.orderItemState.filter { !it.fired }.map { it.toEntity() }
-                )
+                    items = fireItems
+                ) else
+                    manageChecksUseCase.addItemsToCheck(
+                        checkID = checkId,
+                        userID = StarTouchSetup.USER_ID.toString(),
+                        serverId = StarTouchSetup.REST_ID,
+                        items = fireItems
+                    )
             },
             onSuccess = {
                 if (it)
@@ -417,6 +427,7 @@ class OrderScreenModel(
                         updateState { state -> state.copy(orderItemState = emptyList()) }
                         orders.clear()
                         val fastLoop = manageSetting.getIsBackToHome()
+                        updateState { s -> s.copy(isLoadingButton = false) }
                         if (fastLoop) sendNewEffect(OrderUiEffect.NavigateBackToDinIn)
                         else {
                             AppLanguage.code.emit(StarTouchSetup.USER_LANGUAGE)
@@ -497,7 +508,7 @@ class OrderScreenModel(
                 pickFollowItemQty = false,
                 prePaidCard = false,
                 taxable = false,
-                refModItem = 0,
+                refModItem = state.value.modifyLastItemDialogue.itemId,
                 pOnCheck = true,
                 pOnReport = true,
                 totalPrice = 0f
@@ -514,7 +525,7 @@ class OrderScreenModel(
     }
 
     override fun onClickMinus(id: Int) {
-        val order = orders.find { it.id == id }
+        val order = orders.find { it.id == id && !it.fired && !it.voided }
         order?.let { or ->
             if (or.qty == 1) {
                 orders.remove(or)
@@ -558,7 +569,7 @@ class OrderScreenModel(
     }
 
     override fun onClickPlus(id: Int) {
-        val order = orders.find { it.id == id }
+        val order = orders.find { it.id == id && !it.fired && !it.voided }
         order?.let { or ->
             orders[orders.indexOf(order)] =
                 or.copy(qty = or.qty + 1, totalPrice = (or.qty + 1) * or.unitPrice)
@@ -572,7 +583,7 @@ class OrderScreenModel(
     }
 
     override fun onClickRemoveItem(id: Int) {
-        val order = orders.find { it.id == id }
+        val order = orders.find { it.id == id && !it.fired && !it.voided }
         orders.remove(order)
         val newList = orders
         updateState {

@@ -14,7 +14,7 @@ val screenModelModule = module {
     factoryOf(::HomeScreenModel)
     factoryOf(::DinInScreenModel)
     factoryOf(::SettingScreenModel)
-    factory { (checkId: Long,items:List<FireItems>) ->
-        OrderScreenModel(get(), get(), get(), checkId,items)
+    factory { (checkId: Long, items: List<FireItems>, isReopened: Boolean) ->
+        OrderScreenModel(get(), get(), get(), checkId, items, isReopened)
     }
 }

@@ -32,6 +32,7 @@ data class OrderState(
     val warningDialogueIsVisible: Boolean = false,
     val warningItemIsVisible: Boolean = false,
     val itemId: Int = 0,
+    val isLoadingButton: Boolean = false,
 )
 
 @Immutable

@@ -2,6 +2,7 @@ package presentation.screen.order
 
 import abapps_startouch.composeapp.generated.resources.Res
 import abapps_startouch.composeapp.generated.resources.ic_back
+import abapps_startouch.composeapp.generated.resources.trash
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -35,7 +36,6 @@ import androidx.compose.material.DismissValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -108,7 +108,7 @@ class OrderScreen(
     @Composable
     override fun Content() {
         val screenModel: OrderScreenModel =
-            getScreenModel(parameters = { parametersOf(checkId, items) })
+            getScreenModel(parameters = { parametersOf(checkId, items, isReopened) })
         val state by screenModel.state.collectAsState()
         val pullRefreshState = rememberPullRefreshState(state.isRefresh, { screenModel.retry() })
         val nav = LocalNavigator.currentOrThrow
@@ -210,6 +210,7 @@ class OrderScreen(
                 }
                 SlideAnimation(state.isFinishOrder) {
                     OrdersList(
+                        isLoading = state.isLoadingButton,
                         orderItemState = state.orderItemState,
                         screenModel as OrderInteractionListener,
                         modifier = Modifier.padding(top = it.calculateTopPadding())
@@ -418,11 +419,13 @@ private fun ItemModifiersList(
 }
 
 @OptIn(
-    ExperimentalMaterialApi::class, ExperimentalFoundationApi::class,
+    ExperimentalMaterialApi::class,
+    ExperimentalFoundationApi::class,
     ExperimentalMaterial3Api::class
 )
 @Composable
 private fun OrdersList(
+    isLoading: Boolean,
     orderItemState: List<OrderItemState>,
     orderInteractionListener: OrderInteractionListener,
     modifier: Modifier = Modifier,
@@ -490,14 +493,15 @@ private fun OrdersList(
                                     modifier = Modifier
                                         .fillMaxWidth(1f)
                                         .fillMaxHeight()
-                                        .background(Color.Red),
+                                        .background(Color.Transparent),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Row {
                                         IconButton(onClick = { scope.launch { dismissState.reset() } }) {
                                             Icon(
                                                 Icons.Default.Refresh,
-                                                contentDescription = "Refresh"
+                                                contentDescription = "Refresh",
+                                                tint = Color.White
                                             )
                                         }
                                         if (dismissState.targetValue == DismissValue.DismissedToStart)
@@ -506,8 +510,9 @@ private fun OrdersList(
                                                 orderInteractionListener.onClickRemoveItem(item.id)
                                             }) {
                                                 Icon(
-                                                    Icons.Default.Delete,
-                                                    contentDescription = "Delete"
+                                                    painterResource(Res.drawable.trash),
+                                                    contentDescription = "Delete",
+                                                    tint = SnackbarColor.Error
                                                 )
                                             }
                                     }
@@ -515,66 +520,83 @@ private fun OrdersList(
                             },
                             directions = setOf(DismissDirection.EndToStart),
                             dismissContent = {
-                                OrderItem(item, orderInteractionListener)
+                                OrderItem(
+                                    title = item.name,
+                                    qty = item.qty,
+                                    qtyDecrease = orderInteractionListener::onClickMinus,
+                                    qtyIncrease = orderInteractionListener::onClickPlus,
+                                    onClickModify = orderInteractionListener::onClickModifyLastItem,
+                                    totalPrice = item.totalPrice.toDouble(),
+                                    singlePrice = item.unitPrice.toDouble(),
+                                    id = item.id,
+                                    voided = item.voided,
+                                    fired = item.fired,
+                                    isModifier = item.isModifier
+                                )
                             }
                         )
                     }
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .wrapContentSize(align = Alignment.BottomCenter)
+                                .background(Color(0xFF1F1D2B)),
+                            verticalArrangement = Arrangement.Bottom,
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 24.dp)
+                                    .height(1.dp)
+                                    .background(color = Color(0xFF393C49))
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "Total Items",
+                                    color = Color.LightGray,
+                                    style = Theme.typography.title
+                                )
+                                Text(
+                                    text = orderItemState.sumOf { it.qty }.toString(),
+                                    color = Color.White,
+                                    style = Theme.typography.titleMedium
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "Total Check price",
+                                    color = Color.LightGray,
+                                    style = Theme.typography.title
+                                )
+                                Text(
+                                    text = "$${orderItemState.sumOf { it.totalPrice.toDouble() }}",
+                                    color = Color.White,
+                                    style = Theme.typography.titleMedium
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(42.dp))
+                            StButton(
+                                title = "Fire",
+                                modifier = Modifier.fillMaxWidth(),
+                                containerColor = Theme.colors.primary,
+                                onClick = {
+                                    if (!isLoading)
+                                        orderInteractionListener.onClickFire()
+                                },
+                                enabled = !orderItemState.all { it.fired },
+                                isLoading = isLoading
+                            )
+                        }
+                    }
                 }
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .wrapContentSize(align = Alignment.BottomCenter)
-                    .background(Color(0xFF1F1D2B)),
-                verticalArrangement = Arrangement.Bottom,
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 24.dp)
-                        .height(1.dp)
-                        .background(color = Color(0xFF393C49))
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Total Items",
-                        color = Color.LightGray,
-                        style = Theme.typography.title
-                    )
-                    Text(
-                        text = orderItemState.sumOf { it.qty }.toString(),
-                        color = Color.White,
-                        style = Theme.typography.titleMedium
-                    )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Total Check price",
-                        color = Color.LightGray,
-                        style = Theme.typography.title
-                    )
-                    Text(
-                        text = "$${orderItemState.sumOf { it.totalPrice.toDouble() }}",
-                        color = Color.White,
-                        style = Theme.typography.titleMedium
-                    )
-                }
-                Spacer(modifier = Modifier.height(42.dp))
-                StButton(
-                    title = "Fire",
-                    modifier = Modifier.fillMaxWidth(),
-                    containerColor = Theme.colors.primary,
-                    onClick = {
-                        orderInteractionListener.onClickFire()
-                    })
             }
         }
     }
@@ -582,17 +604,26 @@ private fun OrdersList(
 
 @Composable
 private fun OrderItem(
-    orderItemState: OrderItemState,
-    orderInteractionListener: OrderInteractionListener,
+    title: String,
+    singlePrice: Double,
+    totalPrice: Double,
+    qty: Int,
+    id: Int,
+    qtyIncrease: (Int) -> Unit,
+    qtyDecrease: (Int) -> Unit,
+    onClickModify: (Int) -> Unit,
+    voided: Boolean,
+    fired: Boolean,
+    isModifier: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val cardColor = if (orderItemState.voided) SnackbarColor.Info
-    else if (orderItemState.fired) SnackbarColor.Error
+    val cardColor = if (voided) SnackbarColor.Info
+    else if (fired) SnackbarColor.Error
     else Color(0xFF1F1D2B)
     Card(
         modifier = modifier.bounceClick {
-            if (orderItemState.voided || orderItemState.fired) return@bounceClick
-            orderInteractionListener.onClickModifyLastItem(orderItemState.id)
+            if (voided || fired || isModifier) return@bounceClick
+            onClickModify(id)
         },
         colors = CardDefaults.cardColors(containerColor = cardColor),
     ) {
@@ -603,7 +634,7 @@ private fun OrderItem(
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(
-                    if (!orderItemState.voided || !orderItemState.fired) 0.6f else 0.7f
+                    if (!voided || !fired) 0.6f else 0.7f
                 ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -616,15 +647,15 @@ private fun OrderItem(
                 )
                 Column(modifier = Modifier.padding(start = 8.dp)) {
                     Text(
-                        text = orderItemState.name,
+                        text = title,
                         color = Color.White,
                         style = Theme.typography.title
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "$${orderItemState.unitPrice}",
-                        color = Color(0xFF889898),
-                        style = Theme.typography.caption
+                        text = "$$singlePrice",
+                        color = Theme.colors.contentSecondary,
+                        style = Theme.typography.titleMedium
                     )
                 }
             }
@@ -633,7 +664,22 @@ private fun OrderItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (!orderItemState.voided || !orderItemState.fired) {
+                if (voided || fired || isModifier) {
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .border(1.dp, Color(0xFF393C49))
+                            .background(Color(0xFF2D303E)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = qty.toString(),
+                            color = Color.White,
+                            style = Theme.typography.titleMedium,
+                        )
+                    }
+                } else {
                     Box(
                         modifier = Modifier
                             .height(30.dp)
@@ -650,8 +696,8 @@ private fun OrderItem(
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(Color(0xFFEFE3C8))
                                     .clickable {
-                                        if (orderItemState.voided || orderItemState.fired) return@clickable
-                                        orderInteractionListener.onClickMinus(orderItemState.id)
+                                        if (voided || fired || isModifier) return@clickable
+                                        qtyDecrease(id)
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -662,7 +708,7 @@ private fun OrderItem(
                                 )
                             }
                             Text(
-                                text = orderItemState.qty.toString(),
+                                text = qty.toString(),
                                 color = Color.White,
                                 style = Theme.typography.title,
                                 modifier = Modifier.padding(horizontal = 8.dp)
@@ -674,8 +720,8 @@ private fun OrderItem(
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(Color(0xFFEFE3C8))
                                     .clickable {
-                                        if (orderItemState.voided || orderItemState.fired) return@clickable
-                                        orderInteractionListener.onClickPlus(orderItemState.id)
+                                        if (voided || fired || isModifier) return@clickable
+                                        qtyIncrease(id)
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -687,24 +733,9 @@ private fun OrderItem(
                             }
                         }
                     }
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .border(1.dp, Color(0xFF393C49))
-                            .background(Color(0xFF2D303E)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = orderItemState.qty.toString(),
-                            color = Color.White,
-                            style = Theme.typography.titleMedium,
-                        )
-                    }
                 }
                 Text(
-                    text = "$${orderItemState.totalPrice}",
+                    text = "$$totalPrice",
                     color = Color.White,
                     style = Theme.typography.titleMedium
                 )

@@ -67,6 +67,22 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
         }.data?.map { it.toEntity() } ?: throw NotFoundException("Check not found")
     }
 
+    override suspend fun addItemsToExistCheck(
+        checkID: Long,
+        serverId: Int,
+        userID: String,
+        items: List<FireItems>
+    ): Boolean {
+        return tryToExecute<ServerResponse<Boolean>> {
+            post("/check/fire/reopen") {
+                setBody(items.map { it.toDto() })
+                parameter("checkID", checkID)
+                parameter("userID", serverId)
+                parameter("serverID", userID)
+            }
+        }.data ?: throw Exception("")
+    }
+
     override suspend fun fireItems(
         checkID: Long,
         serverId: Int,
