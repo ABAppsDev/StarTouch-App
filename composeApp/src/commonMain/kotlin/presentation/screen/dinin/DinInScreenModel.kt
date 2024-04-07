@@ -423,13 +423,19 @@ class DinInScreenModel(
                                 isVisible = true,
                                 isLoading = false,
                                 isLoadingButton = false,
-                                checks = checks.map { check ->
-                                    AssignCheckState(
-                                        id = check.id,
-                                        name = check.checkSerial.toString()
-                                    )
-                                }
                             ),
+                        )
+                    }
+                    if (checks.isEmpty()) throw Exception("This Table Open By Another Waiter")
+                    else updateState {
+                        it.copy(
+                            dinInDialogueState = it.dinInDialogueState.copy(checks = checks.map { check ->
+                                AssignCheckState(
+                                    id = check.id,
+                                    name = check.checkSerial.toString()
+                                )
+                            }
+                            )
                         )
                     }
                 },

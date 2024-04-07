@@ -198,7 +198,7 @@ class OrderScreen(
                         }
                     }
                 }) {
-                FadeAnimation(state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && state.errorState == null) {
+                FadeAnimation(state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && state.errorState == null && !state.isLoading) {
                     PresetsList(
                         state.presetItemsState,
                         onClickPreset = screenModel::onClickPreset,

@@ -13,6 +13,10 @@ class ManageChecksUseCase(
         return checksGateway.openNewCheck(openNewCheck)
     }
 
+    suspend fun openNewCheckWithChecksOpen(openNewCheck: OpenNewCheck): OpenCheck {
+        return checksGateway.openNewCheckWithChecksOpen(openNewCheck)
+    }
+
     suspend fun makeCheckAborted(checkId: Long, outletID: Int, restID: Int) {
         checksGateway.makeCheckAborted(checkId, outletID, restID)
     }
