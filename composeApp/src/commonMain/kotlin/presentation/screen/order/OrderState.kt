@@ -38,6 +38,7 @@ data class OrderState(
 data class ModifyLastItemDialogue(
     val isVisible: Boolean = false,
     val comment: String = "",
+    val itemId: Int = 0,
 )
 
 @Immutable
@@ -55,6 +56,7 @@ data class OrderItemState(
     val prePaidCard: Boolean = false,
     val pOnReport: Boolean = false,
     val fired: Boolean = false,
+    val voided: Boolean = false,
     val pOnCheck: Boolean = false,
     val refModItem: Int = 0,
 )
@@ -74,7 +76,8 @@ fun OrderItemState.toEntity(): FireItems = FireItems(
     pOnReport = pOnReport,
     fired = fired,
     pOnCheck = pOnCheck,
-    refModItem = refModItem
+    refModItem = refModItem,
+    voided = voided,
 )
 
 fun FireItems.toState(): OrderItemState = OrderItemState(
@@ -92,7 +95,8 @@ fun FireItems.toState(): OrderItemState = OrderItemState(
     pOnCheck = pOnCheck ?: false,
     pOnReport = pOnReport ?: false,
     fired = fired ?: false,
-    refModItem = refModItem ?: 0
+    refModItem = refModItem ?: 0,
+    voided = voided ?: false,
 )
 
 @Immutable

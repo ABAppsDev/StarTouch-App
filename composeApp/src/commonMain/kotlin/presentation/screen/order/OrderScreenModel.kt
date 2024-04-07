@@ -452,12 +452,13 @@ class OrderScreenModel(
         getAllPresets()
     }
 
-    override fun onClickModifyLastItem() {
+    override fun onClickModifyLastItem(id: Int) {
         updateState {
             it.copy(
                 modifyLastItemDialogue = it.modifyLastItemDialogue.copy(
                     isVisible = true,
-                    comment = ""
+                    comment = "",
+                    itemId = id
                 )
             )
         }

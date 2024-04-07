@@ -10,7 +10,7 @@ interface OrderInteractionListener {
     fun onClickClose()
     fun showErrorScreen()
     fun onClickIconBack()
-    fun onClickModifyLastItem()
+    fun onClickModifyLastItem(id: Int)
     fun onDismissDialogue()
     fun onModifyLastItemChanged(comment: String)
     fun onClickOk()
