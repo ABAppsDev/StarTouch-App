@@ -74,6 +74,7 @@ class DinInScreenModel(
                     is ErrorState.ServerError -> errorState.message.toString()
                     is ErrorState.UnknownError -> errorState.message.toString()
                     is ErrorState.EmptyData -> errorState.message.toString()
+                    is ErrorState.PermissionDenied -> errorState.message.toString()
                     is ErrorState.ValidationNetworkError -> errorState.message.toString()
                     else -> "Unknown error"
                 }
@@ -198,10 +199,11 @@ class DinInScreenModel(
                             is ErrorState.NotFound -> errorState.message.toString()
                             is ErrorState.ServerError -> errorState.message.toString()
                             is ErrorState.UnknownError -> errorState.message.toString()
+                            is ErrorState.PermissionDenied -> errorState.message.toString()
                             is ErrorState.EmptyData -> errorState.message.toString()
                             is ErrorState.ValidationError -> errorState.message.toString()
                             is ErrorState.ValidationNetworkError -> errorState.message.toString()
-                            else -> "Unknown error"
+                            else -> "Logon Error"
                         }
                     )
                 }
@@ -223,6 +225,7 @@ class DinInScreenModel(
                     is ErrorState.NetworkError -> errorState.message.toString()
                     is ErrorState.NotFound -> errorState.message.toString()
                     is ErrorState.ServerError -> errorState.message.toString()
+                    is ErrorState.PermissionDenied -> errorState.message.toString()
                     is ErrorState.UnknownError -> errorState.message.toString()
                     is ErrorState.EmptyData -> errorState.message.toString()
                     is ErrorState.ValidationError -> errorState.message.toString()
@@ -444,6 +447,7 @@ class DinInScreenModel(
                                 is ErrorState.UnknownError -> errorState.message.toString()
                                 is ErrorState.EmptyData -> errorState.message.toString()
                                 is ErrorState.ValidationError -> errorState.message.toString()
+                                is ErrorState.PermissionDenied -> errorState.message.toString()
                                 is ErrorState.ValidationNetworkError -> errorState.message.toString()
                                 else -> "Unknown error"
                             }
@@ -535,6 +539,7 @@ class DinInScreenModel(
                             is ErrorState.ServerError -> errorState.message.toString()
                             is ErrorState.UnknownError -> errorState.message.toString()
                             is ErrorState.EmptyData -> errorState.message.toString()
+                            is ErrorState.PermissionDenied -> errorState.message.toString()
                             is ErrorState.ValidationNetworkError -> errorState.message.toString()
                             else -> "Unknown error"
                         }
@@ -602,6 +607,7 @@ class DinInScreenModel(
                             is ErrorState.ServerError -> errorState.message.toString()
                             is ErrorState.UnknownError -> errorState.message.toString()
                             is ErrorState.EmptyData -> errorState.message.toString()
+                            is ErrorState.PermissionDenied -> errorState.message.toString()
                             is ErrorState.ValidationNetworkError -> errorState.message.toString()
                             else -> "Unknown error"
                         }
@@ -672,6 +678,7 @@ class DinInScreenModel(
                             is ErrorState.NetworkError -> errorState.message.toString()
                             is ErrorState.NotFound -> errorState.message.toString()
                             is ErrorState.ServerError -> errorState.message.toString()
+                            is ErrorState.PermissionDenied -> errorState.message.toString()
                             is ErrorState.UnknownError -> errorState.message.toString()
                             is ErrorState.EmptyData -> errorState.message.toString()
                             is ErrorState.ValidationError -> errorState.message.toString()

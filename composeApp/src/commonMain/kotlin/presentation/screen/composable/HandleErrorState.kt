@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,6 +18,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.beepbeep.designSystem.ui.composable.StButton
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import presentation.base.ErrorState
@@ -30,7 +32,7 @@ fun HandleErrorState(
     onClick: () -> Unit = {},
 ) {
     when (error) {
-        is ErrorState.EmptyData -> NoContent(title)
+        is ErrorState.ValidationNetworkError -> NoContent(title)
         is ErrorState.ServerError -> ErrorHappened(title, onClick)
         is ErrorState.NotFound -> NoContent(title)
         is ErrorState.NetworkError -> NoInternet(onClick = onClick)
@@ -92,6 +94,7 @@ private fun NoContent(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NoInternet(onClick: () -> Unit = {}) {
     ErrorPage(
@@ -99,7 +102,7 @@ private fun NoInternet(onClick: () -> Unit = {}) {
         title = Resources.strings.noInternetMessage,
         description = Resources.strings.noInternetDescription,
         retryButton = {
-            AppButton(
+            StButton(
                 modifier = Modifier.fillMaxWidth(LocalDensity.current.density / 4f),
                 onClick = { onClick() },
                 title = Resources.strings.tryAgain,
@@ -109,6 +112,7 @@ private fun NoInternet(onClick: () -> Unit = {}) {
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ErrorHappened(
     title: String,
@@ -119,7 +123,7 @@ private fun ErrorHappened(
         title = title,
         description = Resources.strings.somethingWrongHappened,
         retryButton = {
-            AppButton(
+            StButton(
                 modifier = Modifier.fillMaxWidth(LocalDensity.current.density / 4f),
                 onClick = { onClick() },
                 title = Resources.strings.tryAgain,

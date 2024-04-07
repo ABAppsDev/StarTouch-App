@@ -399,6 +399,7 @@ private fun CheckItem(
                     painterResource(Res.drawable.invoice),
                     contentDescription = null,
                     Modifier.align(Alignment.Center).size(24.dp),
+                    tint = Color.Unspecified
                 )
             }
             Text(

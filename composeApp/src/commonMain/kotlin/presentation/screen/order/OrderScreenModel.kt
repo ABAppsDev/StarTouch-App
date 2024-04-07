@@ -123,6 +123,7 @@ class OrderScreenModel(
                     is ErrorState.ServerError -> errorState.message.toString()
                     is ErrorState.UnknownError -> errorState.message.toString()
                     is ErrorState.EmptyData -> errorState.message.toString()
+                    is ErrorState.ValidationNetworkError -> errorState.message.toString()
                     else -> "Unknown error"
                 }
             )

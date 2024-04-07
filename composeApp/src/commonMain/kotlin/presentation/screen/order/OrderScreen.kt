@@ -31,6 +31,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.DismissDirection
 import androidx.compose.material.DismissValue
 import androidx.compose.material.ExperimentalMaterialApi
@@ -49,7 +50,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -61,7 +61,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -71,20 +71,19 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.beepbeep.designSystem.ui.composable.StAppBar
 import com.beepbeep.designSystem.ui.composable.StButton
+import com.beepbeep.designSystem.ui.composable.StOutlinedButton
+import com.beepbeep.designSystem.ui.composable.StTextField
 import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
 import com.beepbeep.designSystem.ui.composable.animate.SlideAnimation
 import com.beepbeep.designSystem.ui.composable.snackbar.internal.SnackbarColor
 import com.beepbeep.designSystem.ui.theme.Theme
 import domain.entity.FireItems
-import kms
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.core.parameter.parametersOf
 import presentation.base.ErrorState
-import presentation.screen.composable.AppButton
 import presentation.screen.composable.AppDialogue
-import presentation.screen.composable.AppTextField
 import presentation.screen.composable.HandleErrorState
 import presentation.screen.composable.SetLayoutDirection
 import presentation.screen.composable.ShimmerListItem
@@ -173,6 +172,7 @@ class OrderScreen(
                         onNavigateUp = {
                             if (state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && !isReopened)
                                 screenModel.showWarningDialogue()
+                            else if (state.errorState != null) screenModel.backToPresets()
                             else if (state.isFinishOrder) screenModel.onClickIconBack()
                             else if (!state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && isReopened) nav.replace(
                                 DinInScreen()
@@ -198,7 +198,7 @@ class OrderScreen(
                         }
                     }
                 }) {
-                FadeAnimation(state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty()) {
+                FadeAnimation(state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && state.errorState == null) {
                     PresetsList(
                         state.presetItemsState,
                         onClickPreset = screenModel::onClickPreset,
@@ -744,6 +744,7 @@ private fun OrderItem(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EnterModifyLastItemDialogue(
     comment: String,
@@ -755,32 +756,40 @@ private fun EnterModifyLastItemDialogue(
         modifier = modifier,
     ) {
         Text(
-            "Enter comment",
-            modifier = Modifier.padding(vertical = 8.kms),
-            style = MaterialTheme.typography.headlineSmall
+            text = "Enter comment",
+            style = Theme.typography.headline,
+            color = Theme.colors.contentPrimary,
         )
-        AppTextField(
+        StTextField(
+            modifier = Modifier.padding(top = 24.dp),
+            label = "",
             text = comment,
-            onValueChange = orderInteractionListener::onModifyLastItemChanged,
             hint = Resources.strings.comment,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.kms),
-            keyboardType = KeyboardType.Text,
+            onValueChange = orderInteractionListener::onModifyLastItemChanged,
+            imeAction = ImeAction.Go,
+            keyboardActions = KeyboardActions(onGo = {
+                orderInteractionListener.onClickOk()
+            })
         )
         SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
             Row(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(horizontal = 16.kms, vertical = 16.kms),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.kms)
+                modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                AppButton(
-                    Resources.strings.cancel,
+                StOutlinedButton(
+                    title = Resources.strings.cancel,
+                    onClick = {
+                        orderInteractionListener.onDismissDialogue()
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+                StButton(
+                    title = Resources.strings.ok,
+                    onClick = {
+                        orderInteractionListener.onClickOk()
+                    },
                     modifier = Modifier.weight(1f),
-                ) { orderInteractionListener.onDismissDialogue() }
-                AppButton(
-                    Resources.strings.ok,
-                    modifier = Modifier.weight(1f),
-                ) { orderInteractionListener.onClickOk() }
+                )
             }
         }
     }
