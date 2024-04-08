@@ -41,6 +41,7 @@ data class ModifyLastItemDialogue(
     val isVisible: Boolean = false,
     val comment: String = "",
     val itemId: Int = 0,
+    val serial: Int = 0,
 )
 
 @Immutable

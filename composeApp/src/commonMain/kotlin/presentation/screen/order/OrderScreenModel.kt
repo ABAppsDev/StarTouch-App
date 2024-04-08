@@ -271,21 +271,23 @@ class OrderScreenModel(
     override fun onClickItemModifier(name: String) {
         val item = state.value.itemModifiersState.find { it.name == name }
         item?.let {
+            val order = orders.find { it.id == state.value.selectedItemId }
             val serial =
-                orders.indexOf(orders.find { it.id == state.value.selectedItemId }) + 1
+                orders.indexOf(order) + 1
+            val x = Random.nextInt()
             addItem(
                 OrderItemState(
                     id = item.id,
-                    serial = Random.nextInt(),
+                    serial = x,
                     name = item.name,
                     counter = serial + 1,
-                    qty = 1,
+                    qty = order?.qty ?: 1,
                     unitPrice = item.price,
                     isModifier = item.isModifier,
                     noServiceCharge = item.noServiceCharge,
                     refModItem = serial,
                     status = item.name,
-                    refItemId = state.value.selectedItemId,
+                    refItemId = order?.serial ?: 0,
                     modifierGroupID = item.modifierGroupID,
                     pickFollowItemQty = item.pickFollowItemQty,
                     prePaidCard = item.prePaidCard,
@@ -448,8 +450,12 @@ class OrderScreenModel(
         updateState { it.copy(isLoadingButton = true) }
         orders.forEachIndexed { i, order ->
             if (order.isModifier) {
-                val item = orders.indexOf(orders.find { it.id == order.refItemId })
-                orders[i] = order.copy(refModItem = if (item == 0) 1 else item + 1)
+                val temp = orders.find { it.serial == order.refItemId }
+                val item = orders.indexOf(orders.find {
+                    it.serial == order.refItemId
+                })
+                orders[i] =
+                    order.copy(refModItem = if (item == 0) 1 else item + 1, qty = temp?.qty ?: 1)
                 val newList = orders
                 updateState {
                     it.copy(
@@ -518,13 +524,14 @@ class OrderScreenModel(
         getAllPresets()
     }
 
-    override fun onClickModifyLastItem(id: Int) {
+    override fun onClickModifyLastItem(id: Int, serial: Int) {
         updateState {
             it.copy(
                 modifyLastItemDialogue = it.modifyLastItemDialogue.copy(
                     isVisible = true,
                     comment = "",
-                    itemId = id
+                    itemId = id,
+                    serial = serial,
                 )
             )
         }
@@ -551,8 +558,11 @@ class OrderScreenModel(
     }
 
     override fun onClickOk() {
+        //== ids[state.value.modifyLastItemDialogue.itemId]
+        val order =
+            orders.find { it.serial == state.value.modifyLastItemDialogue.serial }
         val serial =
-            orders.indexOf(orders.find { it.id == state.value.modifyLastItemDialogue.itemId }) + 1
+            orders.indexOf(order) + 1
         orders.add(
             serial,
             OrderItemState(
@@ -566,12 +576,12 @@ class OrderScreenModel(
                 counter = serial + 1,
                 pickFollowItemQty = false,
                 prePaidCard = false,
-                refItemId = state.value.modifyLastItemDialogue.itemId,
+                refItemId = state.value.modifyLastItemDialogue.serial,
                 taxable = false,
                 modifierPick = 1,
                 serial = Random.nextInt(),
                 status = state.value.modifyLastItemDialogue.comment,
-                refModItem = serial,
+                refModItem = order?.serial ?: serial,
                 pOnCheck = true,
                 pOnReport = false,
                 totalPrice = 0f
@@ -588,7 +598,7 @@ class OrderScreenModel(
     }
 
     override fun onClickMinus(id: Int) {
-        val order = orders.find { it.serial == id && !it.fired && !it.voided }
+        val order = orders.find { it.serial == id && !it.fired && !it.voided && !it.isModifier }
         order?.let { or ->
             if (or.qty == 1) {
                 orders.remove(or)
@@ -632,7 +642,7 @@ class OrderScreenModel(
     }
 
     override fun onClickPlus(id: Int) {
-        val order = orders.find { it.serial == id && !it.fired && !it.voided }
+        val order = orders.find { it.serial == id && !it.fired && !it.voided && !it.isModifier }
         order?.let { or ->
             orders[orders.indexOf(order)] =
                 or.copy(qty = or.qty + 1, totalPrice = (or.qty + 1) * or.unitPrice)

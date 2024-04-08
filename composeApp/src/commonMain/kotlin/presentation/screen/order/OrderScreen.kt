@@ -644,7 +644,7 @@ private fun OrderItem(
     serial: Int,
     qtyIncrease: (Int) -> Unit,
     qtyDecrease: (Int) -> Unit,
-    onClickModify: (Int) -> Unit,
+    onClickModify: (Int,Int) -> Unit,
     voided: Boolean,
     fired: Boolean,
     isModifier: Boolean,
@@ -656,7 +656,7 @@ private fun OrderItem(
     Card(
         modifier = modifier.bounceClick {
             if (voided || fired || isModifier) return@bounceClick
-            onClickModify(id)
+            onClickModify(id,serial)
         },
         colors = CardDefaults.cardColors(containerColor = cardColor),
     ) {
