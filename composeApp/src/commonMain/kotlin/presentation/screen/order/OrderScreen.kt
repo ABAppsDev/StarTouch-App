@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -353,7 +352,7 @@ fun ItemCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    var qty by remember { mutableStateOf("0") }
+    var qty by remember { mutableStateOf("1") }
     Box(modifier.heightIn(260.dp).width(192.dp).bounceClick { onClick() }) {
         Box(
             modifier = Modifier
@@ -402,7 +401,8 @@ fun ItemCard(
                 ) {
                     Box(
                         modifier = Modifier
-                            .heightIn(20.dp)
+                            .heightIn(30.dp)
+                            .fillMaxWidth()
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color(0xFF2D303E)),
                     ) {
@@ -418,7 +418,7 @@ fun ItemCard(
                                     .clickable {
                                         if (qty.toFloat() > 1f) {
                                             var temp = qty.toFloat()
-                                            temp += 1f
+                                            temp -= 1f
                                             qty = temp.toString()
                                         }
                                     },
@@ -441,7 +441,7 @@ fun ItemCard(
                                     textAlign = TextAlign.Center
                                 ),
                                 modifier = Modifier
-                                    .widthIn(30.dp)
+                                    .width(50.dp)
                                     .padding(horizontal = 4.dp)
                                     .bounceClick { qty = "0" },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -454,7 +454,7 @@ fun ItemCard(
                                     .clickable {
                                         if (qty.toFloat() < 99f) {
                                             var temp = qty.toFloat()
-                                            temp -= 1
+                                            temp += 1
                                             qty = temp.toString()
                                         }
                                     },

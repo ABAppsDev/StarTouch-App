@@ -14,7 +14,7 @@ import presentation.app.App
 
 fun main() = application {
     val state: WindowState = rememberWindowState(
-        placement = WindowPlacement.Fullscreen,
+        placement = WindowPlacement.Floating,
         position = WindowPosition(
             Alignment.Center
         )
