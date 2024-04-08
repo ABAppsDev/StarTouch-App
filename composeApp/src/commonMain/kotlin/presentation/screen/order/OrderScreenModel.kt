@@ -540,6 +540,10 @@ class OrderScreenModel(
         }
     }
 
+    override fun onChooseItem(itemId: Int) {
+        updateState { it.copy(isChoose = true, selectedItemId = itemId) }
+    }
+
     override fun onDismissDialogue() {
         updateState {
             it.copy(

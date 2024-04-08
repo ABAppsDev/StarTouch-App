@@ -11,6 +11,7 @@ interface OrderInteractionListener {
     fun showErrorScreen()
     fun onClickIconBack()
     fun onClickModifyLastItem(id: Int, serial: Int)
+    fun onChooseItem(itemId: Int)
     fun onDismissDialogue()
     fun onModifyLastItemChanged(comment: String)
     fun onClickOk()
