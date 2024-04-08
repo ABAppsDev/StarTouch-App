@@ -171,20 +171,39 @@ class DinInScreenModel(
                 )
             },
             onSuccess = { assignDrawers ->
-                updateState {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = "",
-                        errorDinInState = null,
-                        dinInDialogueState = it.dinInDialogueState.copy(
-                            isVisible = true,
+                if (assignDrawers.isEmpty()) {
+                    updateState {
+                        it.copy(
                             isLoading = false,
-                            isLoadingButton = false,
-                            assignDrawers = assignDrawers.map { assignDrawer ->
-                                assignDrawer.toAssignDrawerState()
-                            }
-                        ),
-                    )
+                            errorMessage = "",
+                            errorDinInState = null,
+                            dinInDialogueState = it.dinInDialogueState.copy(
+                                isVisible = true,
+                                isLoading = false,
+                                isLoadingButton = false,
+                                isSuccess = true,
+                                serverId = StarTouchSetup.USER_ID,
+                                assignDrawers = emptyList()
+                            ),
+                        )
+                    }
+                    StarTouchSetup.SERVER_ID = StarTouchSetup.USER_ID
+                } else {
+                    updateState {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "",
+                            errorDinInState = null,
+                            dinInDialogueState = it.dinInDialogueState.copy(
+                                isVisible = true,
+                                isLoading = false,
+                                isLoadingButton = false,
+                                assignDrawers = assignDrawers.map { assignDrawer ->
+                                    assignDrawer.toAssignDrawerState()
+                                }
+                            ),
+                        )
+                    }
                 }
             },
             onError = { errorState ->
