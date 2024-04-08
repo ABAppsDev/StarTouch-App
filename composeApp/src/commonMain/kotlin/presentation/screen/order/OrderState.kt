@@ -8,6 +8,7 @@ import domain.entity.Item
 import domain.entity.Preset
 import presentation.base.ErrorState
 import util.LanguageCode
+import kotlin.random.Random
 
 val orders = mutableListOf<OrderItemState>()
 
@@ -44,6 +45,7 @@ data class ModifyLastItemDialogue(
 
 @Immutable
 data class OrderItemState(
+    val serial: Int = Random.nextInt(3),
     val id: Int = 0,
     val name: String = "",
     val qty: Int = 0,
@@ -60,6 +62,8 @@ data class OrderItemState(
     val voided: Boolean = false,
     val pOnCheck: Boolean = false,
     val refModItem: Int = 0,
+    val modifierPick: Int = 0,
+    val status: String = "",
 )
 
 fun OrderItemState.toEntity(): FireItems = FireItems(
@@ -79,12 +83,15 @@ fun OrderItemState.toEntity(): FireItems = FireItems(
     pOnCheck = pOnCheck,
     refModItem = refModItem,
     voided = voided,
+    modifierPick = modifierPick,
+    status = status
 )
 
 fun FireItems.toState(): OrderItemState = OrderItemState(
     id = id,
     name = name ?: "",
     unitPrice = price,
+    serial = Random.nextInt(),
     qty = qty,
     totalPrice = totalPrice,
     isModifier = isModifier,
@@ -98,6 +105,8 @@ fun FireItems.toState(): OrderItemState = OrderItemState(
     fired = fired ?: false,
     refModItem = refModItem ?: 0,
     voided = voided ?: false,
+    modifierPick = modifierPick ?: 0,
+    status = status ?: "preparing"
 )
 
 @Immutable

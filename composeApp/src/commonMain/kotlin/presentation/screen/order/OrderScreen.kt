@@ -32,6 +32,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material.BadgedBox
 import androidx.compose.material.DismissDirection
 import androidx.compose.material.DismissValue
 import androidx.compose.material.ExperimentalMaterialApi
@@ -71,6 +72,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.beepbeep.designSystem.ui.composable.StAppBar
 import com.beepbeep.designSystem.ui.composable.StButton
+import com.beepbeep.designSystem.ui.composable.StDialogue
 import com.beepbeep.designSystem.ui.composable.StOutlinedButton
 import com.beepbeep.designSystem.ui.composable.StTextField
 import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
@@ -83,7 +85,6 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.core.parameter.parametersOf
 import presentation.base.ErrorState
-import presentation.screen.composable.AppDialogue
 import presentation.screen.composable.HandleErrorState
 import presentation.screen.composable.SetLayoutDirection
 import presentation.screen.composable.ShimmerListItem
@@ -186,15 +187,43 @@ class OrderScreen(
                 },
                 floatingActionButton = {
                     SlideAnimation(!state.isFinishOrder && state.itemModifiersState.isEmpty()) {
-                        FloatingActionButton(
-                            onClick = screenModel::onClickFloatActionButton,
-                            containerColor = Theme.colors.primary
-                        ) {
-                            Icon(
-                                Icons.Filled.ShoppingCart,
-                                contentDescription = null,
-                                tint = Theme.colors.contentPrimary
-                            )
+                        Box {
+                            FloatingActionButton(
+                                onClick = screenModel::onClickFloatActionButton,
+                                containerColor = Theme.colors.primary
+                            ) {
+                                Icon(
+                                    Icons.Filled.ShoppingCart,
+                                    contentDescription = null,
+                                    tint = Theme.colors.contentPrimary
+                                )
+                            }
+                            BadgedBox(
+                                {
+                                    Box(
+                                        modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .background(
+                                                    color = Theme.colors.contentPrimary,
+                                                    shape = CircleShape
+                                                )
+                                        ) {
+                                            Text(
+                                                state.orderItemState.size.toString(),
+                                                style = Theme.typography.title,
+                                                textAlign = TextAlign.Center,
+                                                modifier = Modifier.fillMaxSize()
+                                                    .align(Alignment.Center)
+                                            )
+                                        }
+                                    }
+                                },
+                                modifier = Modifier.align(Alignment.TopCenter).padding(start = 8.dp)
+                            ) {
+                            }
                         }
                     }
                 }) {
@@ -479,7 +508,7 @@ private fun OrdersList(
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    items(orderItemState) { item ->
+                    items(orderItemState, key = { it.serial }) { item ->
                         val dismissState = rememberDismissState(
                             initialValue = DismissValue.Default,
                         )
@@ -507,7 +536,7 @@ private fun OrdersList(
                                         if (dismissState.targetValue == DismissValue.DismissedToStart)
                                             IconButton(onClick = {
                                                 if (item.voided || item.fired) return@IconButton
-                                                orderInteractionListener.onClickRemoveItem(item.id)
+                                                orderInteractionListener.onClickRemoveItem(item.serial)
                                             }) {
                                                 Icon(
                                                     painterResource(Res.drawable.trash),
@@ -526,9 +555,10 @@ private fun OrdersList(
                                     qtyDecrease = orderInteractionListener::onClickMinus,
                                     qtyIncrease = orderInteractionListener::onClickPlus,
                                     onClickModify = orderInteractionListener::onClickModifyLastItem,
-                                    totalPrice = item.totalPrice.toDouble(),
-                                    singlePrice = item.unitPrice.toDouble(),
+                                    totalPrice = item.totalPrice,
+                                    singlePrice = item.unitPrice,
                                     id = item.id,
+                                    serial = item.serial,
                                     voided = item.voided,
                                     fired = item.fired,
                                     isModifier = item.isModifier
@@ -577,7 +607,9 @@ private fun OrdersList(
                                     style = Theme.typography.title
                                 )
                                 Text(
-                                    text = "$${orderItemState.sumOf { it.totalPrice.toDouble() }}",
+                                    text = "${
+                                        orderItemState.sumOf { it.totalPrice.toDouble() }.toFloat()
+                                    }",
                                     color = Color.White,
                                     style = Theme.typography.titleMedium
                                 )
@@ -605,10 +637,11 @@ private fun OrdersList(
 @Composable
 private fun OrderItem(
     title: String,
-    singlePrice: Double,
-    totalPrice: Double,
+    singlePrice: Float,
+    totalPrice: Float,
     qty: Int,
     id: Int,
+    serial: Int,
     qtyIncrease: (Int) -> Unit,
     qtyDecrease: (Int) -> Unit,
     onClickModify: (Int) -> Unit,
@@ -653,7 +686,7 @@ private fun OrderItem(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "$$singlePrice",
+                        text = "$singlePrice",
                         color = Theme.colors.contentSecondary,
                         style = Theme.typography.titleMedium
                     )
@@ -697,7 +730,7 @@ private fun OrderItem(
                                     .background(Color(0xFFEFE3C8))
                                     .clickable {
                                         if (voided || fired || isModifier) return@clickable
-                                        qtyDecrease(id)
+                                        qtyDecrease(serial)
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -721,7 +754,7 @@ private fun OrderItem(
                                     .background(Color(0xFFEFE3C8))
                                     .clickable {
                                         if (voided || fired || isModifier) return@clickable
-                                        qtyIncrease(id)
+                                        qtyIncrease(serial)
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -735,7 +768,7 @@ private fun OrderItem(
                     }
                 }
                 Text(
-                    text = "$$totalPrice",
+                    text = "$totalPrice",
                     color = Color.White,
                     style = Theme.typography.titleMedium
                 )
@@ -751,7 +784,7 @@ private fun EnterModifyLastItemDialogue(
     orderInteractionListener: OrderInteractionListener,
     modifier: Modifier = Modifier,
 ) {
-    AppDialogue(
+    StDialogue(
         onDismissRequest = orderInteractionListener::onDismissDialogue,
         modifier = modifier,
     ) {

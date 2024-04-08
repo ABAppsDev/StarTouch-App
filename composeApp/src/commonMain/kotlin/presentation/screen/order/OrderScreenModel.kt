@@ -13,6 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import presentation.base.BaseScreenModel
 import presentation.base.ErrorState
+import kotlin.random.Random
 
 class OrderScreenModel(
     private val manageOrder: ManageOrderUseCase,
@@ -192,11 +193,11 @@ class OrderScreenModel(
                 isPresetVisible = true,
                 itemChildrenState = items.map { item ->
                     item.toItemState()
-                }
+                },
             )
         }
-        if (state.value.itemChildrenState.isEmpty()) {
-            getAllItemModifiers(state.value.selectedItemId)
+        if (items.isEmpty()) {
+            addItem(state.value.selectedItemId)
         }
     }
 
@@ -253,7 +254,7 @@ class OrderScreenModel(
                 }
             )
         }
-        if (state.value.itemModifiersState.isEmpty()) updateState { it.copy(isPresetVisible = false) }
+        if (state.value.itemModifiersState.isEmpty()) updateState { it.copy(isPresetVisible = true) }
     }
 
     fun retry() {
@@ -275,6 +276,7 @@ class OrderScreenModel(
                 addItem(
                     OrderItemState(
                         id = item.id,
+                        serial = Random.nextInt(),
                         name = item.name,
                         qty = 1,
                         unitPrice = item.price,
@@ -293,12 +295,40 @@ class OrderScreenModel(
                 it.copy(
                     selectedPresetId = 0,
                     selectedItemId = 0,
+                    itemId = 0,
                     itemsState = emptyList(),
                     itemChildrenState = emptyList(),
                     itemModifiersState = emptyList(),
                     isPresetVisible = false,
                 )
             }
+        }
+    }
+
+    private fun addItem(itemId: Int) {
+        val item = state.value.itemsState.find { it.id == itemId }
+        if (orders.contains(orders.find { it.id == item?.id }))
+            showWarningItem()
+        else {
+            item?.let {
+                addItem(
+                    OrderItemState(
+                        id = item.id,
+                        serial = Random.nextInt(),
+                        name = item.name,
+                        qty = 1,
+                        unitPrice = item.price,
+                        isModifier = item.isModifier,
+                        noServiceCharge = item.noServiceCharge,
+                        modifierGroupID = item.modifierGroupID,
+                        pickFollowItemQty = item.pickFollowItemQty,
+                        prePaidCard = item.prePaidCard,
+                        taxable = item.taxable,
+                    )
+                )
+                updateState { it.copy(orderItemState = orders.toList()) }
+            }
+            getAllItemModifiers(itemId)
         }
     }
 
@@ -312,6 +342,7 @@ class OrderScreenModel(
                     OrderItemState(
                         id = item.id,
                         name = item.name,
+                        serial = Random.nextInt(),
                         qty = 1,
                         unitPrice = item.price,
                         isModifier = item.isModifier,
@@ -330,13 +361,14 @@ class OrderScreenModel(
     }
 
     fun add() {
-        val item = state.value.itemsState.find { it.id == state.value.itemId }
+        val item = state.value.itemsState.find { it.id == state.value.selectedItemId }
         item?.let {
             addItem(
                 OrderItemState(
                     id = item.id,
                     name = item.name,
                     qty = 1,
+                    serial = Random.nextInt(),
                     unitPrice = item.price,
                     isModifier = item.isModifier,
                     noServiceCharge = item.noServiceCharge,
@@ -350,42 +382,15 @@ class OrderScreenModel(
                 it.copy(
                     orderItemState = orders.toList(),
                     warningItemIsVisible = false,
-                    itemsState = emptyList(),
-                    itemModifiersState = emptyList(),
-                    itemChildrenState = emptyList(),
-                    selectedItemId = state.value.itemId,
-                    isPresetVisible = false
+                    isPresetVisible = true
                 )
             }
         }
     }
 
     override fun onClickItem(itemId: Int) {
-        val item = state.value.itemsState.find { it.id == itemId }
-        updateState { it.copy(itemId = itemId) }
-        if (orders.contains(orders.find { it.id == item?.id }))
-            showWarningItem()
-        else {
-            item?.let {
-                addItem(
-                    OrderItemState(
-                        id = item.id,
-                        name = item.name,
-                        qty = 1,
-                        unitPrice = item.price,
-                        isModifier = item.isModifier,
-                        noServiceCharge = item.noServiceCharge,
-                        modifierGroupID = item.modifierGroupID,
-                        pickFollowItemQty = item.pickFollowItemQty,
-                        prePaidCard = item.prePaidCard,
-                        taxable = item.taxable,
-                    )
-                )
-                updateState { it.copy(orderItemState = orders.toList()) }
-            }
-            getAllItemChildren(itemId)
-            updateState { it.copy(selectedItemId = itemId, itemsState = emptyList()) }
-        }
+        updateState { it.copy(selectedItemId = itemId) }
+        getAllItemChildren(itemId)
     }
 
     override fun onClickFloatActionButton() {
@@ -397,6 +402,7 @@ class OrderScreenModel(
                 itemChildrenState = emptyList(),
                 itemModifiersState = emptyList(),
                 selectedItemId = 0,
+                itemId = 0,
                 selectedPresetId = 0,
                 presetItemsState = emptyList()
             )
@@ -431,7 +437,7 @@ class OrderScreenModel(
                         updateState { s -> s.copy(isLoadingButton = false) }
                         if (fastLoop) sendNewEffect(OrderUiEffect.NavigateBackToDinIn)
                         else {
-                            AppLanguage.code.emit(StarTouchSetup.USER_LANGUAGE)
+                            AppLanguage.code.emit(StarTouchSetup.DEFAULT_LANGUAGE)
                             sendNewEffect(OrderUiEffect.NavigateBackToHome)
                         }
                     }
@@ -457,6 +463,7 @@ class OrderScreenModel(
                 itemChildrenState = emptyList(),
                 itemModifiersState = emptyList(),
                 selectedItemId = 0,
+                itemId = 0,
                 selectedPresetId = 0,
                 presetItemsState = emptyList()
             )
@@ -480,7 +487,7 @@ class OrderScreenModel(
         updateState {
             it.copy(
                 modifyLastItemDialogue = it.modifyLastItemDialogue.copy(
-                    isVisible = false
+                    isVisible = false,
                 )
             )
         }
@@ -509,6 +516,9 @@ class OrderScreenModel(
                 pickFollowItemQty = false,
                 prePaidCard = false,
                 taxable = false,
+                modifierPick = 1,
+                serial = Random.nextInt(),
+                status = state.value.modifyLastItemDialogue.comment,
                 refModItem = state.value.modifyLastItemDialogue.itemId,
                 pOnCheck = true,
                 pOnReport = true,
@@ -526,7 +536,7 @@ class OrderScreenModel(
     }
 
     override fun onClickMinus(id: Int) {
-        val order = orders.find { it.id == id && !it.fired && !it.voided }
+        val order = orders.find { it.serial == id && !it.fired && !it.voided }
         order?.let { or ->
             if (or.qty == 1) {
                 orders.remove(or)
@@ -570,7 +580,7 @@ class OrderScreenModel(
     }
 
     override fun onClickPlus(id: Int) {
-        val order = orders.find { it.id == id && !it.fired && !it.voided }
+        val order = orders.find { it.serial == id && !it.fired && !it.voided }
         order?.let { or ->
             orders[orders.indexOf(order)] =
                 or.copy(qty = or.qty + 1, totalPrice = (or.qty + 1) * or.unitPrice)
@@ -584,7 +594,7 @@ class OrderScreenModel(
     }
 
     override fun onClickRemoveItem(id: Int) {
-        val order = orders.find { it.id == id && !it.fired && !it.voided }
+        val order = orders.find { it.serial == id && !it.fired && !it.voided }
         orders.remove(order)
         val newList = orders
         updateState {

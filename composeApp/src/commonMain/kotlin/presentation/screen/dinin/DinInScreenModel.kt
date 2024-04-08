@@ -91,8 +91,8 @@ class DinInScreenModel(
     override fun onClickOk() {
         if (state.value.dinInDialogueState.coversCount.isEmpty())
             onError(errorState = ErrorState.ValidationError("Enter covers number"))
-        else if (state.value.dinInDialogueState.coversCount.toInt() <= 0)
-            onError(errorState = ErrorState.ValidationError("Zero covers not allowed"))
+//        else if (state.value.dinInDialogueState.coversCount.toInt() <= 0)
+//            onError(errorState = ErrorState.ValidationError("Zero covers not allowed"))
         else {
             updateState {
                 it.copy(
@@ -488,7 +488,7 @@ class DinInScreenModel(
                             tableId,
                             items,
                             true,
-                            tableId.toString().substring(6, tableId.toString().length).toInt()
+                            tableId.toString().takeLast(5).toInt()
                         )
                     )
                 },
