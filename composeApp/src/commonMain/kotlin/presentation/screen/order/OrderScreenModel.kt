@@ -249,7 +249,7 @@ class OrderScreenModel(
                 errorState = null,
                 showErrorScreen = false,
                 isPresetVisible = false,
-                itemsState = emptyList(),
+                itemsState = if (items.isNotEmpty()) emptyList() else state.value.itemsState,
                 itemChildrenState = emptyList(),
                 itemModifiersState = items.map { item ->
                     item.toItemModifierState()
@@ -278,12 +278,14 @@ class OrderScreenModel(
                     id = item.id,
                     serial = Random.nextInt(),
                     name = item.name,
+                    counter = serial + 1,
                     qty = 1,
                     unitPrice = item.price,
                     isModifier = item.isModifier,
                     noServiceCharge = item.noServiceCharge,
                     refModItem = serial,
                     status = item.name,
+                    refItemId = state.value.selectedItemId,
                     modifierGroupID = item.modifierGroupID,
                     pickFollowItemQty = item.pickFollowItemQty,
                     prePaidCard = item.prePaidCard,
@@ -308,6 +310,8 @@ class OrderScreenModel(
     }
 
     private fun addItem(itemId: Int) {
+        val serial =
+            orders.indexOf(orders.find { it.id == state.value.modifyLastItemDialogue.itemId }) + 1
         val item = state.value.itemsState.find { it.id == itemId }
         if (orders.contains(orders.find { it.id == item?.id }))
             showWarningItem()
@@ -319,6 +323,7 @@ class OrderScreenModel(
                         serial = Random.nextInt(),
                         name = item.name,
                         qty = 1,
+                        counter = serial,
                         unitPrice = item.price,
                         isModifier = item.isModifier,
                         noServiceCharge = item.noServiceCharge,
@@ -342,6 +347,9 @@ class OrderScreenModel(
     }
 
     override fun onClickItemChild(itemId: Int) {
+        updateState { it.copy(selectedItemId = itemId) }
+        val serial =
+            orders.indexOf(orders.find { it.id == state.value.modifyLastItemDialogue.itemId }) + 1
         val item = state.value.itemChildrenState.find { it.id == itemId }
         if (orders.contains(orders.find { it.id == item?.id }))
             showWarningItem()
@@ -352,6 +360,7 @@ class OrderScreenModel(
                         id = item.id,
                         name = item.name,
                         serial = Random.nextInt(),
+                        counter = serial,
                         qty = 1,
                         unitPrice = item.price,
                         isModifier = item.isModifier,
@@ -372,11 +381,13 @@ class OrderScreenModel(
                 updateState { it.copy(orderItemState = orders.toList()) }
             }
             getAllItemModifiers(itemId)
-            updateState { it.copy(selectedItemId = itemId, itemChildrenState = emptyList()) }
+            updateState { it.copy(selectedItemId = itemId) }
         }
     }
 
     fun add() {
+        val serial =
+            orders.indexOf(orders.find { it.id == state.value.modifyLastItemDialogue.itemId }) + 1
         val item = state.value.itemsState.find { it.id == state.value.selectedItemId }
         item?.let {
             addItem(
@@ -384,6 +395,7 @@ class OrderScreenModel(
                     id = item.id,
                     name = item.name,
                     qty = 1,
+                    counter = serial,
                     serial = Random.nextInt(),
                     unitPrice = item.price,
                     isModifier = item.isModifier,
@@ -434,6 +446,18 @@ class OrderScreenModel(
 
     override fun onClickFire() {
         updateState { it.copy(isLoadingButton = true) }
+        orders.forEachIndexed { i, order ->
+            if (order.isModifier) {
+                val item = orders.indexOf(orders.find { it.id == order.refItemId })
+                orders[i] = order.copy(refModItem = if (item == 0) 1 else item + 1)
+                val newList = orders
+                updateState {
+                    it.copy(
+                        orderItemState = newList.toList()
+                    )
+                }
+            }
+        }
         tryToExecute(
             function = {
                 val fireItems =
@@ -539,8 +563,10 @@ class OrderScreenModel(
                 isModifier = true,
                 noServiceCharge = false,
                 modifierGroupID = 0,
+                counter = serial + 1,
                 pickFollowItemQty = false,
                 prePaidCard = false,
+                refItemId = state.value.modifyLastItemDialogue.itemId,
                 taxable = false,
                 modifierPick = 1,
                 serial = Random.nextInt(),

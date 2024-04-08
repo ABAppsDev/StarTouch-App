@@ -51,7 +51,7 @@ data class OrderItemState(
     val name: String = "",
     val unitPrice: Float = 0f,
     val totalPrice: Float = unitPrice * qty,
-    // val case: String = "I",
+    val counter: Int = 0,
     val fired: Boolean = false,
     val voided: Boolean = false,
     val pOnCheck: Boolean = false,
@@ -65,6 +65,7 @@ data class OrderItemState(
     val pickFollowItemQty: Boolean = false,
     val modifierPick: Int = 0,
     val prePaidCard: Boolean = false,
+    val refItemId: Int = 0,
 )
 
 fun OrderItemState.toEntity(): FireItems = FireItems(
@@ -87,6 +88,7 @@ fun OrderItemState.toEntity(): FireItems = FireItems(
     voided = voided,
     modifierPick = modifierPick,
     status = status,
+    serial = counter,
 )
 
 fun FireItems.toState(): OrderItemState = OrderItemState(
@@ -108,7 +110,8 @@ fun FireItems.toState(): OrderItemState = OrderItemState(
     refModItem = refModItem ?: 0,
     voided = voided ?: false,
     modifierPick = modifierPick ?: 0,
-    status = status ?: "preparing"
+    status = status ?: "preparing",
+    counter = serial ?: 0,
 )
 
 @Immutable
