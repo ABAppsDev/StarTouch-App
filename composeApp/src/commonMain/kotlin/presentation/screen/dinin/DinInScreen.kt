@@ -288,7 +288,7 @@ private fun EnterTableName(
         keyboardType = KeyboardType.Text,
         imeAction = ImeAction.Go,
         keyboardActions = KeyboardActions(onGo = {
-            dinInInteractionListener.onClickOk()
+            dinInInteractionListener.onEnterTableName()
         })
     )
     SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
