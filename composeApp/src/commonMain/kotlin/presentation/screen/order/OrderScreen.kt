@@ -61,7 +61,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -353,7 +353,7 @@ fun ItemCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    var qty by remember { mutableFloatStateOf(1f) }
+    var qty by remember { mutableStateOf("0") }
     Box(modifier.heightIn(260.dp).width(192.dp).bounceClick { onClick() }) {
         Box(
             modifier = Modifier
@@ -416,8 +416,11 @@ fun ItemCard(
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(Color(0xFFEFE3C8))
                                     .clickable {
-                                        if (qty > 1)
-                                            qty -= 1
+                                        if (qty.toFloat() > 1f) {
+                                            var temp = qty.toFloat()
+                                            temp += 1f
+                                            qty = temp.toString()
+                                        }
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -428,11 +431,9 @@ fun ItemCard(
                                 )
                             }
                             BasicTextField(
-                                value = qty.toString(),
+                                value = qty,
                                 onValueChange = {
-                                    if (it.matches(Regex("^[0-9]*\\.?[0-9]*$"))) {
-                                        qty = it.toFloatOrNull() ?: 0f
-                                    }
+                                    qty = it
                                 },
                                 textStyle = TextStyle(
                                     color = Theme.colors.contentPrimary,
@@ -442,7 +443,7 @@ fun ItemCard(
                                 modifier = Modifier
                                     .widthIn(30.dp)
                                     .padding(horizontal = 4.dp)
-                                    .bounceClick { qty = 0f },
+                                    .bounceClick { qty = "0" },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             )
                             Box(
@@ -451,8 +452,11 @@ fun ItemCard(
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(Color(0xFFEFE3C8))
                                     .clickable {
-                                        if (qty < 99)
-                                            qty += 1
+                                        if (qty.toFloat() < 99f) {
+                                            var temp = qty.toFloat()
+                                            temp -= 1
+                                            qty = temp.toString()
+                                        }
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -462,7 +466,7 @@ fun ItemCard(
                                     style = Theme.typography.titleMedium
                                 )
                             }
-                            TextButton(onClick = { onClickOk(id, qty) }) {
+                            TextButton(onClick = { onClickOk(id, qty.toFloat()) }) {
                                 Text(
                                     text = "Done",
                                     color = Theme.colors.contentPrimary,

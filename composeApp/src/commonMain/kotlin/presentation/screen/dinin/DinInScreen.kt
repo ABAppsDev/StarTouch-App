@@ -478,11 +478,13 @@ private fun ChooseTable(
         modifier = modifier
             .combinedClickable(
                 onLongClick = {
-                    if (table.covers > 0 && id != 0)
+                    if (table.checksCount == 0 && id != 0)
+                        onClick()
+                    if (table.checksCount > 0)
                         onClick()
                 },
             ) {
-                if (table.covers > 0) onLongClick() else if (id != 0) onClick()
+                if (table.checksCount > 0) onLongClick() else if (id != 0) onClick()
             }
     )
 }
