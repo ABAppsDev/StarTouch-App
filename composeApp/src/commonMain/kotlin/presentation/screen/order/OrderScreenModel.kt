@@ -287,6 +287,7 @@ class OrderScreenModel(
                         prePaidCard = item.prePaidCard,
                         taxable = item.taxable,
                         pOnReport = item.pOnReport,
+                        pOnCheck = item.pOnCheck
                     )
                 )
                 updateState { it.copy(orderItemState = orders.toList()) }
@@ -324,6 +325,13 @@ class OrderScreenModel(
                         pickFollowItemQty = item.pickFollowItemQty,
                         prePaidCard = item.prePaidCard,
                         taxable = item.taxable,
+                        status = "preparing",
+                        fired = false,
+                        voided = false,
+                        modifierPick = 0,
+                        refModItem = 0,
+                        pOnReport = item.pOnReport,
+                        pOnCheck = item.pOnCheck,
                     )
                 )
                 updateState { it.copy(orderItemState = orders.toList()) }
@@ -351,6 +359,13 @@ class OrderScreenModel(
                         pickFollowItemQty = item.pickFollowItemQty,
                         prePaidCard = item.prePaidCard,
                         taxable = item.taxable,
+                        status = "preparing",
+                        fired = false,
+                        voided = false,
+                        modifierPick = 0,
+                        refModItem = 0,
+                        pOnReport = item.pOnReport,
+                        pOnCheck = item.pOnCheck,
                     )
                 )
                 updateState { it.copy(orderItemState = orders.toList()) }
@@ -376,6 +391,13 @@ class OrderScreenModel(
                     pickFollowItemQty = item.pickFollowItemQty,
                     prePaidCard = item.prePaidCard,
                     taxable = item.taxable,
+                    status = "preparing",
+                    fired = false,
+                    voided = false,
+                    modifierPick = 0,
+                    refModItem = 0,
+                    pOnReport = item.pOnReport,
+                    pOnCheck = item.pOnCheck,
                 )
             )
             updateState {
@@ -521,7 +543,7 @@ class OrderScreenModel(
                 status = state.value.modifyLastItemDialogue.comment,
                 refModItem = state.value.modifyLastItemDialogue.itemId,
                 pOnCheck = true,
-                pOnReport = true,
+                pOnReport = false,
                 totalPrice = 0f
             )
         )

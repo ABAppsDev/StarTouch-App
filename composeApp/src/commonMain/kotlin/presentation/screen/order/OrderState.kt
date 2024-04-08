@@ -47,29 +47,31 @@ data class ModifyLastItemDialogue(
 data class OrderItemState(
     val serial: Int = Random.nextInt(3),
     val id: Int = 0,
-    val name: String = "",
     val qty: Int = 0,
+    val name: String = "",
     val unitPrice: Float = 0f,
     val totalPrice: Float = unitPrice * qty,
-    val noServiceCharge: Boolean = false,
-    val isModifier: Boolean = false,
-    val taxable: Boolean = false,
-    val pickFollowItemQty: Boolean = false,
-    val modifierGroupID: Int = 0,
-    val prePaidCard: Boolean = false,
-    val pOnReport: Boolean = false,
+    // val case: String = "I",
     val fired: Boolean = false,
     val voided: Boolean = false,
     val pOnCheck: Boolean = false,
-    val refModItem: Int = 0,
-    val modifierPick: Int = 0,
     val status: String = "",
+    val isModifier: Boolean = false,
+    val refModItem: Int = 0,
+    val taxable: Boolean = false,
+    val noServiceCharge: Boolean = false,
+    val pOnReport: Boolean = false,
+    val modifierGroupID: Int = 0,
+    val pickFollowItemQty: Boolean = false,
+    val modifierPick: Int = 0,
+    val prePaidCard: Boolean = false,
 )
 
 fun OrderItemState.toEntity(): FireItems = FireItems(
     id = id,
     price = unitPrice,
     qty = qty,
+    name = name,
     totalPrice = totalPrice,
     ws = StarTouchSetup.WORK_STATION_ID,
     isModifier = isModifier,
@@ -84,7 +86,7 @@ fun OrderItemState.toEntity(): FireItems = FireItems(
     refModItem = refModItem,
     voided = voided,
     modifierPick = modifierPick,
-    status = status
+    status = status,
 )
 
 fun FireItems.toState(): OrderItemState = OrderItemState(
