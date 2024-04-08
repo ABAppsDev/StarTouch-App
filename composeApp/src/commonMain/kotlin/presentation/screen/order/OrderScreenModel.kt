@@ -457,7 +457,7 @@ class OrderScreenModel(
                 orders[i] =
                     order.copy(
                         refModItem = if (item == 0) 1 else item + 1,
-                        qty = if (order.qty <= 0) temp?.qty ?: 1 else order.qty
+                        qty = if (order.qty > 0) temp?.qty ?: 1 else order.qty
                     )
                 val newList = orders
                 updateState {
