@@ -430,9 +430,9 @@ fun ItemCard(
                             BasicTextField(
                                 value = qty.toString(),
                                 onValueChange = {
-                                    qty = if (it.toFloat() >= 99f)
-                                        99f
-                                    else it.toFloat()
+                                    if (it.matches(Regex("^[0-9]*\\.?[0-9]*$"))) {
+                                        qty = it.toFloatOrNull() ?: 0f
+                                    }
                                 },
                                 textStyle = TextStyle(
                                     color = Theme.colors.contentPrimary,
