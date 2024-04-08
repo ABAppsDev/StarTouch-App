@@ -11,6 +11,7 @@ import domain.usecase.ManageDinInUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import presentation.base.BaseScreenModel
 import presentation.base.ErrorState
@@ -25,7 +26,38 @@ class DinInScreenModel(
     init {
         getTables()
         getAllRooms()
+        socketTables()
     }
+
+    private fun socketTables() {
+        viewModelScope.launch(Dispatchers.Default) {
+            while (true) {
+                try {
+                    delay(3000)
+                    val tables = manageDinInUseCase.getTablesDataByRoomId(
+                        StarTouchSetup.OUTLET_ID,
+                        StarTouchSetup.REST_ID,
+                        state.value.roomId
+                    )
+                    updateState {
+                        it.copy(
+                            tablesDetails = tables.map { table ->
+                                table.toTableDetailsState()
+                            },
+                        )
+                    }
+                } catch (e: Exception) {
+                    updateState {
+                        it.copy(
+                            errorDinInState = ErrorState.UnknownError(""),
+                            errorMessage = ""
+                        )
+                    }
+                }
+            }
+        }
+    }
+
 
     private fun getTables() {
         updateState {
