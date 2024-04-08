@@ -256,7 +256,12 @@ class OrderScreenModel(
                 }
             )
         }
-        if (state.value.itemModifiersState.isEmpty()) updateState { it.copy(isPresetVisible = true) }
+        if (state.value.itemModifiersState.isEmpty()) updateState {
+            it.copy(
+                isPresetVisible = true,
+                qty = 0f
+            )
+        }
     }
 
     fun retry() {
@@ -281,7 +286,7 @@ class OrderScreenModel(
                     serial = x,
                     name = item.name,
                     counter = serial + 1,
-                    qty = order?.qty?.toInt()?.toFloat() ?: 1f,
+                    qty = state.value.qty,
                     unitPrice = item.price,
                     isModifier = item.isModifier,
                     noServiceCharge = item.noServiceCharge,
@@ -296,7 +301,7 @@ class OrderScreenModel(
                     pOnCheck = item.pOnCheck
                 )
             )
-            updateState { it.copy(orderItemState = orders.toList()) }
+            updateState { it.copy(orderItemState = orders.toList(), qty = 0f) }
         }
         updateState {
             it.copy(
@@ -342,7 +347,7 @@ class OrderScreenModel(
                         pOnCheck = item.pOnCheck,
                     )
                 )
-                updateState { it.copy(orderItemState = orders.toList(), qty = 0f) }
+                updateState { it.copy(orderItemState = orders.toList()) }
             }
             getAllItemModifiers(itemId)
         }
@@ -380,7 +385,7 @@ class OrderScreenModel(
                         pOnCheck = item.pOnCheck,
                     )
                 )
-                updateState { it.copy(orderItemState = orders.toList(), qty = 0f) }
+                updateState { it.copy(orderItemState = orders.toList()) }
             }
             getAllItemModifiers(itemId)
             updateState { it.copy(selectedItemId = itemId) }
@@ -421,7 +426,6 @@ class OrderScreenModel(
                     orderItemState = orders.toList(),
                     warningItemIsVisible = false,
                     isPresetVisible = true,
-                    qty = 0f
                 )
             }
         }
