@@ -40,6 +40,7 @@ import androidx.compose.material.DismissValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -55,7 +56,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -402,7 +402,6 @@ fun ItemCard(
                     Box(
                         modifier = Modifier
                             .heightIn(30.dp)
-                            .fillMaxWidth()
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color(0xFF2D303E)),
                     ) {
@@ -466,11 +465,11 @@ fun ItemCard(
                                     style = Theme.typography.titleMedium
                                 )
                             }
-                            TextButton(onClick = { onClickOk(id, qty.toFloat()) }) {
-                                Text(
-                                    text = "Done",
-                                    color = Theme.colors.contentPrimary,
-                                    style = Theme.typography.title
+                            IconButton(onClick = { onClickOk(id, qty.toFloat()) }) {
+                                Icon(
+                                    Icons.Filled.CheckCircle,
+                                    contentDescription = null,
+                                    tint = Theme.colors.success
                                 )
                             }
                         }
