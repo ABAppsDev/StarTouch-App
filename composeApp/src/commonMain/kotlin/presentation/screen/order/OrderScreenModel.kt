@@ -63,7 +63,7 @@ class OrderScreenModel(
                     val fastLoop = manageSetting.getIsBackToHome()
                     if (fastLoop) sendNewEffect(OrderUiEffect.NavigateBackToDinIn)
                     else {
-                        AppLanguage.code.emit(StarTouchSetup.USER_LANGUAGE)
+                        AppLanguage.code.emit(StarTouchSetup.DEFAULT_LANGUAGE)
                         sendNewEffect(OrderUiEffect.NavigateBackToHome)
                     }
                 }

@@ -7,8 +7,8 @@ import domain.gateway.IDinInGateway
 class ManageDinInUseCase(
     private val dinInGateway: IDinInGateway,
 ) {
-    suspend fun getAllOnlineUsers(outletId: Int, restId: Int): List<AssignCheck> {
-        return dinInGateway.getAllOnlineUsers(outletId, restId)
+    suspend fun getAllOnlineUsers(outletId: Int, restId: Int, userID: Int): List<AssignCheck> {
+        return dinInGateway.getAllOnlineUsers(outletId, restId, userID)
     }
 
     suspend fun getTablesDataByRoomId(outletID: Int, restID: Int, roomID: Int): List<TableData> =

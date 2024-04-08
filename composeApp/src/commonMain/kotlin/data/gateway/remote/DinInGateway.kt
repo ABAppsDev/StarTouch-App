@@ -31,11 +31,12 @@ class DinInGateway(client: HttpClient) : BaseGateway(client), IDinInGateway {
         }.data?.map { it.toEntity() } ?: throw NotFoundException("Tables not found")
     }
 
-    override suspend fun getAllOnlineUsers(outletId: Int, restId: Int): List<AssignCheck> {
+    override suspend fun getAllOnlineUsers(outletId: Int, restId: Int,userID:Int): List<AssignCheck> {
         return tryToExecute<ServerResponse<List<AssignCheckDto>>> {
             get("/check/assign") {
                 parameter("outletID", outletId)
                 parameter("restID", restId)
+                parameter("userID", userID)
             }
         }.data?.map { it.toEntity() } ?: throw NotFoundException("Users not found")
     }

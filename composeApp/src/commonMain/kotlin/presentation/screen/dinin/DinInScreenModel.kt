@@ -142,7 +142,32 @@ class DinInScreenModel(
                         )
                     }
                 },
-                onError = ::onError
+                onError = { errorState ->
+                    updateState {
+                        it.copy(
+                            isLoading = false,
+                            errorState = errorState,
+                            showErrorScreen = false,
+                            errorDinInState = null,
+                            dinInDialogueState = it.dinInDialogueState.copy(
+                                isLoading = false,
+                                isLoadingButton = false,
+                            ),
+                            errorDialogueIsVisible = true,
+                            errorMessage = when (errorState) {
+                                is ErrorState.NetworkError -> errorState.message.toString()
+                                is ErrorState.NotFound -> errorState.message.toString()
+                                is ErrorState.ServerError -> errorState.message.toString()
+                                is ErrorState.PermissionDenied -> errorState.message.toString()
+                                is ErrorState.UnknownError -> errorState.message.toString()
+                                is ErrorState.EmptyData -> errorState.message.toString()
+                                is ErrorState.ValidationError -> errorState.message.toString()
+                                is ErrorState.ValidationNetworkError -> errorState.message.toString()
+                                else -> "Unknown error"
+                            }
+                        )
+                    }
+                }
             )
         }
     }
@@ -167,7 +192,8 @@ class DinInScreenModel(
             function = {
                 manageDinInUseCase.getAllOnlineUsers(
                     StarTouchSetup.OUTLET_ID,
-                    StarTouchSetup.REST_ID
+                    StarTouchSetup.REST_ID,
+                    StarTouchSetup.USER_ID
                 )
             },
             onSuccess = { assignDrawers ->
@@ -249,7 +275,7 @@ class DinInScreenModel(
                     is ErrorState.EmptyData -> errorState.message.toString()
                     is ErrorState.ValidationError -> errorState.message.toString()
                     is ErrorState.ValidationNetworkError -> errorState.message.toString()
-                    else -> "Unknown error"
+                    else -> "Logon Error"
                 }
             )
         }
@@ -474,7 +500,7 @@ class DinInScreenModel(
                                 is ErrorState.ValidationError -> errorState.message.toString()
                                 is ErrorState.PermissionDenied -> errorState.message.toString()
                                 is ErrorState.ValidationNetworkError -> errorState.message.toString()
-                                else -> "Unknown error"
+                                else -> "Logon Error"
                             }
                         )
                     }
@@ -566,7 +592,7 @@ class DinInScreenModel(
                             is ErrorState.EmptyData -> errorState.message.toString()
                             is ErrorState.PermissionDenied -> errorState.message.toString()
                             is ErrorState.ValidationNetworkError -> errorState.message.toString()
-                            else -> "Unknown error"
+                            else -> "Logon Error"
                         }
                     )
                 }
