@@ -32,20 +32,23 @@ class DinInScreenModel(
     private fun socketTables() {
         viewModelScope.launch(Dispatchers.Default) {
             if (state.value.roomId != 0)
-                while (true) {
+            while (true) {
+                if (state.value.roomId != 0)
                     try {
                         delay(6000)
-                        val tables = manageDinInUseCase.getTablesDataByRoomId(
-                            StarTouchSetup.OUTLET_ID,
-                            StarTouchSetup.REST_ID,
-                            state.value.roomId
-                        )
-                        updateState {
-                            it.copy(
-                                tablesDetails = tables.map { table ->
-                                    table.toTableDetailsState()
-                                },
+                        if (state.value.roomId != 0) {
+                            val tables = manageDinInUseCase.getTablesDataByRoomId(
+                                StarTouchSetup.OUTLET_ID,
+                                StarTouchSetup.REST_ID,
+                                state.value.roomId
                             )
+                            updateState {
+                                it.copy(
+                                    tablesDetails = tables.map { table ->
+                                        table.toTableDetailsState()
+                                    },
+                                )
+                            }
                         }
                     } catch (e: Exception) {
                         updateState {
@@ -55,7 +58,7 @@ class DinInScreenModel(
                             )
                         }
                     }
-                }
+            }
         }
     }
 
