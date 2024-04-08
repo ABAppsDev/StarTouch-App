@@ -7,6 +7,7 @@ import data.remote.model.OpenCheckDto
 import data.remote.model.OpenNewCheckDto
 import data.remote.model.ReOpenCheck
 import data.remote.model.ServerResponse
+import data.util.StarTouchSetup
 import domain.entity.FireItems
 import domain.entity.OpenCheck
 import domain.entity.OpenNewCheck
@@ -89,6 +90,7 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
                 parameter("checkID", checkID)
                 parameter("userID", serverId)
                 parameter("serverID", userID)
+                parameter("outletID", StarTouchSetup.OUTLET_ID)
             }
         }.data ?: throw Exception("")
     }
@@ -104,6 +106,7 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
                 parameter("checkID", checkID)
                 parameter("userID", serverId)
                 parameter("serverID", userID)
+                parameter("outletID", StarTouchSetup.OUTLET_ID)
             }
         }.data ?: throw Exception("")
     }
