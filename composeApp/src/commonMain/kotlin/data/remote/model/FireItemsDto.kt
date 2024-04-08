@@ -9,7 +9,7 @@ data class FireItemsDto(
     val name: String? = null,
     val price: Float? = null,
     val totalPrice: Float? = null,
-    val qty: Int? = null,
+    val qty: Float? = null,
     val noServiceCharge: Boolean? = null,
     val isModifier: Boolean? = null,
     val taxable: Boolean? = null,

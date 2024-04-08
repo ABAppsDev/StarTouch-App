@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -60,7 +61,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -279,8 +283,8 @@ class OrderScreen(
                         ItemsList(
                             state.itemsState,
                             onClickItem = screenModel::onClickItem,
+                            id = state.selectedItemId,
                             onChooseItem = screenModel::onChooseItem,
-                            isChoose = state.isChoose,
                             modifier = Modifier.padding(top = it.calculateTopPadding())
                                 .pullRefresh(pullRefreshState),
                         )
@@ -345,10 +349,11 @@ fun ItemCard(
     price: String,
     id: Int = 0,
     isChoose: Boolean = false,
-    onClickOk: (Int) -> Unit = {},
+    onClickOk: (Int, Float) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
+    var qty by remember { mutableFloatStateOf(1f) }
     Box(modifier.heightIn(260.dp).width(192.dp).bounceClick { onClick() }) {
         Box(
             modifier = Modifier
@@ -397,12 +402,13 @@ fun ItemCard(
                 ) {
                     Box(
                         modifier = Modifier
-                            .height(30.dp)
+                            .heightIn(20.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color(0xFF2D303E)),
                     ) {
                         Row(
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(start = 8.dp)
                         ) {
                             Box(
                                 modifier = Modifier
@@ -410,45 +416,8 @@ fun ItemCard(
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(Color(0xFFEFE3C8))
                                     .clickable {
-
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "+",
-                                    color = Theme.colors.surface,
-                                    style = Theme.typography.titleMedium
-                                )
-                            }
-                            BasicTextField(
-                                value = "1",
-                                onValueChange = {
-//                                    if (it == "")
-//                                        qty = -1
-//                                    else if (it.toInt() >= 99)
-//                                        qty = 99
-//                                    else if (it.toInt() <= 1)
-//                                        qty = 1
-//                                    else
-//                                        qty = it.toInt()
-                                },
-                                textStyle = TextStyle(
-                                    color = Theme.colors.contentPrimary,
-                                    fontSize = 14.sp,
-                                    textAlign = TextAlign.Center
-                                ),
-                                modifier = Modifier
-                                    .width(30.dp)
-                                    .padding(horizontal = 4.dp),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .size(30.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(Color(0xFFEFE3C8))
-                                    .clickable {
-
+                                        if (qty > 1)
+                                            qty -= 1
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -458,7 +427,42 @@ fun ItemCard(
                                     style = Theme.typography.titleMedium
                                 )
                             }
-                            TextButton(onClick = { onClickOk(id) }) {
+                            BasicTextField(
+                                value = qty.toString(),
+                                onValueChange = {
+                                    qty = if (it.toFloat() >= 99f)
+                                        99f
+                                    else it.toFloat()
+                                },
+                                textStyle = TextStyle(
+                                    color = Theme.colors.contentPrimary,
+                                    fontSize = 14.sp,
+                                    textAlign = TextAlign.Center
+                                ),
+                                modifier = Modifier
+                                    .widthIn(30.dp)
+                                    .padding(horizontal = 4.dp)
+                                    .bounceClick { qty = 0f },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color(0xFFEFE3C8))
+                                    .clickable {
+                                        if (qty < 99)
+                                            qty += 1
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "+",
+                                    color = Theme.colors.surface,
+                                    style = Theme.typography.titleMedium
+                                )
+                            }
+                            TextButton(onClick = { onClickOk(id, qty) }) {
                                 Text(
                                     text = "Done",
                                     color = Theme.colors.contentPrimary,
@@ -476,9 +480,9 @@ fun ItemCard(
 @Composable
 private fun ItemsList(
     items: List<ItemState>,
-    isChoose: Boolean = false,
+    id: Int = 0,
     modifier: Modifier = Modifier,
-    onClickItem: (Int) -> Unit,
+    onClickItem: (Int, Float) -> Unit,
     onChooseItem: (Int) -> Unit,
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
@@ -491,11 +495,12 @@ private fun ItemsList(
         ) {
             items(items) { item ->
                 ItemCard(
-                    item.name,
-                    item.price.toString(),
-                    item.id,
-                    isChoose,
-                    { onClickItem(item.id) }) {
+                    name = item.name,
+                    price = item.price.toString(),
+                    id = item.id,
+                    isChoose = id == item.id,
+                    onClickOk = onClickItem
+                ) {
                     onChooseItem(item.id)
                 }
             }
@@ -693,7 +698,8 @@ private fun OrdersList(
                                     style = Theme.typography.title
                                 )
                                 Text(
-                                    text = orderItemState.sumOf { it.qty }.toString(),
+                                    text = orderItemState.sumOf { it.qty.toDouble() }.toFloat()
+                                        .toString(),
                                     color = Color.White,
                                     style = Theme.typography.titleMedium
                                 )
@@ -741,7 +747,7 @@ private fun OrderItem(
     title: String,
     singlePrice: Float,
     totalPrice: Float,
-    qty: Int,
+    qty: Float,
     id: Int,
     serial: Int,
     qtyIncrease: (Int) -> Unit,

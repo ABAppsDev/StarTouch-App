@@ -281,7 +281,7 @@ class OrderScreenModel(
                     serial = x,
                     name = item.name,
                     counter = serial + 1,
-                    qty = order?.qty ?: 1,
+                    qty = order?.qty ?: 1f,
                     unitPrice = item.price,
                     isModifier = item.isModifier,
                     noServiceCharge = item.noServiceCharge,
@@ -324,7 +324,7 @@ class OrderScreenModel(
                         id = item.id,
                         serial = Random.nextInt(),
                         name = item.name,
-                        qty = 1,
+                        qty = state.value.qty,
                         counter = serial,
                         unitPrice = item.price,
                         isModifier = item.isModifier,
@@ -342,7 +342,7 @@ class OrderScreenModel(
                         pOnCheck = item.pOnCheck,
                     )
                 )
-                updateState { it.copy(orderItemState = orders.toList()) }
+                updateState { it.copy(orderItemState = orders.toList(), qty = 0f) }
             }
             getAllItemModifiers(itemId)
         }
@@ -363,7 +363,7 @@ class OrderScreenModel(
                         name = item.name,
                         serial = Random.nextInt(),
                         counter = serial,
-                        qty = 1,
+                        qty = state.value.qty,
                         unitPrice = item.price,
                         isModifier = item.isModifier,
                         noServiceCharge = item.noServiceCharge,
@@ -380,7 +380,7 @@ class OrderScreenModel(
                         pOnCheck = item.pOnCheck,
                     )
                 )
-                updateState { it.copy(orderItemState = orders.toList()) }
+                updateState { it.copy(orderItemState = orders.toList(), qty = 0f) }
             }
             getAllItemModifiers(itemId)
             updateState { it.copy(selectedItemId = itemId) }
@@ -396,7 +396,7 @@ class OrderScreenModel(
                 OrderItemState(
                     id = item.id,
                     name = item.name,
-                    qty = 1,
+                    qty = state.value.qty,
                     counter = serial,
                     serial = Random.nextInt(),
                     unitPrice = item.price,
@@ -419,14 +419,15 @@ class OrderScreenModel(
                 it.copy(
                     orderItemState = orders.toList(),
                     warningItemIsVisible = false,
-                    isPresetVisible = true
+                    isPresetVisible = true,
+                    qty = 0f
                 )
             }
         }
     }
 
-    override fun onClickItem(itemId: Int) {
-        updateState { it.copy(selectedItemId = itemId) }
+    override fun onClickItem(itemId: Int, qty: Float) {
+        updateState { it.copy(selectedItemId = itemId, qty = qty) }
         getAllItemChildren(itemId)
     }
 
@@ -457,7 +458,7 @@ class OrderScreenModel(
                 orders[i] =
                     order.copy(
                         refModItem = if (item == 0) 1 else item + 1,
-                        qty = if (order.qty > 0) temp?.qty ?: 1 else order.qty
+                        qty = if (order.qty > 0f) temp?.qty ?: 1f else order.qty
                     )
                 val newList = orders
                 updateState {
@@ -541,7 +542,7 @@ class OrderScreenModel(
     }
 
     override fun onChooseItem(itemId: Int) {
-        updateState { it.copy(isChoose = true, selectedItemId = itemId) }
+        updateState { it.copy(selectedItemId = itemId) }
     }
 
     override fun onDismissDialogue() {
@@ -575,7 +576,7 @@ class OrderScreenModel(
             OrderItemState(
                 id = 0,
                 name = state.value.modifyLastItemDialogue.comment,
-                qty = 0,
+                qty = 0f,
                 unitPrice = 0f,
                 isModifier = true,
                 noServiceCharge = false,
@@ -607,7 +608,7 @@ class OrderScreenModel(
     override fun onClickMinus(id: Int) {
         val order = orders.find { it.serial == id && !it.fired && !it.voided && !it.isModifier }
         order?.let { or ->
-            if (or.qty == 1) {
+            if (or.qty == 1f) {
                 orders.remove(or)
                 val newList = orders
                 updateState {

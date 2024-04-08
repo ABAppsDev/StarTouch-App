@@ -34,7 +34,7 @@ data class OrderState(
     val warningItemIsVisible: Boolean = false,
     val itemId: Int = 0,
     val isLoadingButton: Boolean = false,
-    val isChoose: Boolean = false,
+    val qty: Float = 0f,
 )
 
 @Immutable
@@ -49,7 +49,7 @@ data class ModifyLastItemDialogue(
 data class OrderItemState(
     val serial: Int = Random.nextInt(3),
     val id: Int = 0,
-    val qty: Int = 0,
+    val qty: Float = 0f,
     val name: String = "",
     val unitPrice: Float = 0f,
     val totalPrice: Float = unitPrice * qty,

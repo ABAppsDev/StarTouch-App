@@ -4,7 +4,7 @@ interface OrderInteractionListener {
     fun onClickPreset(presetId: Int)
     fun onClickItemModifier(name: String)
     fun onClickItemChild(itemId: Int)
-    fun onClickItem(itemId: Int)
+    fun onClickItem(itemId: Int,qty:Float)
     fun onClickFloatActionButton()
     fun onClickFire()
     fun onClickClose()

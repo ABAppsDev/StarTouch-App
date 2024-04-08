@@ -6,7 +6,7 @@ import domain.entity.FireItems
 fun FireItemsDto.toEntity() = FireItems(
     id = id ?: 0,
     price = price ?: 0f,
-    qty = qty ?: 0,
+    qty = qty ?: 0f,
     totalPrice = totalPrice ?: 0f,
     modifierGroupID = modifierGroupID ?: 0,
     isModifier = isModifier ?: false,
