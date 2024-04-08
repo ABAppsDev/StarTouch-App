@@ -32,33 +32,33 @@ class DinInScreenModel(
     private fun socketTables() {
         viewModelScope.launch(Dispatchers.Default) {
             if (state.value.roomId != 0)
-            while (true) {
-                if (state.value.roomId != 0)
-                    try {
-                        delay(6000)
-                        if (state.value.roomId != 0) {
-                            val tables = manageDinInUseCase.getTablesDataByRoomId(
-                                StarTouchSetup.OUTLET_ID,
-                                StarTouchSetup.REST_ID,
-                                state.value.roomId
-                            )
+                while (true) {
+                    if (state.value.roomId != 0)
+                        try {
+                            delay(8000)
+                            if (state.value.roomId != 0) {
+                                val tables = manageDinInUseCase.getTablesDataByRoomId(
+                                    StarTouchSetup.OUTLET_ID,
+                                    StarTouchSetup.REST_ID,
+                                    state.value.roomId
+                                )
+                                updateState {
+                                    it.copy(
+                                        tablesDetails = tables.map { table ->
+                                            table.toTableDetailsState()
+                                        },
+                                    )
+                                }
+                            }
+                        } catch (e: Exception) {
                             updateState {
                                 it.copy(
-                                    tablesDetails = tables.map { table ->
-                                        table.toTableDetailsState()
-                                    },
+                                    errorDinInState = ErrorState.UnknownError(""),
+                                    errorMessage = ""
                                 )
                             }
                         }
-                    } catch (e: Exception) {
-                        updateState {
-                            it.copy(
-                                errorDinInState = ErrorState.UnknownError(""),
-                                errorMessage = ""
-                            )
-                        }
-                    }
-            }
+                }
         }
     }
 
