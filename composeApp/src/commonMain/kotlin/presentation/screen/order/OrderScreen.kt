@@ -707,7 +707,7 @@ private fun OrderItem(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = qty.toString(),
+                            text = if (isModifier) "${qty}M" else qty.toString(),
                             color = Color.White,
                             style = Theme.typography.titleMedium,
                         )

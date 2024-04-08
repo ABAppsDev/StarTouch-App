@@ -249,6 +249,8 @@ class OrderScreenModel(
                 errorState = null,
                 showErrorScreen = false,
                 isPresetVisible = false,
+                itemsState = emptyList(),
+                itemChildrenState = emptyList(),
                 itemModifiersState = items.map { item ->
                     item.toItemModifierState()
                 }
@@ -267,42 +269,41 @@ class OrderScreenModel(
     }
 
     override fun onClickItemModifier(name: String) {
-        println(state.value.itemModifiersState)
         val item = state.value.itemModifiersState.find { it.name == name }
-        if (orders.contains(orders.find { it.id == item?.id }))
-            showWarningItem()
-        else {
-            item?.let {
-                addItem(
-                    OrderItemState(
-                        id = item.id,
-                        serial = Random.nextInt(),
-                        name = item.name,
-                        qty = 1,
-                        unitPrice = item.price,
-                        isModifier = item.isModifier,
-                        noServiceCharge = item.noServiceCharge,
-                        modifierGroupID = item.modifierGroupID,
-                        pickFollowItemQty = item.pickFollowItemQty,
-                        prePaidCard = item.prePaidCard,
-                        taxable = item.taxable,
-                        pOnReport = item.pOnReport,
-                        pOnCheck = item.pOnCheck
-                    )
+        item?.let {
+            val serial =
+                orders.indexOf(orders.find { it.id == state.value.selectedItemId }) + 1
+            addItem(
+                OrderItemState(
+                    id = item.id,
+                    serial = Random.nextInt(),
+                    name = item.name,
+                    qty = 1,
+                    unitPrice = item.price,
+                    isModifier = item.isModifier,
+                    noServiceCharge = item.noServiceCharge,
+                    refModItem = serial,
+                    status = item.name,
+                    modifierGroupID = item.modifierGroupID,
+                    pickFollowItemQty = item.pickFollowItemQty,
+                    prePaidCard = item.prePaidCard,
+                    taxable = item.taxable,
+                    pOnReport = item.pOnReport,
+                    pOnCheck = item.pOnCheck
                 )
-                updateState { it.copy(orderItemState = orders.toList()) }
-            }
-            updateState {
-                it.copy(
-                    selectedPresetId = 0,
-                    selectedItemId = 0,
-                    itemId = 0,
-                    itemsState = emptyList(),
-                    itemChildrenState = emptyList(),
-                    itemModifiersState = emptyList(),
-                    isPresetVisible = false,
-                )
-            }
+            )
+            updateState { it.copy(orderItemState = orders.toList()) }
+        }
+        updateState {
+            it.copy(
+                selectedPresetId = 0,
+                selectedItemId = 0,
+                itemId = 0,
+                itemsState = emptyList(),
+                itemChildrenState = emptyList(),
+                itemModifiersState = emptyList(),
+                isPresetVisible = false,
+            )
         }
     }
 
@@ -325,6 +326,7 @@ class OrderScreenModel(
                         pickFollowItemQty = item.pickFollowItemQty,
                         prePaidCard = item.prePaidCard,
                         taxable = item.taxable,
+                        status = "Preparing",
                         fired = false,
                         voided = false,
                         modifierPick = 0,
@@ -525,7 +527,10 @@ class OrderScreenModel(
     }
 
     override fun onClickOk() {
-        addItem(
+        val serial =
+            orders.indexOf(orders.find { it.id == state.value.modifyLastItemDialogue.itemId }) + 1
+        orders.add(
+            serial,
             OrderItemState(
                 id = 0,
                 name = state.value.modifyLastItemDialogue.comment,
@@ -540,7 +545,7 @@ class OrderScreenModel(
                 modifierPick = 1,
                 serial = Random.nextInt(),
                 status = state.value.modifyLastItemDialogue.comment,
-                refModItem = state.value.modifyLastItemDialogue.itemId,
+                refModItem = serial,
                 pOnCheck = true,
                 pOnReport = false,
                 totalPrice = 0f
