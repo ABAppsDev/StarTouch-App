@@ -31,30 +31,31 @@ class DinInScreenModel(
 
     private fun socketTables() {
         viewModelScope.launch(Dispatchers.Default) {
-            while (true) {
-                try {
-                    delay(3000)
-                    val tables = manageDinInUseCase.getTablesDataByRoomId(
-                        StarTouchSetup.OUTLET_ID,
-                        StarTouchSetup.REST_ID,
-                        state.value.roomId
-                    )
-                    updateState {
-                        it.copy(
-                            tablesDetails = tables.map { table ->
-                                table.toTableDetailsState()
-                            },
+            if (state.value.roomId != 0)
+                while (true) {
+                    try {
+                        delay(6000)
+                        val tables = manageDinInUseCase.getTablesDataByRoomId(
+                            StarTouchSetup.OUTLET_ID,
+                            StarTouchSetup.REST_ID,
+                            state.value.roomId
                         )
-                    }
-                } catch (e: Exception) {
-                    updateState {
-                        it.copy(
-                            errorDinInState = ErrorState.UnknownError(""),
-                            errorMessage = ""
-                        )
+                        updateState {
+                            it.copy(
+                                tablesDetails = tables.map { table ->
+                                    table.toTableDetailsState()
+                                },
+                            )
+                        }
+                    } catch (e: Exception) {
+                        updateState {
+                            it.copy(
+                                errorDinInState = ErrorState.UnknownError(""),
+                                errorMessage = ""
+                            )
+                        }
                     }
                 }
-            }
         }
     }
 

@@ -388,51 +388,44 @@ class OrderScreenModel(
     }
 
     fun add() {
-        updateState {
-            it.copy(
-                //orderItemState = orders.toList(),
-                warningItemIsVisible = false,
-                //isPresetVisible = true,
-                //qty = 0f
+        getAllItemModifiers(state.value.selectedItemId)
+        val serial =
+            orders.indexOf(orders.find { it.id == state.value.modifyLastItemDialogue.itemId }) + 1
+        val item = state.value.itemsState.find { it.id == state.value.selectedItemId }
+        item?.let {
+            addItem(
+                OrderItemState(
+                    id = item.id,
+                    name = item.name,
+                    qty = state.value.qty,
+                    counter = serial,
+                    serial = Random.nextInt(),
+                    unitPrice = item.price,
+                    isModifier = item.isModifier,
+                    noServiceCharge = item.noServiceCharge,
+                    modifierGroupID = item.modifierGroupID,
+                    pickFollowItemQty = item.pickFollowItemQty,
+                    prePaidCard = item.prePaidCard,
+                    taxable = item.taxable,
+                    status = "Preparing",
+                    fired = false,
+                    voided = false,
+                    modifierPick = 0,
+                    refModItem = 0,
+                    pOnReport = item.pOnReport,
+                    pOnCheck = item.pOnCheck,
+                )
             )
+            updateState {
+                it.copy(
+                    orderItemState = orders.toList(),
+                    warningItemIsVisible = false,
+                    isPresetVisible = true,
+                    qty = 0f
+                )
+            }
         }
         getAllItemModifiers(state.value.selectedItemId)
-//        val serial =
-//            orders.indexOf(orders.find { it.id == state.value.modifyLastItemDialogue.itemId }) + 1
-//        val item = state.value.itemsState.find { it.id == state.value.selectedItemId }
-//        item?.let {
-//            addItem(
-//                OrderItemState(
-//                    id = item.id,
-//                    name = item.name,
-//                    qty = state.value.qty,
-//                    counter = serial,
-//                    serial = Random.nextInt(),
-//                    unitPrice = item.price,
-//                    isModifier = item.isModifier,
-//                    noServiceCharge = item.noServiceCharge,
-//                    modifierGroupID = item.modifierGroupID,
-//                    pickFollowItemQty = item.pickFollowItemQty,
-//                    prePaidCard = item.prePaidCard,
-//                    taxable = item.taxable,
-//                    status = "Preparing",
-//                    fired = false,
-//                    voided = false,
-//                    modifierPick = 0,
-//                    refModItem = 0,
-//                    pOnReport = item.pOnReport,
-//                    pOnCheck = item.pOnCheck,
-//                )
-//            )
-//            updateState {
-//                it.copy(
-//                    orderItemState = orders.toList(),
-//                    warningItemIsVisible = false,
-//                    isPresetVisible = true,
-//                    qty = 0f
-//                )
-//            }
-//        }
     }
 
     override fun onClickItem(itemId: Int, qty: Float) {
