@@ -671,6 +671,14 @@ class OrderScreenModel(
 
     override fun onClickRemoveItem(id: Int) {
         val order = orders.find { it.serial == id && !it.fired && !it.voided }
+        orders.forEachIndexed { i, order2 ->
+            if (order2.isModifier) {
+                val temp = orders.find { it.serial == order2.refItemId }
+                val item = orders.indexOf(orders.find {
+                    it.serial == order2.refItemId
+                })
+            }
+        }
         orders.remove(order)
         val newList = orders
         updateState {
