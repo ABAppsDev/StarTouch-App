@@ -277,6 +277,7 @@ class OrderScreenModel(
         val item = state.value.itemModifiersState.find { it.name == name }
         item?.let {
             val order = orders.find { it.id == state.value.selectedItemId }
+            println(order.toString())
             val serial =
                 orders.indexOf(order) + 1
             val x = Random.nextInt()
@@ -671,15 +672,11 @@ class OrderScreenModel(
 
     override fun onClickRemoveItem(id: Int) {
         val order = orders.find { it.serial == id && !it.fired && !it.voided }
-        orders.forEachIndexed { i, order2 ->
-            if (order2.isModifier) {
-                val temp = orders.find { it.serial == order2.refItemId }
-                val item = orders.indexOf(orders.find {
-                    it.serial == order2.refItemId
-                })
-            }
-        }
         orders.remove(order)
+        orders.filter { it.isModifier }.forEach { item ->
+            if (item.refItemId == id)
+                orders.remove(item)
+        }
         val newList = orders
         updateState {
             it.copy(
