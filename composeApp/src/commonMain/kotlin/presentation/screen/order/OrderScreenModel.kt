@@ -276,7 +276,8 @@ class OrderScreenModel(
     override fun onClickItemModifier(name: String) {
         val item = state.value.itemModifiersState.find { it.name == name }
         item?.let {
-            val order = orders.find { it.id == state.value.selectedItemId }
+            val order =
+                orders.reversed().find { it.id == state.value.selectedItemId }
             println(order.toString())
             val serial =
                 orders.indexOf(order) + 1
