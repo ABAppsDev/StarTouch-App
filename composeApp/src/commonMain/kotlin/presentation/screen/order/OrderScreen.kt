@@ -221,7 +221,8 @@ class OrderScreen(
                                                 )
                                         ) {
                                             Text(
-                                                state.orderItemState.size.toString(),
+                                                state.orderItemState.sumOf { it.qty.toDouble() }
+                                                    .toInt().toString(),
                                                 style = Theme.typography.title,
                                                 textAlign = TextAlign.Center,
                                                 modifier = Modifier.fillMaxSize()
