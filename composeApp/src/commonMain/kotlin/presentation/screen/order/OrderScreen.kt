@@ -727,17 +727,39 @@ private fun OrdersList(
                                 )
                             }
                             Spacer(modifier = Modifier.height(42.dp))
-                            StButton(
-                                title = "Fire",
-                                modifier = Modifier.fillMaxWidth(),
-                                containerColor = Theme.colors.primary,
-                                onClick = {
-                                    if (!isLoading)
-                                        orderInteractionListener.onClickFire()
-                                },
-                                enabled = !orderItemState.all { it.fired },
-                                isLoading = isLoading
-                            )
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                StButton(
+                                    title = "Fire",
+                                    modifier = Modifier.weight(1f),
+                                    containerColor = Theme.colors.primary,
+                                    onClick = {
+                                        if (!isLoading)
+                                            orderInteractionListener.onClickFire()
+                                    },
+                                    enabled = !orderItemState.all { it.fired },
+                                    isLoading = isLoading
+                                )
+                                StButton(
+                                    title = "Fire & Hold",
+                                    modifier = Modifier.weight(1f),
+                                    containerColor = Theme.colors.primary,
+                                    onClick = {
+
+                                    },
+                                    enabled = !orderItemState.all { it.fired },
+                                    //isLoading = isLoading
+                                )
+                                StButton(
+                                    title = "Fire & Print",
+                                    modifier = Modifier.weight(1f),
+                                    containerColor = Theme.colors.primary,
+                                    onClick = {
+
+                                    },
+                                    enabled = !orderItemState.all { it.fired },
+                                    //isLoading = isLoading
+                                )
+                            }
                         }
                     }
                 }
