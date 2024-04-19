@@ -10,7 +10,7 @@ object AppLanguage {
 
 object StarTouchSetup {
     var OUTLET_ID = 0
-    var MAIN_ROOM_ID = 0
+    var MAIN_ROOM_ID = 1
     var REST_ID = 0
     var USER_ID = 0
     var SERVER_ID = 0

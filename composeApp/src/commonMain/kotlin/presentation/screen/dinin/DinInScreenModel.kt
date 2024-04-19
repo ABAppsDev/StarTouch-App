@@ -495,7 +495,8 @@ class DinInScreenModel(
                     )
                 },
                 onSuccess = { checks ->
-                    updateState {
+                    if (checks.size == 1) onClickCheck(checks[0].id, checks[0].checkSerial)
+                    else updateState {
                         it.copy(
                             isLoading = false,
                             errorMessage = "",

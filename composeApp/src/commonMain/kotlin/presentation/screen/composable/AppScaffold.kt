@@ -47,7 +47,7 @@ fun AppScaffold(
         ) {
             onError()
         }
-        SlideAnimation(
+        FadeAnimation(
             visible = !isLoading,
         ) {
             content()
