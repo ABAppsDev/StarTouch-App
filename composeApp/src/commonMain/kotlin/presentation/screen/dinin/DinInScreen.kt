@@ -109,7 +109,7 @@ class DinInScreen : Screen {
         LaunchedEffect(state.errorDinInState) {
             if (state.errorDinInState != null) dinInScreenModel.showErrorScreen()
         }
-        FadeAnimation(visible = true) {
+        FadeAnimation(visible = state.dinInDialogueState.isVisible) {
             DinInDialogue(
                 covers = state.dinInDialogueState.coversCount,
                 isLoadingButton = state.dinInDialogueState.isLoadingButton,
@@ -117,14 +117,7 @@ class DinInScreen : Screen {
                 dinInInteractionListener = dinInScreenModel as DinInInteractionListener,
                 assignChecks = state.dinInDialogueState.assignDrawers,
                 isSuccess = state.dinInDialogueState.isSuccess,
-                checks = listOf(
-                    AssignCheckState(
-                        id = 0,
-                        name = "4",
-                        tableName = "MarwanTable",
-                        status = "Pending"
-                    )
-                ),
+                checks = state.dinInDialogueState.checks,
                 isNamedTable = state.dinInDialogueState.isNamedTable,
                 tableName = state.dinInDialogueState.tableName
             )
