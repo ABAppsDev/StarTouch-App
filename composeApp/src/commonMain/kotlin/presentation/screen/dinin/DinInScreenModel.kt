@@ -26,7 +26,7 @@ class DinInScreenModel(
     init {
         getTables()
         getAllRooms()
-        socketTables()
+        //socketTables()
     }
 
     private fun socketTables() {
@@ -127,8 +127,6 @@ class DinInScreenModel(
     override fun onClickOk() {
         if (state.value.dinInDialogueState.coversCount.isEmpty())
             onError(errorState = ErrorState.ValidationError("Enter covers number"))
-//        else if (state.value.dinInDialogueState.coversCount.toInt() <= 0)
-//            onError(errorState = ErrorState.ValidationError("Zero covers not allowed"))
         else {
             updateState {
                 it.copy(
@@ -144,7 +142,20 @@ class DinInScreenModel(
             tryToExecute(
                 function = {
                     val value = state.value
-                    manageChecksUseCase.openNewCheck(
+                    if (!state.value.validation) manageChecksUseCase.openNewCheck(
+                        OpenNewCheck(
+                            tableId = value.tableId,
+                            tableName = value.tableName,
+                            serverId = value.dinInDialogueState.serverId,
+                            workStationId = StarTouchSetup.WORK_STATION_ID,
+                            outletId = StarTouchSetup.OUTLET_ID,
+                            restId = StarTouchSetup.REST_ID,
+                            covers = value.dinInDialogueState.coversCount.toInt(),
+                            userId = StarTouchSetup.USER_ID,
+                            dateTime = StarTouchSetup.SYSTEM_DATE
+                        )
+                    )
+                    else manageChecksUseCase.openNewCheckWithChecksOpen(
                         OpenNewCheck(
                             tableId = value.tableId,
                             tableName = value.tableName,
@@ -166,6 +177,7 @@ class DinInScreenModel(
                                 errorMessage = "",
                                 errorDinInState = null,
                                 dinInDialogueState = DinInDialogueState(),
+                                validation = false
                             )
                         }
                         sendNewEffect(
@@ -397,6 +409,7 @@ class DinInScreenModel(
                 dinInDialogueState = DinInDialogueState(),
                 tableId = 0,
                 tableName = "0",
+                validation = false
             )
         }
     }
@@ -444,7 +457,8 @@ class DinInScreenModel(
                 errorDinInState = null,
                 warningDialogueIsVisible = false,
                 tableName = "0",
-                tableId = 0
+                tableId = 0,
+                validation = false
             )
         }
     }
@@ -456,6 +470,7 @@ class DinInScreenModel(
                 errorMessage = "",
                 errorDinInState = null,
                 warningDialogueIsVisible = false,
+                validation = true,
                 dinInDialogueState = it.dinInDialogueState.copy(
                     isVisible = true,
                     isLoading = false,

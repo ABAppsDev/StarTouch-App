@@ -26,6 +26,7 @@ data class DinInState(
     val checkId: Long = 0,
     val rooms: List<RoomDetailsState> = emptyList(),
     val roomId: Int = StarTouchSetup.MAIN_ROOM_ID,
+    val validation: Boolean = false,
 )
 
 @Immutable
@@ -65,9 +66,9 @@ data class DinInDialogueState(
 data class AssignCheckState(
     val id: Long = 0,
     val name: String = "",
-    val tableName:String = "",
-    val status:String = "",
-    val date:String = ""
+    val tableName: String = "",
+    val status: String = "",
+    val date: String = ""
 )
 
 

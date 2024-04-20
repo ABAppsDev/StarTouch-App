@@ -35,7 +35,7 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
     @OptIn(InternalAPI::class)
     override suspend fun openNewCheckWithChecksOpen(openNewCheck: OpenNewCheck): OpenCheck {
         return tryToExecute<ServerResponse<OpenCheckDto>> {
-            post("/check/validation") {
+            post("/check/new/validation") {
                 val openNewCheckDto = openNewCheck.toDto()
                 body = Json.encodeToString(OpenNewCheckDto.serializer(), openNewCheckDto)
             }
