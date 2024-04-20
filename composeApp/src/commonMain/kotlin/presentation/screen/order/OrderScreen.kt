@@ -588,11 +588,11 @@ private fun OrdersList(
                     Text(
                         text = "Item",
                         color = Color.White,
-                        modifier = Modifier.fillMaxWidth(0.7f),
+                        modifier = Modifier.weight(1f),
                         style = Theme.typography.titleMedium,
                     )
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.weight(0.5f),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
@@ -800,9 +800,7 @@ private fun OrderItem(
                 .padding(horizontal = 8.dp, vertical = 4.dp),
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(
-                    if (!voided || !fired) 0.6f else 0.7f
-                ),
+                modifier = Modifier.weight(1f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
@@ -827,7 +825,7 @@ private fun OrderItem(
                 }
             }
             Row(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.weight(0.5f),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
