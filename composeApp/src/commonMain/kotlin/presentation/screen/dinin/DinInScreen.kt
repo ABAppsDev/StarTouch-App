@@ -109,7 +109,7 @@ class DinInScreen : Screen {
         LaunchedEffect(state.errorDinInState) {
             if (state.errorDinInState != null) dinInScreenModel.showErrorScreen()
         }
-        FadeAnimation(visible = state.dinInDialogueState.isVisible) {
+        FadeAnimation(visible = true) {
             DinInDialogue(
                 covers = state.dinInDialogueState.coversCount,
                 isLoadingButton = state.dinInDialogueState.isLoadingButton,
@@ -117,7 +117,14 @@ class DinInScreen : Screen {
                 dinInInteractionListener = dinInScreenModel as DinInInteractionListener,
                 assignChecks = state.dinInDialogueState.assignDrawers,
                 isSuccess = state.dinInDialogueState.isSuccess,
-                checks = state.dinInDialogueState.checks,
+                checks = listOf(
+                    AssignCheckState(
+                        id = 0,
+                        name = "4",
+                        tableName = "MarwanTable",
+                        status = "Pending"
+                    )
+                ),
                 isNamedTable = state.dinInDialogueState.isNamedTable,
                 tableName = state.dinInDialogueState.tableName
             )
@@ -342,7 +349,7 @@ private fun ChooseCheck(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(checks) { check ->
-            CheckItem(check.name) {
+            CheckItem(check) {
                 dinInInteractionListener.onClickCheck(check.id, check.name.toInt())
             }
         }
@@ -380,7 +387,7 @@ private fun AssignCheckItem(
 
 @Composable
 private fun CheckItem(
-    name: String,
+    check: AssignCheckState,
     onClick: () -> Unit,
 ) {
     SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
@@ -402,8 +409,20 @@ private fun CheckItem(
                     tint = Color.Unspecified
                 )
             }
+            Column(modifier = Modifier.weight(1f).padding(bottom = 4.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    "Table: ${check.tableName}",
+                    style = Theme.typography.headline,
+                    color = Theme.colors.contentPrimary
+                )
+                Text(
+                    "Check number : ${check.name}",
+                    style = Theme.typography.headline,
+                    color = Theme.colors.contentPrimary
+                )
+            }
             Text(
-                "Check number : $name",
+                check.status,
                 style = Theme.typography.headline,
                 color = Theme.colors.contentPrimary
             )

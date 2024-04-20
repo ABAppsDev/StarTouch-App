@@ -65,6 +65,8 @@ data class DinInDialogueState(
 data class AssignCheckState(
     val id: Long = 0,
     val name: String = "",
+    val tableName:String = "",
+    val status:String = ""
 )
 
 
