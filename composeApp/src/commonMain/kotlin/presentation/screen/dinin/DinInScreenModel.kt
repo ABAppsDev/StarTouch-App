@@ -15,6 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import presentation.base.BaseScreenModel
 import presentation.base.ErrorState
+import util.getDateNow
 
 class DinInScreenModel(
     private val manageDinInUseCase: ManageDinInUseCase,
@@ -516,7 +517,8 @@ class DinInScreenModel(
                                     id = check.id,
                                     name = check.checkSerial.toString(),
                                     status = check.myStatus,
-                                    tableName = check.myTable
+                                    tableName = check.myTable,
+                                    date = check.myDateTime ?: getDateNow().time.toString()
                                 )
                             }
                             )

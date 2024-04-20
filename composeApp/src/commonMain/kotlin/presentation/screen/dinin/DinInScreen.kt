@@ -414,11 +414,18 @@ private fun CheckItem(
                     color = Theme.colors.contentPrimary
                 )
             }
-            Text(
-                check.status,
-                style = Theme.typography.headline,
-                color = Theme.colors.contentPrimary
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp) , horizontalAlignment = Alignment.End) {
+                Text(
+                    check.date,
+                    style = Theme.typography.headline,
+                    color = Theme.colors.contentPrimary
+                )
+                Text(
+                    check.status,
+                    style = Theme.typography.headline,
+                    color = Theme.colors.contentPrimary
+                )
+            }
         }
     }
 }

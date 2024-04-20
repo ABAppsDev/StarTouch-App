@@ -629,36 +629,38 @@ private fun OrdersList(
                                 .clip(RoundedCornerShape(16.dp)),
                             state = dismissState,
                             background = {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth(1f)
-                                        .fillMaxHeight()
-                                        .background(Color.Transparent),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Row {
-                                        IconButton(onClick = { scope.launch { dismissState.reset() } }) {
-                                            Icon(
-                                                Icons.Default.Refresh,
-                                                contentDescription = "Refresh",
-                                                tint = Color.White
-                                            )
-                                        }
-                                        if (dismissState.targetValue == DismissValue.DismissedToStart)
-                                            IconButton(onClick = {
-                                                if (item.voided || item.fired) return@IconButton
-                                                orderInteractionListener.onClickRemoveItem(item.serial)
-                                            }) {
+                                if (!item.fired && !item.voided) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth(1f)
+                                            .fillMaxHeight()
+                                            .background(Color.Transparent),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Row {
+                                            IconButton(onClick = { scope.launch { dismissState.reset() } }) {
                                                 Icon(
-                                                    painterResource(Res.drawable.trash),
-                                                    contentDescription = "Delete",
-                                                    tint = SnackbarColor.Error
+                                                    Icons.Default.Refresh,
+                                                    contentDescription = "Refresh",
+                                                    tint = Color.White
                                                 )
                                             }
+                                            if (dismissState.targetValue == DismissValue.DismissedToStart)
+                                                IconButton(onClick = {
+                                                    if (item.voided || item.fired) return@IconButton
+                                                    orderInteractionListener.onClickRemoveItem(item.serial)
+                                                }) {
+                                                    Icon(
+                                                        painterResource(Res.drawable.trash),
+                                                        contentDescription = "Delete",
+                                                        tint = SnackbarColor.Error
+                                                    )
+                                                }
+                                        }
                                     }
                                 }
                             },
-                            directions = setOf(DismissDirection.EndToStart),
+                            directions = if (!item.fired && !item.voided) setOf(DismissDirection.EndToStart) else setOf(),
                             dismissContent = {
                                 OrderItem(
                                     title = item.name,
