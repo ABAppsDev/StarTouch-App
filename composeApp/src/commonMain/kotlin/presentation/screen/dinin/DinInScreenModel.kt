@@ -513,7 +513,9 @@ class DinInScreenModel(
                             dinInDialogueState = it.dinInDialogueState.copy(checks = checks.map { check ->
                                 AssignCheckState(
                                     id = check.id,
-                                    name = check.checkSerial.toString()
+                                    name = check.checkSerial.toString(),
+                                    status = check.myStatus,
+                                    tableName = check.myTable
                                 )
                             }
                             )
