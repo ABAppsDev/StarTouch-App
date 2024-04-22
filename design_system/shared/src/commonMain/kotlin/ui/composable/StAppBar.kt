@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import com.beepbeep.designSystem.ui.composable.modifier.noRippleEffect
+import com.beepbeep.designSystem.ui.composable.utils.debouncedClick
 import com.beepbeep.designSystem.ui.theme.Theme
 import com.beepbeep.designSystem.ui.theme.Theme.colors
 
@@ -39,7 +40,7 @@ fun StAppBar(
                     Icon(
                         painter = painterResource,
                         contentDescription = "",
-                        modifier = Modifier.noRippleEffect { onNavigateUp?.invoke() }
+                        modifier = Modifier.noRippleEffect(onClick = debouncedClick { onNavigateUp?.invoke() })
                             .padding(start = 16.dp, end = 16.dp),
                         tint = colors.contentSecondary,
                     )
