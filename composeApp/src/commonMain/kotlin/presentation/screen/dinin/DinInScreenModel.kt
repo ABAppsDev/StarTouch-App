@@ -518,7 +518,7 @@ class DinInScreenModel(
                             errorDinInState = null,
                             dinInDialogueState = it.dinInDialogueState.copy(
                                 isVisible = true,
-                                isLoading = false,
+                                isLoading = true,
                                 isLoadingButton = false,
                             ),
                         )
