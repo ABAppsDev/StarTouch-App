@@ -421,7 +421,8 @@ fun ItemCard(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(30.dp)
+                                    .weight(1f)
+                                    .height(30.dp)
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(Color(0xFFEFE3C8))
                                     .clickable {
@@ -451,7 +452,7 @@ fun ItemCard(
                                     textAlign = TextAlign.Center
                                 ),
                                 modifier = Modifier
-                                    .width(50.dp)
+                                    .weight(2f)
                                     .padding(horizontal = 4.dp),
                                 maxLines = 1,
                                 keyboardOptions = KeyboardOptions(
@@ -468,7 +469,8 @@ fun ItemCard(
                             )
                             Box(
                                 modifier = Modifier
-                                    .size(30.dp)
+                                    .weight(1f)
+                                    .height(30.dp)
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(Color(0xFFEFE3C8))
                                     .clickable {
@@ -487,7 +489,8 @@ fun ItemCard(
                                     style = Theme.typography.titleMedium
                                 )
                             }
-                            IconButton(onClick = { onClickOk(id, qty.toFloat()) }) {
+                            IconButton(modifier = Modifier.weight(1f).padding(start = 2.dp),
+                                onClick = { onClickOk(id, qty.toFloat()) }) {
                                 Icon(
                                     Icons.Filled.CheckCircle,
                                     contentDescription = null,
