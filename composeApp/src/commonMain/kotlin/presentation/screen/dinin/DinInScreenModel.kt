@@ -489,12 +489,12 @@ class DinInScreenModel(
                 isLoading = false,
                 errorMessage = "",
                 errorDinInState = null,
-//                dinInDialogueState = it.dinInDialogueState.copy(
-//                    isVisible = true,
-//                    isLoading = true,
-//                    isLoadingButton = false,
-//                    isSuccess = false
-//                ),
+                dinInDialogueState = it.dinInDialogueState.copy(
+                    isVisible = true,
+                    isLoading = true,
+                    isLoadingButton = false,
+                    isSuccess = false
+                ),
                 tableId = tableId.toInt(),
             )
         }
@@ -511,32 +511,34 @@ class DinInScreenModel(
                 },
                 onSuccess = { checks ->
                     if (checks.size == 1) onClickCheck(checks[0].id, checks[0].checkSerial)
-                    else updateState {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = "",
-                            errorDinInState = null,
-                            dinInDialogueState = it.dinInDialogueState.copy(
-                                isVisible = true,
-                                isLoading = true,
-                                isLoadingButton = false,
-                            ),
-                        )
-                    }
-                    if (checks.isEmpty()) throw Exception("This Table Open By Another Waiter")
-                    else updateState {
-                        it.copy(
-                            dinInDialogueState = it.dinInDialogueState.copy(checks = checks.map { check ->
-                                AssignCheckState(
-                                    id = check.id,
-                                    name = check.checkSerial.toString(),
-                                    status = check.myStatus,
-                                    tableName = check.myTable,
-                                    date = check.myDateTime + " " + check.createDate
-                                )
-                            }
+                    else {
+                        updateState {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = "",
+                                errorDinInState = null,
+                                dinInDialogueState = it.dinInDialogueState.copy(
+                                    isVisible = true,
+                                    isLoading = false,
+                                    isLoadingButton = false,
+                                ),
                             )
-                        )
+                        }
+                        if (checks.isEmpty()) throw Exception("This Table Open By Another Waiter")
+                        else updateState {
+                            it.copy(
+                                dinInDialogueState = it.dinInDialogueState.copy(checks = checks.map { check ->
+                                    AssignCheckState(
+                                        id = check.id,
+                                        name = check.checkSerial.toString(),
+                                        status = check.myStatus,
+                                        tableName = check.myTable,
+                                        date = check.myDateTime + " " + check.createDate
+                                    )
+                                }
+                                )
+                            )
+                        }
                     }
                 },
                 onError = { errorState ->
