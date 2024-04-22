@@ -489,12 +489,12 @@ class DinInScreenModel(
                 isLoading = false,
                 errorMessage = "",
                 errorDinInState = null,
-                dinInDialogueState = it.dinInDialogueState.copy(
-                    isVisible = true,
-                    isLoading = true,
-                    isLoadingButton = false,
-                    isSuccess = false
-                ),
+//                dinInDialogueState = it.dinInDialogueState.copy(
+//                    isVisible = true,
+//                    isLoading = true,
+//                    isLoadingButton = false,
+//                    isSuccess = false
+//                ),
                 tableId = tableId.toInt(),
             )
         }
@@ -511,19 +511,17 @@ class DinInScreenModel(
                 },
                 onSuccess = { checks ->
                     if (checks.size == 1) onClickCheck(checks[0].id, checks[0].checkSerial)
-                    else {
-                        updateState {
-                            it.copy(
+                    else updateState {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "",
+                            errorDinInState = null,
+                            dinInDialogueState = it.dinInDialogueState.copy(
+                                isVisible = true,
                                 isLoading = false,
-                                errorMessage = "",
-                                errorDinInState = null,
-                                dinInDialogueState = it.dinInDialogueState.copy(
-                                    isVisible = true,
-                                    isLoading = false,
-                                    isLoadingButton = false,
-                                ),
-                            )
-                        }
+                                isLoadingButton = false,
+                            ),
+                        )
                     }
                     if (checks.isEmpty()) throw Exception("This Table Open By Another Waiter")
                     else updateState {
