@@ -8,6 +8,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -354,6 +356,13 @@ fun ItemCard(
     onClick: () -> Unit,
 ) {
     var qty by remember { mutableStateOf("1") }
+    val source = remember {
+        MutableInteractionSource()
+    }
+
+    if(source.collectIsPressedAsState().value){
+        qty = ""
+    }
     Box(modifier.heightIn(260.dp).width(192.dp).bounceClick { onClick() }) {
         Box(
             modifier = Modifier
@@ -416,6 +425,7 @@ fun ItemCard(
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(Color(0xFFEFE3C8))
                                     .clickable {
+                                        if (qty.isNotEmpty() || qty.isBlank()) return@clickable
                                         if (qty.toFloat() > 1f) {
                                             var temp = qty.toFloat()
                                             temp -= 1f
@@ -442,8 +452,8 @@ fun ItemCard(
                                 ),
                                 modifier = Modifier
                                     .width(50.dp)
-                                    .padding(horizontal = 4.dp)
-                                    .bounceClick { qty = "" },
+                                    .padding(horizontal = 4.dp),
+                                maxLines = 1,
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
                                     imeAction = ImeAction.Done
@@ -453,7 +463,8 @@ fun ItemCard(
                                         id,
                                         qty.toFloat()
                                     )
-                                })
+                                }),
+                                interactionSource = source
                             )
                             Box(
                                 modifier = Modifier
@@ -461,6 +472,7 @@ fun ItemCard(
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(Color(0xFFEFE3C8))
                                     .clickable {
+                                        if (qty.isNotEmpty() || qty.isBlank()) return@clickable
                                         if (qty.toFloat() < 99f) {
                                             var temp = qty.toFloat()
                                             temp += 1
