@@ -37,6 +37,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -153,6 +156,7 @@ private fun OnRender(
     listener: DinInInteractionListener,
     pullRefreshState: PullRefreshState
 ) {
+    var isSelected by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
         SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
             Column(Modifier.fillMaxSize()) {
@@ -175,8 +179,11 @@ private fun OnRender(
                     )
                     StChip(
                         label = Resources.strings.showAllTableGuest,
-                        isSelected = true,
-                        onClick = { if (state.roomId != 0) listener.onClickTableGuest() },
+                        isSelected = isSelected,
+                        onClick = {
+                            isSelected = true
+                            if (state.roomId != 0) listener.onClickTableGuest()
+                        },
                     )
                 }
                 LazyRow(
@@ -191,7 +198,10 @@ private fun OnRender(
                         StChip(
                             room.name,
                             isSelected = room.id == state.roomId,
-                            onClick = { if (room.id != state.roomId) listener.onClickRoom(room.id) },
+                            onClick = {
+                                isSelected = false
+                                if (room.id != state.roomId) listener.onClickRoom(room.id)
+                            },
                             painter = painterResource(Res.drawable.table)
                         )
                     }
@@ -402,27 +412,33 @@ private fun CheckItem(
                     tint = Color.Unspecified
                 )
             }
-            Column(modifier = Modifier.weight(1f).padding(bottom = 4.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(
+                modifier = Modifier.weight(1f).padding(bottom = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 Text(
                     "Table: ${check.tableName}",
-                    style = Theme.typography.headline,
+                    style = Theme.typography.title,
                     color = Theme.colors.contentPrimary
                 )
                 Text(
                     "Check number : ${check.name}",
-                    style = Theme.typography.headline,
+                    style = Theme.typography.title,
                     color = Theme.colors.contentPrimary
                 )
             }
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp) , horizontalAlignment = Alignment.End) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.End
+            ) {
                 Text(
                     check.date,
-                    style = Theme.typography.headline,
+                    style = Theme.typography.title,
                     color = Theme.colors.contentPrimary
                 )
                 Text(
                     check.status,
-                    style = Theme.typography.headline,
+                    style = Theme.typography.title,
                     color = Theme.colors.contentPrimary
                 )
             }

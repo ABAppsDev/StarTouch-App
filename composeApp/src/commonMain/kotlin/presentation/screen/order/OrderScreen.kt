@@ -136,6 +136,7 @@ class OrderScreen(
             }
         }
 
+
         FadeAnimation(visible = state.isLoading) {
             ShimmerListItem(columnsCount = 4) { ChoosePresetLoading() }
         }
@@ -147,15 +148,6 @@ class OrderScreen(
         }
         LaunchedEffect(state.errorState) {
             if (state.errorState != null) screenModel.showErrorScreen()
-        }
-
-        FadeAnimation(state.showErrorScreen) {
-            HandleErrorState(
-                title = state.errorMessage,
-                error = state.errorState
-                    ?: ErrorState.UnknownError(Resources.strings.somethingWrongHappened),
-                onClick = screenModel::retry
-            )
         }
         FadeAnimation(state.warningDialogueIsVisible) {
             WarningDialogue(
@@ -238,7 +230,8 @@ class OrderScreen(
                             }
                         }
                     }
-                }) {
+                })
+            {
                 FadeAnimation(state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && state.errorState == null && !state.isLoading) {
                     PresetsList(
                         state.presetItemsState,
@@ -266,7 +259,7 @@ class OrderScreen(
                         Box(
                             modifier = Modifier.fillMaxWidth()
                                 .padding(top = it.calculateTopPadding())
-                                .pullRefresh(pullRefreshState)
+
                         ) {
                             LazyRow(
                                 modifier = Modifier.fillMaxWidth(),
@@ -287,28 +280,33 @@ class OrderScreen(
                             onClickItem = screenModel::onClickItem,
                             id = state.selectedItemId,
                             onChooseItem = screenModel::onChooseItem,
-                            modifier = Modifier.padding(top = it.calculateTopPadding())
-                                .pullRefresh(pullRefreshState),
+                            //modifier = Modifier.padding(top = it.calculateTopPadding()),
                         )
                     }
                     FadeAnimation(state.itemChildrenState.isNotEmpty()) {
                         ItemChildrenList(
                             state.itemChildrenState,
                             onClickItemChildren = screenModel::onClickItemChild,
-                            modifier = Modifier.padding(top = it.calculateTopPadding())
-                                .pullRefresh(pullRefreshState),
+                            modifier = Modifier.padding(top = it.calculateTopPadding()),
                         )
                     }
                     FadeAnimation(state.itemModifiersState.isNotEmpty()) {
                         ItemModifiersList(
                             state.itemModifiersState,
                             onClickItemModifier = screenModel::onClickItemModifier,
-                            modifier = Modifier.padding(top = it.calculateTopPadding())
-                                .pullRefresh(pullRefreshState),
+                            modifier = Modifier.padding(top = it.calculateTopPadding()),
                         )
                     }
                 }
             }
+        }
+        FadeAnimation(state.showErrorScreen) {
+            HandleErrorState(
+                title = state.errorMessage,
+                error = state.errorState
+                    ?: ErrorState.UnknownError(Resources.strings.somethingWrongHappened),
+                onClick = screenModel::retry
+            )
         }
     }
 }
@@ -323,12 +321,6 @@ private fun PresetsList(
     isRefresh: Boolean,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
-        PullRefreshIndicator(
-            isRefresh,
-            pullRefreshState,
-            modifier = Modifier.align(Alignment.TopCenter),
-            contentColor = Color(0xFF8D7B4B)
-        )
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
             modifier = Modifier.fillMaxWidth(),
@@ -342,6 +334,12 @@ private fun PresetsList(
                 }
             }
         }
+        PullRefreshIndicator(
+            isRefresh,
+            pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter),
+            contentColor = Color(0xFF8D7B4B)
+        )
     }
 }
 
@@ -360,7 +358,7 @@ fun ItemCard(
         MutableInteractionSource()
     }
 
-    if(source.collectIsPressedAsState().value){
+    if (source.collectIsPressedAsState().value) {
         qty = ""
     }
     Box(modifier.heightIn(260.dp).width(192.dp).bounceClick { onClick() }) {
@@ -490,7 +488,10 @@ fun ItemCard(
                                 )
                             }
                             IconButton(modifier = Modifier.weight(1f).padding(start = 2.dp),
-                                onClick = { onClickOk(id, qty.toFloat()) }) {
+                                onClick = {
+                                    if (qty.isNotEmpty() || qty.isBlank()) return@IconButton
+                                    onClickOk(id, qty.toFloat())
+                                }) {
                                 Icon(
                                     Icons.Filled.CheckCircle,
                                     contentDescription = null,
