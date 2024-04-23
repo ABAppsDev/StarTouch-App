@@ -80,7 +80,7 @@ fun RestaurantTableWithText(
                 )
 
                 val dotColor =
-                    if (printed) Color.Blue else if (hasOrders) Color.Red else Color.Green
+                    if (printed) Color.Cyan else if (hasOrders) Color.Red else Color.Green
                 Box(
                     modifier = Modifier
                         .padding(end = 8.dp)
