@@ -62,7 +62,7 @@ fun WarningItemDialogue(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 AppButton(
-                    title = Resources.strings.yes,//yes
+                    title = Resources.strings.yes,
                     onClick = onClickConfirmButton,
                     modifier = Modifier.height(52.dp)
                         .padding(bottom = 8.dp)
@@ -71,7 +71,7 @@ fun WarningItemDialogue(
                     contentColor = Color.White,
                 )
                 AppButton(
-                    title = Resources.strings.no,//no
+                    title = Resources.strings.no,
                     onClick = onClickRejectButton,
                     modifier = Modifier.height(52.dp)
                         .padding(bottom = 8.dp)
