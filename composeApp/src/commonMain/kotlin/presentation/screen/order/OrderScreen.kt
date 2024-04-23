@@ -987,11 +987,11 @@ private fun EnterPriceDialogue(
     modifier: Modifier = Modifier,
 ) {
     StDialogue(
-        onDismissRequest = orderInteractionListener::onDismissDialogue,
+        onDismissRequest = orderInteractionListener::onDismissPriceDialogue,
         modifier = modifier,
     ) {
         Text(
-            text = Resources.strings.enterComment,
+            text = Resources.strings.openPrice,
             style = Theme.typography.headline,
             color = Theme.colors.contentPrimary,
         )
@@ -999,11 +999,12 @@ private fun EnterPriceDialogue(
             modifier = Modifier.padding(top = 24.dp),
             label = "",
             text = price,
-            hint = "Enter price",
-            onValueChange = orderInteractionListener::onModifyLastItemChanged,
+            hint = Resources.strings.enterPrice,
+            onValueChange = orderInteractionListener::onPriceChanged,
             imeAction = ImeAction.Go,
+            keyboardType = KeyboardType.Number,
             keyboardActions = KeyboardActions(onGo = {
-                orderInteractionListener.onClickOk()
+                orderInteractionListener.onClickOkPrice()
             })
         )
         SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {

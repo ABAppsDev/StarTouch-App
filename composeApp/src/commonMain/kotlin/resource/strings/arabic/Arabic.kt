@@ -55,4 +55,6 @@ data class Arabic(
     override val checkNumber: String = "رقم الشيك",
     override val no: String = "لا",
     override val yes: String = "نعم",
+    override val enterPrice: String = "ادخل السعر",
+    override val openPrice: String = "السعر المفتوح",
 ) : IStringResources

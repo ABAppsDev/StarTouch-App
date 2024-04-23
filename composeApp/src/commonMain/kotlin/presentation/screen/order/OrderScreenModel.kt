@@ -598,7 +598,7 @@ class OrderScreenModel(
         }
     }
 
-    override fun onPriceChanged(price: Float) {
+    override fun onPriceChanged(price: String) {
         updateState { it.copy(price = price) }
     }
 
@@ -698,8 +698,8 @@ class OrderScreenModel(
                         name = item.name,
                         qty = state.value.qty,
                         counter = serial,
-                        unitPrice = state.value.price,
-                        totalPrice = state.value.price * state.value.qty,
+                        unitPrice = state.value.price.toFloat(),
+                        totalPrice = state.value.price.toFloat() * state.value.qty,
                         isModifier = item.isModifier,
                         noServiceCharge = item.noServiceCharge,
                         modifierGroupID = item.modifierGroupID,
@@ -718,7 +718,7 @@ class OrderScreenModel(
                 updateState {
                     it.copy(
                         orderItemState = orders.toList(),
-                        price = 0.0f,
+                        price = "",
                         showEnterOpenPrice = false
                     )
                 }
@@ -736,7 +736,7 @@ class OrderScreenModel(
     }
 
     override fun onDismissPriceDialogue() {
-        updateState { it.copy(showEnterOpenPrice = false, price = 0.0f) }
+        updateState { it.copy(showEnterOpenPrice = false, price = "") }
     }
 
     override fun showWarningItem() {

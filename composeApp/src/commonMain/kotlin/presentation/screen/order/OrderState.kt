@@ -36,7 +36,7 @@ data class OrderState(
     val isLoadingButton: Boolean = false,
     val qty: Float = 0f,
     val showEnterOpenPrice: Boolean = false,
-    val price: Float = 0.0f,
+    val price: String = "",
 )
 
 @Immutable

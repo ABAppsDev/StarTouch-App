@@ -14,7 +14,7 @@ interface OrderInteractionListener {
     fun onChooseItem(itemId: Int)
     fun onDismissDialogue()
     fun onModifyLastItemChanged(comment: String)
-    fun onPriceChanged(price: Float)
+    fun onPriceChanged(price: String)
     fun onClickOk()
     fun onClickMinus(id: Int)
     fun onClickPlus(id: Int)

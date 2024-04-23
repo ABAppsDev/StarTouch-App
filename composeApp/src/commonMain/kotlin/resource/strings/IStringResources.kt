@@ -53,4 +53,6 @@ interface IStringResources {
     val fire: String
     val enterComment: String
     val checkNumber: String
+    val enterPrice:String
+    val openPrice:String
 }
