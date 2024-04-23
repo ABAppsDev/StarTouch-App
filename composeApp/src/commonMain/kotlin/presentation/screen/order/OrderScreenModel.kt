@@ -393,13 +393,20 @@ class OrderScreenModel(
         }
     }
 
-    fun addInExistItem(){
+    fun addInExistItem() {
         val order = orders.find { state.value.selectedItemId == it.id }
         val index = orders.indexOfFirst { state.value.selectedItemId == it.id }
         val updatedOrder = order?.copy(
             qty = state.value.qty + order.qty
         )
         orders[index] = updatedOrder!!
+        val newList = orders.toList()
+        updateState {
+            it.copy(
+                orderItemState = newList,
+                warningItemIsVisible = false
+            )
+        }
     }
 
     fun add() {

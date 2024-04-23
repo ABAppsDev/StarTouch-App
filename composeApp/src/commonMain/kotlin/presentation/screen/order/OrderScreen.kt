@@ -165,7 +165,7 @@ class OrderScreen(
                 Resources.strings.warning,
                 Resources.strings.itemAlreadyExist,
                 onDismissRequest = screenModel::onDismissWarningDialogue,
-                onClickConfirmButton = { screenModel.addInExistItem()},
+                onClickConfirmButton = { screenModel.addInExistItem() },
                 onClickRejectButton = { screenModel.add() },
                 onClickDismissButton = screenModel::onDismissItemDialogue
             )
