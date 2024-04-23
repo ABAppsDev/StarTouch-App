@@ -142,7 +142,20 @@ class DinInScreenModel(
             tryToExecute(
                 function = {
                     val value = state.value
-                    if (!state.value.validation) manageChecksUseCase.openNewCheck(
+                    if (state.value.isTableGuest) manageChecksUseCase.openNewCheckTableGuest(
+                        OpenNewCheck(
+                            tableId = value.tableId,
+                            tableName = value.tableName,
+                            serverId = value.dinInDialogueState.serverId,
+                            workStationId = StarTouchSetup.WORK_STATION_ID,
+                            outletId = StarTouchSetup.OUTLET_ID,
+                            restId = StarTouchSetup.REST_ID,
+                            covers = value.dinInDialogueState.coversCount.toInt(),
+                            userId = StarTouchSetup.USER_ID,
+                            dateTime = StarTouchSetup.SYSTEM_DATE
+                        )
+                    )
+                    else if (!state.value.validation) manageChecksUseCase.openNewCheck(
                         OpenNewCheck(
                             tableId = value.tableId,
                             tableName = value.tableName,
@@ -178,7 +191,8 @@ class DinInScreenModel(
                                 errorMessage = "",
                                 errorDinInState = null,
                                 dinInDialogueState = DinInDialogueState(),
-                                validation = false
+                                validation = false,
+                                isTableGuest = false
                             )
                         }
                         sendNewEffect(
@@ -198,6 +212,7 @@ class DinInScreenModel(
                             errorState = errorState,
                             showErrorScreen = false,
                             errorDinInState = null,
+                            isTableGuest = false,
                             dinInDialogueState = it.dinInDialogueState.copy(
                                 isLoading = false,
                                 isLoadingButton = false,
@@ -245,8 +260,8 @@ class DinInScreenModel(
                     StarTouchSetup.USER_ID
                 )
             },
-            onSuccess = { assignDrawers ->
-                if (assignDrawers.isEmpty()) {
+            onSuccess = { assignChecks ->
+                if (assignChecks.isEmpty()) {
                     updateState {
                         it.copy(
                             isLoading = false,
@@ -273,8 +288,8 @@ class DinInScreenModel(
                                 isVisible = true,
                                 isLoading = false,
                                 isLoadingButton = false,
-                                assignDrawers = assignDrawers.map { assignDrawer ->
-                                    assignDrawer.toAssignDrawerState()
+                                assignDrawers = assignChecks.map { assignCheck ->
+                                    assignCheck.toAssignDrawerState()
                                 }
                             ),
                         )
@@ -410,7 +425,8 @@ class DinInScreenModel(
                 dinInDialogueState = DinInDialogueState(),
                 tableId = 0,
                 tableName = "0",
-                validation = false
+                validation = false,
+                isTableGuest = false
             )
         }
     }
@@ -430,6 +446,7 @@ class DinInScreenModel(
                 isLoading = false,
                 errorDialogueIsVisible = false,
                 dinInDialogueState = DinInDialogueState(),
+                isTableGuest = false
             )
         }
     }
@@ -460,7 +477,8 @@ class DinInScreenModel(
                 warningDialogueIsVisible = false,
                 tableName = "0",
                 tableId = 0,
-                validation = false
+                validation = false,
+                isTableGuest = false
             )
         }
     }
@@ -480,7 +498,8 @@ class DinInScreenModel(
                     isLoadingButton = false,
                     serverId = 0,
                     isNamedTable = true
-                )
+                ),
+                isTableGuest = false
             )
         }
     }
@@ -681,6 +700,7 @@ class DinInScreenModel(
                     isNamedTable = true
                 ),
                 tableId = 0,
+                isTableGuest = true
             )
         }
     }

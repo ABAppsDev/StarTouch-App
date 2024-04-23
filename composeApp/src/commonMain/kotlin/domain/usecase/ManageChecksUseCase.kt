@@ -13,6 +13,10 @@ class ManageChecksUseCase(
         return checksGateway.openNewCheck(openNewCheck)
     }
 
+    suspend fun openNewCheckTableGuest(openNewCheck: OpenNewCheck): OpenCheck {
+        return checksGateway.openNewCheckTableGuest(openNewCheck)
+    }
+
     suspend fun openNewCheckWithChecksOpen(openNewCheck: OpenNewCheck): OpenCheck {
         return checksGateway.openNewCheckWithChecksOpen(openNewCheck)
     }

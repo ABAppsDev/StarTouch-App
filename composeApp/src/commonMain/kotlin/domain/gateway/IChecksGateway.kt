@@ -34,4 +34,6 @@ interface IChecksGateway {
         userID: String,
         items: List<FireItems>
     ): Boolean
+
+    suspend fun openNewCheckTableGuest(openNewCheck: OpenNewCheck): OpenCheck
 }

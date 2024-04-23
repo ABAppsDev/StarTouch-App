@@ -33,6 +33,16 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
     }
 
     @OptIn(InternalAPI::class)
+    override suspend fun openNewCheckTableGuest(openNewCheck: OpenNewCheck): OpenCheck {
+        return tryToExecute<ServerResponse<OpenCheckDto>> {
+            post("/check/new/table-guest") {
+                val openNewCheckDto = openNewCheck.toDto()
+                body = Json.encodeToString(OpenNewCheckDto.serializer(), openNewCheckDto)
+            }
+        }.data?.toEntity() ?: throw NotFoundException("Check not found")
+    }
+
+    @OptIn(InternalAPI::class)
     override suspend fun openNewCheckWithChecksOpen(openNewCheck: OpenNewCheck): OpenCheck {
         return tryToExecute<ServerResponse<OpenCheckDto>> {
             post("/check/new/validation") {

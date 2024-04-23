@@ -27,6 +27,7 @@ data class DinInState(
     val rooms: List<RoomDetailsState> = emptyList(),
     val roomId: Int = StarTouchSetup.MAIN_ROOM_ID,
     val validation: Boolean = false,
+    val isTableGuest: Boolean = false,
 )
 
 @Immutable
