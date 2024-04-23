@@ -44,6 +44,9 @@ class OrderScreenModel(
                 itemChildrenState = emptyList(),
                 itemModifiersState = emptyList(),
                 isPresetVisible = false,
+                errorState = null,
+                errorMessage = "",
+                showErrorScreen = false
             )
         }
     }
@@ -93,7 +96,7 @@ class OrderScreenModel(
             },
             onSuccess = ::onGetAllPresetsSuccess,
             onError = { error ->
-                updateState { it.copy(presetItemsState = emptyList()) }
+                //updateState { it.copy(presetItemsState = emptyList()) }
                 onError(error)
             }
         )
@@ -129,7 +132,6 @@ class OrderScreenModel(
                 }
             )
         }
-        println(errorState.toString())
     }
 
     private fun getAllItems(presetId: Int) {
@@ -259,7 +261,8 @@ class OrderScreenModel(
         if (state.value.itemModifiersState.isEmpty()) updateState {
             it.copy(
                 isPresetVisible = true,
-                qty = 0f
+                qty = 0f,
+                selectedItemId = 0
             )
         }
     }
