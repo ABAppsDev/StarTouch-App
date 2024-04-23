@@ -16,10 +16,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import kms
 import com.beepbeep.designSystem.ui.composable.snackbar.internal.SnackbarColor
 import com.beepbeep.designSystem.ui.composable.snackbar.internal.icons.SnackbarIcon
 import com.beepbeep.designSystem.ui.composable.snackbar.internal.icons.snackbaricon.IcWarning
+import kms
 import resource.Resources
 
 @Composable
@@ -51,7 +51,7 @@ fun WarningDialogue(
         Text(
             text,
             color = Color.Black,
-            modifier = Modifier.padding(bottom = 16.dp),
+            modifier = Modifier.padding(bottom = 16.dp, start = 8.dp),
             style = MaterialTheme.typography.bodyMedium
         )
         SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {

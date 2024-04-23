@@ -278,7 +278,6 @@ class OrderScreenModel(
         item?.let {
             val order =
                 orders.reversed().find { it.id == state.value.selectedItemId }
-            println(order.toString())
             val serial =
                 orders.indexOf(order) + 1
             val x = Random.nextInt()

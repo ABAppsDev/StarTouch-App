@@ -165,8 +165,8 @@ class OrderScreen(
                 Resources.strings.warning,
                 Resources.strings.itemAlreadyExist,
                 onDismissRequest = screenModel::onDismissWarningDialogue,
-                onClickConfirmButton = { screenModel.add() },
-                onClickRejectButton = {},
+                onClickConfirmButton = { },
+                onClickRejectButton = { screenModel.add() },
                 onClickDismissButton = screenModel::onDismissItemDialogue
             )
         }
@@ -426,7 +426,7 @@ fun ItemCard(
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(Color(0xFFEFE3C8))
                                     .clickable {
-                                        if (qty.isNotEmpty() || qty.isBlank()) return@clickable
+                                        if (qty.isEmpty() || qty.isBlank()) return@clickable
                                         if (qty.toFloat() > 1f) {
                                             var temp = qty.toFloat()
                                             temp -= 1f
@@ -474,7 +474,7 @@ fun ItemCard(
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(Color(0xFFEFE3C8))
                                     .clickable {
-                                        if (qty.isNotEmpty() || qty.isBlank()) return@clickable
+                                        if (qty.isEmpty() || qty.isBlank()) return@clickable
                                         if (qty.toFloat() < 99f) {
                                             var temp = qty.toFloat()
                                             temp += 1
@@ -491,7 +491,7 @@ fun ItemCard(
                             }
                             IconButton(modifier = Modifier.weight(1f).padding(start = 2.dp),
                                 onClick = {
-                                    if (qty.isNotEmpty() || qty.isBlank()) return@IconButton
+                                    if (qty.isEmpty() || qty.isBlank()) return@IconButton
                                     onClickOk(id, qty.toFloat())
                                 }) {
                                 Icon(
@@ -861,7 +861,6 @@ private fun OrderItem(
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-
                             Box(
                                 modifier = Modifier
                                     .size(30.dp)
