@@ -417,12 +417,12 @@ private fun CheckItem(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    "Table: ${check.tableName}",
+                    "Table: ${check.tableName}",// رقم الطرابيزة
                     style = Theme.typography.title,
                     color = Theme.colors.contentPrimary
                 )
                 Text(
-                    "Check number : ${check.name}",
+                    "Check number : ${check.name}",//رقم الشيك
                     style = Theme.typography.title,
                     color = Theme.colors.contentPrimary
                 )

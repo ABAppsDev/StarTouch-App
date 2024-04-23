@@ -100,6 +100,7 @@ import presentation.screen.composable.HandleErrorState
 import presentation.screen.composable.SetLayoutDirection
 import presentation.screen.composable.ShimmerListItem
 import presentation.screen.composable.WarningDialogue
+import presentation.screen.composable.WarningItemDialogue
 import presentation.screen.composable.modifier.bounceClick
 import presentation.screen.dinin.DinInScreen
 import presentation.screen.home.HomeScreen
@@ -160,11 +161,12 @@ class OrderScreen(
         }
 
         FadeAnimation(state.warningItemIsVisible) {
-            WarningDialogue(
+            WarningItemDialogue(
                 Resources.strings.warning,
-                "Item already exist do you want to add it again or alone",
+                "Item already exists do you want to add it again or alone",// هذا الصنف موجود بالفعل هل تريد اضافته مجددا ام طلبه بمفرده
                 onDismissRequest = screenModel::onDismissWarningDialogue,
                 onClickConfirmButton = { screenModel.add() },
+                onClickRejectButton = {},
                 onClickDismissButton = screenModel::onDismissItemDialogue
             )
         }
@@ -611,7 +613,7 @@ private fun OrdersList(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
-                        text = "Item",
+                        text = "Item",//صنف
                         color = Color.White,
                         modifier = Modifier.weight(1f),
                         style = Theme.typography.titleMedium,
@@ -621,12 +623,12 @@ private fun OrdersList(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Qty",
+                            text = "Qty",//كمية
                             color = Color.White,
                             style = Theme.typography.titleMedium
                         )
                         Text(
-                            text = "Price",
+                            text = "Price",//سعر
                             color = Color.White,
                             style = Theme.typography.titleMedium
                         )
@@ -724,7 +726,7 @@ private fun OrdersList(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "Total Items",
+                                    text = "Total Items",//اجمالي الاصناف
                                     color = Color.LightGray,
                                     style = Theme.typography.title
                                 )
@@ -741,7 +743,7 @@ private fun OrdersList(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "Total Check price",
+                                    text = "Total Check price",//اجمالي سعر الشيك
                                     color = Color.LightGray,
                                     style = Theme.typography.title
                                 )
@@ -755,7 +757,7 @@ private fun OrdersList(
                             }
                             Spacer(modifier = Modifier.height(42.dp))
                             StButton(
-                                title = "Fire",
+                                title = "Fire",//اجهز
                                 modifier = Modifier.fillMaxWidth(),
                                 containerColor = Theme.colors.primary,
                                 onClick = {
@@ -926,7 +928,7 @@ private fun EnterModifyLastItemDialogue(
         modifier = modifier,
     ) {
         Text(
-            text = "Enter comment",
+            text = "Enter comment",// اكتب تعليق
             style = Theme.typography.headline,
             color = Theme.colors.contentPrimary,
         )
