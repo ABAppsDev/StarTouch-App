@@ -395,11 +395,16 @@ class OrderScreenModel(
 
     fun addInExistItem() {
         val order = orders.find { state.value.selectedItemId == it.id }
-        val index = orders.indexOfFirst { state.value.selectedItemId == it.id }
+        val indexOfOrder = orders.indexOfFirst { state.value.selectedItemId == it.id }
         val updatedOrder = order?.copy(
             qty = state.value.qty + order.qty
         )
-        orders[index] = updatedOrder!!
+        orders[indexOfOrder] = updatedOrder!!
+        orders.filter { it.isModifier }.filter { it.refItemId == order.serial }
+            .forEachIndexed { index, modifier ->
+                val newModifier = modifier.copy(qty = state.value.qty + order.qty)
+                orders[index] = newModifier
+            }
         val newList = orders.toList()
         updateState {
             it.copy(
