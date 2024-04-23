@@ -22,9 +22,9 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "StarTouch",
-        undecorated = true,
+        undecorated = false,
         state = state,
-        resizable = false,
+        resizable = true,
         icon = painterResource(DrawableResource("logo.png"))
     ) {
         println(LocalDensity.current.density)

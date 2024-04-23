@@ -35,6 +35,8 @@ data class OrderState(
     val itemId: Int = 0,
     val isLoadingButton: Boolean = false,
     val qty: Float = 0f,
+    val showEnterOpenPrice: Boolean = false,
+    val price: Float = 0.0f,
 )
 
 @Immutable
@@ -157,6 +159,7 @@ data class ItemState(
     val prePaidCard: Boolean = false,
     val pOnReport: Boolean = false,
     val pOnCheck: Boolean = false,
+    val openPrice: Boolean = false,
 )
 
 
@@ -171,7 +174,7 @@ fun Item.toItemModifierState(): ItemModifierState = ItemModifierState(
     modifierGroupID = 0,
     noServiceCharge = noServiceCharge,
     pOnReport = printOnReport,
-    pOnCheck = printItemOnCheck
+    pOnCheck = printItemOnCheck,
 )
 
 fun Item.toItemState(): ItemState = ItemState(
@@ -185,7 +188,8 @@ fun Item.toItemState(): ItemState = ItemState(
     modifierGroupID = 0,
     noServiceCharge = noServiceCharge,
     pOnReport = printOnReport,
-    pOnCheck = printItemOnCheck
+    pOnCheck = printItemOnCheck,
+    openPrice = openPrice,
 )
 
 fun ItemState.toItemModifierState(): ItemModifierState = ItemModifierState(

@@ -598,6 +598,10 @@ class OrderScreenModel(
         }
     }
 
+    override fun onPriceChanged(price: Float) {
+        updateState { it.copy(price = price) }
+    }
+
     override fun onClickOk() {
         //== ids[state.value.modifyLastItemDialogue.itemId]
         val order =
@@ -674,12 +678,65 @@ class OrderScreenModel(
         updateState { it.copy(warningDialogueIsVisible = true) }
     }
 
+    override fun showPriceDialogue(id: Int, qty: Float) {
+        updateState { it.copy(showEnterOpenPrice = true, selectedItemId = id, qty = qty) }
+    }
+
+    override fun onClickOkPrice() {
+        val serial =
+            orders.indexOf(orders.find { it.id == state.value.modifyLastItemDialogue.itemId }) + 1
+        val item = state.value.itemsState.find { it.id == state.value.selectedItemId }
+        if (orders.filter { !it.fired || it.voided }
+                .contains(orders.filter { !it.fired || it.voided }.find { it.id == item?.id }))
+            showWarningItem()
+        else {
+            item?.let {
+                addItem(
+                    OrderItemState(
+                        id = item.id,
+                        serial = Random.nextInt(),
+                        name = item.name,
+                        qty = state.value.qty,
+                        counter = serial,
+                        unitPrice = state.value.price,
+                        totalPrice = state.value.price * state.value.qty,
+                        isModifier = item.isModifier,
+                        noServiceCharge = item.noServiceCharge,
+                        modifierGroupID = item.modifierGroupID,
+                        pickFollowItemQty = item.pickFollowItemQty,
+                        prePaidCard = item.prePaidCard,
+                        taxable = item.taxable,
+                        status = "Preparing",
+                        fired = false,
+                        voided = false,
+                        modifierPick = 0,
+                        refModItem = 0,
+                        pOnReport = item.pOnReport,
+                        pOnCheck = item.pOnCheck,
+                    )
+                )
+                updateState {
+                    it.copy(
+                        orderItemState = orders.toList(),
+                        price = 0.0f,
+                        showEnterOpenPrice = false
+                    )
+                }
+            }
+            getAllItemModifiers(state.value.selectedItemId)
+        }
+    }
+
     override fun onDismissWarningDialogue() {
         updateState { it.copy(warningDialogueIsVisible = false) }
     }
 
     override fun onDismissItemDialogue() {
         updateState { it.copy(warningItemIsVisible = false) }
+    }
+
+    override fun onDismissPriceDialogue() {
+        updateState { it.copy(showEnterOpenPrice = false, price = 0.0f) }
     }
 
     override fun showWarningItem() {

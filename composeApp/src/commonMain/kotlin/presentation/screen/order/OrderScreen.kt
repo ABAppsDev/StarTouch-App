@@ -147,6 +147,12 @@ class OrderScreen(
                 screenModel as OrderInteractionListener
             )
         }
+        FadeAnimation(state.showEnterOpenPrice) {
+            EnterPriceDialogue(
+                state.price.toString(),
+                screenModel as OrderInteractionListener
+            )
+        }
         LaunchedEffect(state.errorState) {
             if (state.errorState != null) screenModel.showErrorScreen()
         }
@@ -282,6 +288,7 @@ class OrderScreen(
                             onClickItem = screenModel::onClickItem,
                             id = state.selectedItemId,
                             onChooseItem = screenModel::onChooseItem,
+                            showOpenPriceDialogue = screenModel::showPriceDialogue
                             //modifier = Modifier.padding(top = it.calculateTopPadding()),
                         )
                     }
@@ -349,10 +356,12 @@ private fun PresetsList(
 fun ItemCard(
     name: String,
     price: String,
+    modifier: Modifier = Modifier,
+    openPrice: Boolean = false,
     id: Int = 0,
     isChoose: Boolean = false,
+    showOpenPriceDialogue: (Int, Float) -> Unit = { _, _ -> },
     onClickOk: (Int, Float) -> Unit = { _, _ -> },
-    modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
     var qty by remember { mutableStateOf("1") }
@@ -492,7 +501,8 @@ fun ItemCard(
                             IconButton(modifier = Modifier.weight(1f).padding(start = 2.dp),
                                 onClick = {
                                     if (qty.isEmpty() || qty.isBlank()) return@IconButton
-                                    onClickOk(id, qty.toFloat())
+                                    if (openPrice) showOpenPriceDialogue(id, qty.toFloat())
+                                    else onClickOk(id, qty.toFloat())
                                 }) {
                                 Icon(
                                     Icons.Filled.CheckCircle,
@@ -514,6 +524,7 @@ private fun ItemsList(
     id: Int = 0,
     modifier: Modifier = Modifier,
     onClickItem: (Int, Float) -> Unit,
+    showOpenPriceDialogue: (Int, Float) -> Unit,
     onChooseItem: (Int) -> Unit,
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
@@ -530,6 +541,8 @@ private fun ItemsList(
                     price = item.price.toString(),
                     id = item.id,
                     isChoose = id == item.id,
+                    openPrice = item.openPrice,
+                    showOpenPriceDialogue = showOpenPriceDialogue,
                     onClickOk = onClickItem
                 ) {
                     onChooseItem(item.id)
@@ -958,6 +971,57 @@ private fun EnterModifyLastItemDialogue(
                     title = Resources.strings.ok,
                     onClick = {
                         orderInteractionListener.onClickOk()
+                    },
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EnterPriceDialogue(
+    price: String,
+    orderInteractionListener: OrderInteractionListener,
+    modifier: Modifier = Modifier,
+) {
+    StDialogue(
+        onDismissRequest = orderInteractionListener::onDismissDialogue,
+        modifier = modifier,
+    ) {
+        Text(
+            text = Resources.strings.enterComment,
+            style = Theme.typography.headline,
+            color = Theme.colors.contentPrimary,
+        )
+        StTextField(
+            modifier = Modifier.padding(top = 24.dp),
+            label = "",
+            text = price,
+            hint = "Enter price",
+            onValueChange = orderInteractionListener::onModifyLastItemChanged,
+            imeAction = ImeAction.Go,
+            keyboardActions = KeyboardActions(onGo = {
+                orderInteractionListener.onClickOk()
+            })
+        )
+        SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                StOutlinedButton(
+                    title = Resources.strings.cancel,
+                    onClick = {
+                        orderInteractionListener.onDismissPriceDialogue()
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+                StButton(
+                    title = Resources.strings.ok,
+                    onClick = {
+                        orderInteractionListener.onClickOkPrice()
                     },
                     modifier = Modifier.weight(1f),
                 )
