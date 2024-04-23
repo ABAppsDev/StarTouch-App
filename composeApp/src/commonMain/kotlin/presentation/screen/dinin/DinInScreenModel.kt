@@ -535,11 +535,7 @@ class DinInScreenModel(
                                     errorMessage = ""
                                 )
                             }
-                            onClickTable(
-                                tableId.toInt(),
-                                state.value.tablesDetails.find { c -> c.tableId == tableId.toInt() }?.tableNumber
-                                    ?: ""
-                            )
+                            onConfirmButtonClick()
                         } else updateState {
                             it.copy(
                                 dinInDialogueState = it.dinInDialogueState.copy(checks = checks.map { check ->
