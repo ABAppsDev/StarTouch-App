@@ -393,6 +393,15 @@ class OrderScreenModel(
         }
     }
 
+    fun addInExistItem(){
+        val order = orders.find { state.value.selectedItemId == it.id }
+        val index = orders.indexOfFirst { state.value.selectedItemId == it.id }
+        val updatedOrder = order?.copy(
+            qty = state.value.qty + order.qty
+        )
+        orders[index] = updatedOrder!!
+    }
+
     fun add() {
         getAllItemModifiers(state.value.selectedItemId)
         val serial =
