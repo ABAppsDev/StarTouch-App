@@ -166,7 +166,7 @@ class DinInScreenModel(
                             covers = value.dinInDialogueState.coversCount.toInt(),
                             userId = StarTouchSetup.USER_ID,
                             dateTime = StarTouchSetup.SYSTEM_DATE,
-                            checkId = value.checkId
+                            checkId = value.tablesDetails.find { it.tableId == value.tableId }?.checkId
                         )
                     )
                 },
