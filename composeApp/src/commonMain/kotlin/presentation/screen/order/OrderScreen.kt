@@ -646,7 +646,7 @@ private fun OrdersList(
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    items(orderItemState, key = { it.serial }) { item ->
+                    items(orderItemState, key = { it }) { item ->
                         val dismissState = rememberDismissState(
                             initialValue = DismissValue.Default,
                         )

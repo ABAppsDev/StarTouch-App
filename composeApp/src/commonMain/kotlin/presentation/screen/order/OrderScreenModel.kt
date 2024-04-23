@@ -643,6 +643,10 @@ class OrderScreenModel(
         order?.let { or ->
             if (or.qty == 1f) {
                 orders.remove(or)
+                orders.filter { it.isModifier }.forEach { item ->
+                    if (item.refItemId == id)
+                        orders.remove(item)
+                }
                 val newList = orders
                 updateState {
                     it.copy(
