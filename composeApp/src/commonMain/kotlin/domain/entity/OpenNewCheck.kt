@@ -12,4 +12,5 @@ data class OpenNewCheck(
     val dateTime: LocalDateTime,
     val userId: Int,
     val serverId: Int,
+    val checkId: Long? = null,
 )

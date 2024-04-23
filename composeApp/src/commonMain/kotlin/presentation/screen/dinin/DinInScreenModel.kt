@@ -165,7 +165,8 @@ class DinInScreenModel(
                             restId = StarTouchSetup.REST_ID,
                             covers = value.dinInDialogueState.coversCount.toInt(),
                             userId = StarTouchSetup.USER_ID,
-                            dateTime = StarTouchSetup.SYSTEM_DATE
+                            dateTime = StarTouchSetup.SYSTEM_DATE,
+                            checkId = value.checkId
                         )
                     )
                 },

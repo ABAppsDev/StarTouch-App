@@ -14,6 +14,7 @@ fun OpenNewCheckDto.toEntity(): OpenNewCheck = OpenNewCheck(
     workStationId = workStationId ?: 0,
     restId = restId ?: 0,
     outletId = outletId ?: 0,
+    checkId = checkId ?: 0
 )
 
 
@@ -27,4 +28,5 @@ fun OpenNewCheck.toDto(): OpenNewCheckDto = OpenNewCheckDto(
     workStationId = workStationId,
     restId = restId,
     outletId = outletId,
+    checkId = checkId,
 )

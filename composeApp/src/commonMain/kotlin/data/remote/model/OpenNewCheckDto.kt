@@ -15,4 +15,5 @@ data class OpenNewCheckDto(
     val userId: Int? = null,
     val serverId: Int? = null,
     val checkType: String? = null,
+    val checkId: Long? = null,
 )
