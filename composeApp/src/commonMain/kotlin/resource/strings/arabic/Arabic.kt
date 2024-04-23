@@ -44,4 +44,12 @@ data class Arabic(
     override val showAllTableGuest: String = "عرض كل الطرابيزات المخصوصة",
     override val tableName: String = "اسم الطرابيزة",
     override val doYouWantToAbortCheck: String = "هل تريد غلق الشيك",
+    override val itemAlreadyExist: String = "هذا الصنف موجود بالفعل هل تريد اضافته مجددا ام طلبه بمفرده",
+    override val item: String = "صنف",
+    override val quantity: String = "كميه",
+    override val price: String = "سعر",
+    override val totalItems: String = "اجمالي الاصناف",
+    override val totalCheckPrice: String = "اجمالي سعر الشيك",
+    override val fire: String = "اجهز",
+    override val enterComment: String = "اكتب تعليق", override val checkNumber: String = "رقم الشيك",
 ) : IStringResources

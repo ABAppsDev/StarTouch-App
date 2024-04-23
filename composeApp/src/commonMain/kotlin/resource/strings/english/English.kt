@@ -44,4 +44,12 @@ data class English(
     override val showAllTableGuest: String = "Show All Tables Guest",
     override val tableName: String = "Table name",
     override val doYouWantToAbortCheck: String = "Do you want to abort check",
+    override val itemAlreadyExist: String = "Item already exists do you want to add it again or alone",
+    override val item: String = "item",
+    override val quantity: String = "Qty",
+    override val price: String = "Price",
+    override val totalItems: String = "Total Items",
+    override val totalCheckPrice: String = "Total Check price",
+    override val fire: String = "Fire",
+    override val enterComment: String = "Enter comment", override val checkNumber: String = "Check number",
 ) : IStringResources

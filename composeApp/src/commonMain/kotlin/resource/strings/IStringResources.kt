@@ -42,4 +42,13 @@ interface IStringResources {
     val createTableGuest: String
     val showAllTableGuest: String
     val tableName: String
+    val itemAlreadyExist: String
+    val item: String
+    val quantity: String
+    val price: String
+    val totalItems: String
+    val totalCheckPrice: String
+    val fire: String
+    val enterComment: String
+    val checkNumber: String
 }
