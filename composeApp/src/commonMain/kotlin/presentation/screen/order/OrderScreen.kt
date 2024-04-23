@@ -185,7 +185,7 @@ class OrderScreen(
                             )
                             else screenModel.backToPresets()
                         },
-                        title = "Check number : $checkNumber",
+                        title = "${Resources.strings.checkNumber} : $checkNumber",
                         isBackIconVisible = state.itemModifiersState.isEmpty(),
                         painterResource = painterResource(Res.drawable.ic_back)
                     )
