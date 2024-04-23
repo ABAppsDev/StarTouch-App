@@ -52,7 +52,7 @@ fun WarningItemDialogue(
         Text(
             text,
             color = Color.Black,
-            modifier = Modifier.padding(bottom = 16.dp),
+            modifier = Modifier.padding(bottom = 16.dp, start = 8.dp),
             style = MaterialTheme.typography.bodyMedium
         )
         SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
