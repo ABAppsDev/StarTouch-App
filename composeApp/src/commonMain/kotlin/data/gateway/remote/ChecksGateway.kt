@@ -44,6 +44,7 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
 
     override suspend fun getAllChecksByTableId(
         tableId: Int,
+        checkId: Long,
         outletID: Int,
         restID: Int,
         serverId: Int,
@@ -52,6 +53,7 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
         return tryToExecute<ServerResponse<List<ReOpenCheck>>> {
             get("/check/opened-checks") {
                 parameter("tableId", tableId)
+                parameter("checkId", checkId)
                 parameter("outletID", outletID)
                 parameter("restID", restID)
                 parameter("userId", userId)

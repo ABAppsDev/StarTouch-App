@@ -504,6 +504,8 @@ class DinInScreenModel(
                 function = {
                     manageChecksUseCase.getAllChecksByTableId(
                         tableId = tableId.toInt(),
+                        checkId = state.value.tablesDetails.find { it.tableId == tableId.toInt() }?.checkId
+                            ?: 0L,
                         StarTouchSetup.OUTLET_ID,
                         StarTouchSetup.REST_ID,
                         serverId = StarTouchSetup.USER_ID,

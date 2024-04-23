@@ -400,7 +400,9 @@ class OrderScreenModel(
             qty = state.value.qty + order.qty
         )
         orders[indexOfOrder] = updatedOrder!!
-        orders.filter { it.isModifier }.filter { it.refItemId == order.serial }
+        orders.filter { it.isModifier }
+            .filter { it.refItemId == order.serial }
+            .filter { it.qty > 0 }
             .forEachIndexed { index, modifier ->
                 val newModifier = modifier.copy(qty = state.value.qty + order.qty)
                 orders[index] = newModifier

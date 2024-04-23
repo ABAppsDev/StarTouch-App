@@ -18,6 +18,7 @@ interface IChecksGateway {
 
     suspend fun getAllChecksByTableId(
         tableId: Int,
+        checkId: Long,
         outletID: Int,
         restID: Int,
         serverId: Int,

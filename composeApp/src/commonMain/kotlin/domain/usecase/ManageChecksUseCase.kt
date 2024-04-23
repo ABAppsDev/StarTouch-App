@@ -34,12 +34,20 @@ class ManageChecksUseCase(
 
     suspend fun getAllChecksByTableId(
         tableId: Int,
+        checkId: Long,
         outletID: Int,
         restID: Int,
         serverId: Int,
         userId: Int
     ): List<ReOpenCheck> {
-        return checksGateway.getAllChecksByTableId(tableId, outletID, restID, serverId, userId)
+        return checksGateway.getAllChecksByTableId(
+            tableId,
+            checkId,
+            outletID,
+            restID,
+            serverId,
+            userId
+        )
     }
 
     suspend fun addItemsToCheck(
