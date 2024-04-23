@@ -51,5 +51,6 @@ data class Arabic(
     override val totalItems: String = "اجمالي الاصناف",
     override val totalCheckPrice: String = "اجمالي سعر الشيك",
     override val fire: String = "اجهز",
-    override val enterComment: String = "اكتب تعليق", override val checkNumber: String = "رقم الشيك",
+    override val enterComment: String = "اكتب تعليق",
+    override val checkNumber: String = "رقم الشيك",
 ) : IStringResources

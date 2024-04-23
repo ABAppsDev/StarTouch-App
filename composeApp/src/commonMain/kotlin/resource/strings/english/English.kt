@@ -51,5 +51,6 @@ data class English(
     override val totalItems: String = "Total Items",
     override val totalCheckPrice: String = "Total Check price",
     override val fire: String = "Fire",
-    override val enterComment: String = "Enter comment", override val checkNumber: String = "Check number",
+    override val enterComment: String = "Enter comment",
+    override val checkNumber: String = "Check number",
 ) : IStringResources
