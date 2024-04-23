@@ -216,19 +216,21 @@ class OrderScreen(
                                     ) {
                                         Box(
                                             modifier = Modifier
-                                                .size(24.dp)
+                                                .size(32.dp)
                                                 .background(
                                                     color = Theme.colors.contentPrimary,
                                                     shape = CircleShape
-                                                )
+                                                ).align(Alignment.Center).padding(8.dp),
+                                            contentAlignment = Alignment.Center
                                         ) {
                                             Text(
                                                 state.orderItemState.sumOf { it.qty.toDouble() }
                                                     .toInt().toString(),
                                                 style = Theme.typography.title,
-                                                textAlign = TextAlign.Center,
                                                 modifier = Modifier.fillMaxSize()
-                                                    .align(Alignment.Center)
+                                                    .align(Alignment.Center),
+                                                textAlign = TextAlign.Center,
+                                                color = Theme.colors.surface
                                             )
                                         }
                                     }
@@ -375,7 +377,7 @@ fun ItemCard(
     Box(
         modifier.heightIn(100.dp)
             .width(192.dp)
-            .background(Theme.colors.surface, shape = RoundedCornerShape(16.dp))
+            .background(Theme.colors.disable, shape = RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
             .padding(horizontal = 8.dp)
             .bounceClick { onClick();qty = "1" }) {
