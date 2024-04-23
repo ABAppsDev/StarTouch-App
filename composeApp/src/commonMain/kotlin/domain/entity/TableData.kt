@@ -9,4 +9,5 @@ data class TableData(
     val checkId: Long? = null,
     val checksAmount: Double,
     val openIn: String? = null,
+    val printed: Boolean,
 )

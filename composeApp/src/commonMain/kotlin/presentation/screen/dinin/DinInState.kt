@@ -39,6 +39,7 @@ data class TableDetailsState(
     val coversCount: Int = 0,
     val covers: Int = 0,
     val checksCount: Int = 0,
+    val printed: Boolean = false,
 )
 
 @Immutable
@@ -80,7 +81,8 @@ fun TableData.toTableDetailsState(): TableDetailsState = TableDetailsState(
     covers = this.covers,
     checkId = this.checkId,
     openCheckDate = this.openIn ?: "",
-    checksCount = this.countChecks
+    checksCount = this.countChecks,
+    printed = printed,
 )
 
 fun AssignCheck.toAssignDrawerState(): AssignCheckState = AssignCheckState(

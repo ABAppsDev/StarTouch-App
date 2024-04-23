@@ -12,4 +12,5 @@ data class TableDataDto(
     val checkId: Long? = null,
     val checksAmount: Double? = null,
     val openIn: String? = null,
+    val printed: Boolean? = null,
 )

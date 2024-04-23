@@ -509,6 +509,7 @@ private fun ChooseTable(
         tableCode = table.tableNumber,
         totalAmount = table.totalOrdersPrice.toString(),
         checksCount = table.checksCount.toString(),
+        printed = table.printed,
         hasOrders = table.covers > 0 || table.openCheckDate != "null",
         modifier = modifier
             .combinedClickable(

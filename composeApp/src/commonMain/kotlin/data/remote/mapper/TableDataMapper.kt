@@ -11,5 +11,6 @@ fun TableDataDto.toEntity(): TableData = TableData(
     checkId = checkId,
     checksAmount = checksAmount ?: 0.0,
     countChecks = countChecks ?: 0,
-    openIn = openIn ?: ""
+    openIn = openIn ?: "",
+    printed = printed ?: false,
 )

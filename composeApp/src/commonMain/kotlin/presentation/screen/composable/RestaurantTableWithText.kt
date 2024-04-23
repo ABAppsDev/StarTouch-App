@@ -31,6 +31,7 @@ fun RestaurantTableWithText(
     totalAmount: String,
     tableCode: String,
     hasOrders: Boolean,
+    printed: Boolean,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
@@ -78,7 +79,8 @@ fun RestaurantTableWithText(
                     modifier = Modifier.padding(12.dp).align(Alignment.BottomEnd)
                 )
 
-                val dotColor = if (hasOrders) Color.Red else Color.Green
+                val dotColor =
+                    if (printed) Color.Blue else if (hasOrders) Color.Red else Color.Green
                 Box(
                     modifier = Modifier
                         .padding(end = 8.dp)
