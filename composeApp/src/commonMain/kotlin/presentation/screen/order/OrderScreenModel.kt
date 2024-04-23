@@ -321,7 +321,8 @@ class OrderScreenModel(
         val serial =
             orders.indexOf(orders.find { it.id == state.value.modifyLastItemDialogue.itemId }) + 1
         val item = state.value.itemsState.find { it.id == itemId }
-        if (orders.contains(orders.find { it.id == item?.id }))
+        if (orders.filter { !it.fired || it.voided }
+                .contains(orders.filter { !it.fired || it.voided }.find { it.id == item?.id }))
             showWarningItem()
         else {
             item?.let {
@@ -359,7 +360,8 @@ class OrderScreenModel(
         val serial =
             orders.indexOf(orders.find { it.id == state.value.modifyLastItemDialogue.itemId }) + 1
         val item = state.value.itemChildrenState.find { it.id == itemId }
-        if (orders.contains(orders.find { it.id == item?.id }))
+        if (orders.filter { !it.fired || it.voided }
+                .contains(orders.filter { !it.fired || it.voided }.find { it.id == item?.id }))
             showWarningItem()
         else {
             item?.let {
@@ -394,19 +396,20 @@ class OrderScreenModel(
     }
 
     fun addInExistItem() {
-        val order = orders.find { state.value.selectedItemId == it.id }
-        val indexOfOrder = orders.indexOfFirst { state.value.selectedItemId == it.id }
+        val order =
+            orders.filter { !it.fired || it.voided }.find { state.value.selectedItemId == it.id }
+        val indexOfOrder = orders.indexOf(orders.filter { !it.fired || it.voided }
+            .find { state.value.selectedItemId == it.id })
         val updatedOrder = order?.copy(
-            qty = state.value.qty + order.qty
+            qty = state.value.qty + order.qty,
         )
         orders[indexOfOrder] = updatedOrder!!
-        orders.filter { it.isModifier }
-            .filter { it.refItemId == order.serial }
-            .filter { it.qty > 0 }
-            .forEachIndexed { index, modifier ->
-                val newModifier = modifier.copy(qty = state.value.qty + order.qty)
+        orders.forEachIndexed { index, item ->
+            if (item.isModifier && item.refItemId == order.serial && item.qty > 0) {
+                val newModifier = item.copy(qty = state.value.qty + order.qty)
                 orders[index] = newModifier
             }
+        }
         val newList = orders.toList()
         updateState {
             it.copy(
