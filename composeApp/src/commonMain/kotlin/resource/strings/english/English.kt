@@ -53,4 +53,6 @@ data class English(
     override val fire: String = "Fire",
     override val enterComment: String = "Enter comment",
     override val checkNumber: String = "Check number",
+    override val no: String = "No",
+    override val yes: String = "Yes",
 ) : IStringResources

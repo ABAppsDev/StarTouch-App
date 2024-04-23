@@ -13,6 +13,8 @@ interface IStringResources {
     val userName: String
     val password: String
     val ok: String
+    val no: String
+    val yes: String
     val cancel: String
     val tryAgain: String
     val somethingWrongHappened: String

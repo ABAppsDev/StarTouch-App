@@ -53,4 +53,6 @@ data class Arabic(
     override val fire: String = "اجهز",
     override val enterComment: String = "اكتب تعليق",
     override val checkNumber: String = "رقم الشيك",
+    override val no: String = "لا",
+    override val yes: String = "نعم",
 ) : IStringResources

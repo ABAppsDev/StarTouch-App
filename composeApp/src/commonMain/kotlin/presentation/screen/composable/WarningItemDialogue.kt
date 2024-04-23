@@ -59,19 +59,10 @@ fun WarningItemDialogue(
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 AppButton(
-                    title = Resources.strings.cancel,
-                    onClick = onClickDismissButton,
-                    modifier = Modifier.height(52.dp)
-                        .padding(bottom = 8.dp, end = 8.dp)
-                        .weight(LocalDensity.current.density / 3f),
-                    containerColor = SnackbarColor.Error,
-                    contentColor = Color.White,
-                )
-                AppButton(
-                    title = Resources.strings.ok,//yes
+                    title = Resources.strings.yes,//yes
                     onClick = onClickConfirmButton,
                     modifier = Modifier.height(52.dp)
                         .padding(bottom = 8.dp)
@@ -80,12 +71,21 @@ fun WarningItemDialogue(
                     contentColor = Color.White,
                 )
                 AppButton(
-                    title = Resources.strings.ok,//no
+                    title = Resources.strings.no,//no
                     onClick = onClickRejectButton,
                     modifier = Modifier.height(52.dp)
                         .padding(bottom = 8.dp)
                         .weight(LocalDensity.current.density / 3f),
-                    containerColor = SnackbarColor.Success,
+                    containerColor = SnackbarColor.Error,
+                    contentColor = Color.White,
+                )
+                AppButton(
+                    title = Resources.strings.cancel,
+                    onClick = onClickDismissButton,
+                    modifier = Modifier.height(52.dp)
+                        .padding(bottom = 8.dp, end = 8.dp)
+                        .weight(LocalDensity.current.density / 3f),
+                    containerColor = SnackbarColor.Info,
                     contentColor = Color.White,
                 )
             }
