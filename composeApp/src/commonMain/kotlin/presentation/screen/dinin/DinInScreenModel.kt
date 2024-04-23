@@ -548,9 +548,7 @@ class DinInScreenModel(
                     updateState {
                         it.copy(
                             isLoading = false,
-                            errorDinInState = errorState,
                             dinInDialogueState = DinInDialogueState(),
-                            errorDialogueIsVisible = true,
                             errorMessage = when (errorState) {
                                 is ErrorState.NetworkError -> errorState.message.toString()
                                 is ErrorState.NotFound -> errorState.message.toString()
@@ -562,6 +560,27 @@ class DinInScreenModel(
                                 is ErrorState.ValidationNetworkError -> errorState.message.toString()
                                 else -> "Logon Error"
                             }
+                        )
+                    }
+                    if (state.value.errorMessage != "Logon Error") {
+                        updateState {
+                            it.copy(
+                                errorDinInState = errorState,
+                                errorDialogueIsVisible = true,
+                            )
+                        }
+                    } else {
+                        updateState {
+                            it.copy(
+                                errorDialogueIsVisible = false,
+                                errorDinInState = null,
+                                errorMessage = ""
+                            )
+                        }
+                        onClickTable(
+                            tableId.toInt(),
+                            state.value.tablesDetails.find { c -> c.tableId == tableId.toInt() }?.tableNumber
+                                ?: ""
                         )
                     }
                 }
