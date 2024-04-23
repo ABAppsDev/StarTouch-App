@@ -212,7 +212,7 @@ class DinInScreenModel(
                                 is ErrorState.EmptyData -> errorState.message.toString()
                                 is ErrorState.ValidationError -> errorState.message.toString()
                                 is ErrorState.ValidationNetworkError -> errorState.message.toString()
-                                else -> "Unknown error"
+                                else -> "Logon Error"
                             }
                         )
                     }
