@@ -428,7 +428,8 @@ class DinInScreenModel(
         updateState {
             it.copy(
                 isLoading = false,
-                errorDialogueIsVisible = false
+                errorDialogueIsVisible = false,
+                dinInDialogueState = DinInDialogueState(),
             )
         }
     }
