@@ -1,9 +1,10 @@
 package presentation.screen.composable
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -15,27 +16,28 @@ import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 
 @Composable
 fun Chair(
     tableSize: Dp,
+    modifier: Modifier,
     covers: String,
     openTime: String,
-    checksCount: String,
-    totalAmount: String,
     tableCode: String,
-    hasOrders: Boolean,
+    totalAmount: String,
+    checksCount: String,
     printed: Boolean,
-    modifier: Modifier = Modifier,
+    hasOrders: Boolean
 ) {
     val textMeasurer = rememberTextMeasurer()
     val color = if (printed) Color.Cyan else if (hasOrders) Color.Red else Color.Green
-    SetLayoutDirection(layoutDirection = LayoutDirection.Rtl) {
-        Canvas(modifier = modifier.fillMaxSize().background(Color.White)) {
+    Box(modifier = modifier , contentAlignment = Alignment.Center) {
+        Canvas(modifier = Modifier.size(tableSize)) {
             val sizeWithPx = tableSize.toPx()
 
             val tableHeight = sizeWithPx * 0.4f
+            val tableWidth = sizeWithPx
+
 
             val paddingBetweenTableAndChairs = 4f
 
@@ -60,7 +62,7 @@ fun Chair(
             drawRoundRect(
                 topLeft = Offset(x = 0f, y = (canvasHeight - tableHeight) / 2),
                 color = color,
-                size = Size(height = tableHeight, width = sizeWithPx),
+                size = Size(height = tableHeight, width = tableWidth),
                 cornerRadius = CornerRadius(15f, 15f)
             )
             drawBottomChairs(
@@ -81,12 +83,13 @@ fun Chair(
                 canvasWidth = canvasWidth,
                 canvasHeight = canvasHeight,
                 tableHeight = tableHeight,
+                tableWidth = tableWidth,
                 textMeasurer = textMeasurer,
                 centerText = tableCode,
-                topLeftText = covers,
-                topRightText = totalAmount,
-                bottomLeftText = if (openTime == "null") "" else openTime,
-                bottomRightText = checksCount
+                topLeftText = totalAmount,
+                topRightText = covers,
+                bottomLeftText = checksCount,
+                bottomRightText = if (openTime == "null") "" else openTime
             )
         }
     }
@@ -124,6 +127,7 @@ private fun DrawScope.drawTextInEachSideOfTable(
     canvasWidth: Float,
     canvasHeight: Float,
     tableHeight: Float,
+    tableWidth: Float,
     textMeasurer: TextMeasurer,
     centerText: String,
     topLeftText: String,
@@ -136,7 +140,7 @@ private fun DrawScope.drawTextInEachSideOfTable(
     drawText(
         textLayoutResult = centerTextLayoutResult,
         topLeft = Offset(
-            (canvasWidth - centerTextSize.width) / 2f,
+            (tableWidth - centerTextSize.width) / 2f,
             (canvasHeight - centerTextSize.height) / 2f
         ),
     )
@@ -164,7 +168,7 @@ private fun DrawScope.drawTextInEachSideOfTable(
     drawText(
         textLayoutResult = topRightTextLayoutResult,
         topLeft = Offset(
-            canvasWidth - topRightTextSize.width,
+            tableWidth - topRightTextSize.width,
             (canvasHeight - tableHeight) / 2
         ),
     )
@@ -184,7 +188,7 @@ private fun DrawScope.drawTextInEachSideOfTable(
     drawText(
         textLayoutResult = bottomRightTextLayoutResult,
         topLeft = Offset(
-            canvasWidth - bottomRightTextSize.width,
+            tableWidth - bottomRightTextSize.width,
             ((canvasHeight - tableHeight) / 2) + (tableHeight) - bottomRightTextSize.height
         ),
     )
