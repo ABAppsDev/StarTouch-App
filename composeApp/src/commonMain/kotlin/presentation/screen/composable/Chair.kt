@@ -145,20 +145,12 @@ private fun DrawScope.drawTextInEachSideOfTable(
         ),
     )
 
-    drawText(
-        textMeasurer = textMeasurer,
-        text = topLeftText,
-        topLeft = Offset(
-            4f,
-            (canvasHeight - tableHeight) / 2
-        ),
-    )
 
     drawText(
         textMeasurer = textMeasurer,
         text = topLeftText,
         topLeft = Offset(
-            4f,
+            8f,
             (canvasHeight - tableHeight) / 2
         ),
     )
@@ -168,7 +160,7 @@ private fun DrawScope.drawTextInEachSideOfTable(
     drawText(
         textLayoutResult = topRightTextLayoutResult,
         topLeft = Offset(
-            tableWidth - topRightTextSize.width,
+            tableWidth - topRightTextSize.width - 8,
             (canvasHeight - tableHeight) / 2
         ),
     )
@@ -178,7 +170,7 @@ private fun DrawScope.drawTextInEachSideOfTable(
     drawText(
         textLayoutResult = bottomLeftTextLayoutResult,
         topLeft = Offset(
-            4f,
+            8f,
             ((canvasHeight - tableHeight) / 2) + (tableHeight) - bottomLeftTextSize.height
         ),
     )
@@ -188,7 +180,7 @@ private fun DrawScope.drawTextInEachSideOfTable(
     drawText(
         textLayoutResult = bottomRightTextLayoutResult,
         topLeft = Offset(
-            tableWidth - bottomRightTextSize.width,
+            tableWidth - bottomRightTextSize.width - 8 ,
             ((canvasHeight - tableHeight) / 2) + (tableHeight) - bottomRightTextSize.height
         ),
     )
