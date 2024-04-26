@@ -5,5 +5,5 @@ enum class AttendanceType {
 }
 
 enum class PermissionType {
-    DIN_IN, EXIT
+    DIN_IN, EXIT,TAKE_AWAY
 }

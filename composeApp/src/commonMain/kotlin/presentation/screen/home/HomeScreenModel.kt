@@ -404,6 +404,17 @@ class HomeScreenModel(
         }
     }
 
+    override fun onClickTakeAway() {
+        updateState {
+            it.copy(
+                permissionDialogueState = PermissionDialogueState(
+                    isVisible = true,
+                    permissionType = PermissionType.TAKE_AWAY.name
+                )
+            )
+        }
+    }
+
     override fun onClickEnterPasscode() {
         updateState {
             it.copy(
