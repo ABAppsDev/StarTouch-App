@@ -507,7 +507,7 @@ private fun ChooseTable(
         covers = table.covers.toString(),
         openTime = table.openCheckDate ?: "",
         tableCode = table.tableNumber,
-        totalAmount = table.totalOrdersPrice.toString(),
+        totalAmount = table.totalOrdersPrice.toFloat().toString(),
         checksCount = table.checksCount.toString(),
         printed = table.printed,
         hasOrders = table.covers > 0 || table.openCheckDate != "null",
