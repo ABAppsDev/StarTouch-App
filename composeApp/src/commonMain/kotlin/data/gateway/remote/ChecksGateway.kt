@@ -104,6 +104,7 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
                 parameter("userID", serverId)
                 parameter("serverID", userID)
                 parameter("outletID", StarTouchSetup.OUTLET_ID)
+                parameter("restID", StarTouchSetup.REST_ID)
             }
         }.data ?: throw Exception("")
     }
@@ -120,6 +121,7 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
                 parameter("userID", serverId)
                 parameter("serverID", userID)
                 parameter("outletID", StarTouchSetup.OUTLET_ID)
+                parameter("restID", StarTouchSetup.REST_ID)
             }
         }.data ?: throw Exception("")
     }
