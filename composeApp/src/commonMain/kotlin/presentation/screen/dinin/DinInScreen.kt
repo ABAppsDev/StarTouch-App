@@ -60,6 +60,7 @@ import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
 import com.beepbeep.designSystem.ui.theme.Theme
 import org.jetbrains.compose.resources.painterResource
 import presentation.screen.composable.AppScaffold
+import presentation.screen.composable.Chair
 import presentation.screen.composable.ErrorDialogue
 import presentation.screen.composable.RestaurantTableWithText
 import presentation.screen.composable.RestaurantTableWithTextLoading
@@ -503,7 +504,8 @@ private fun ChooseTable(
     onLongClick: () -> Unit = {},
     onClick: () -> Unit = {},
 ) {
-    RestaurantTableWithText(
+    Chair(
+        tableSize = 200.dp,
         covers = table.covers.toString(),
         openTime = table.openCheckDate ?: "",
         tableCode = table.tableNumber,

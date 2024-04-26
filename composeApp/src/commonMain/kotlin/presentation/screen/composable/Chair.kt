@@ -1,10 +1,10 @@
 package presentation.screen.composable
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -12,80 +12,90 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Dp
 
 @Composable
-fun Chair(tableSize: Dp, color: Color) {
+fun Chair(
+    tableSize: Dp,
+    modifier: Modifier,
+    covers: String,
+    openTime: String,
+    tableCode: String,
+    totalAmount: String,
+    checksCount: String,
+    printed: Boolean,
+    hasOrders: Boolean
+) {
     val textMeasurer = rememberTextMeasurer()
+    val color = if (printed) Color.Cyan else if (hasOrders) Color.Red else Color.Green
+    Box(modifier = modifier , contentAlignment = Alignment.Center) {
+        Canvas(modifier = Modifier.size(tableSize)) {
+            val sizeWithPx = tableSize.toPx()
 
-    Canvas(modifier = Modifier.size(tableSize).background(Color.White)) {
-        val sizeWithPx = tableSize.toPx()
-
-        val tableHeight = sizeWithPx * 0.4f
-        val tableWidth = sizeWithPx
-
-        val tableX = 0f
-        val tableY = sizeWithPx * 0.25f
-
-        val paddingBetweenTableAndChairs = 4f
+            val tableHeight = sizeWithPx * 0.4f
+            val tableWidth = sizeWithPx
 
 
-        val canvasWidth = size.width
-        val canvasHeight = size.height
+            val paddingBetweenTableAndChairs = 4f
 
-        drawTopChairs(
-            sizeWithPx = sizeWithPx,
-            x = sizeWithPx * 0.15f,
-            y = ((canvasHeight - tableHeight) / 2) - (sizeWithPx * 0.1f) - paddingBetweenTableAndChairs,
-            color = color
-        )
 
-        drawTopChairs(
-            sizeWithPx = sizeWithPx,
-            x = sizeWithPx * 0.6f,
-            y = ((canvasHeight - tableHeight) / 2) - (sizeWithPx * 0.1f) - paddingBetweenTableAndChairs,
-            color = color
-        )
+            val canvasWidth = size.width
+            val canvasHeight = size.height
 
-        drawRoundRect(
-            topLeft = Offset(x = 0f, y = (canvasHeight - tableHeight) / 2),
-            color = color,
-            size = Size(height = tableHeight, width = tableWidth),
-            cornerRadius = CornerRadius(15f, 15f)
-        )
-        drawBottomChairs(
-            sizeWithPx = sizeWithPx,
-            x = sizeWithPx * 0.15f,
-            y = ((canvasHeight + tableHeight) / 2) + paddingBetweenTableAndChairs,
-            color = color
-        )
+            drawTopChairs(
+                sizeWithPx = sizeWithPx,
+                x = sizeWithPx * 0.15f,
+                y = ((canvasHeight - tableHeight) / 2) - (sizeWithPx * 0.1f) - paddingBetweenTableAndChairs,
+                color = color
+            )
 
-        drawBottomChairs(
-            sizeWithPx = sizeWithPx,
-            x = sizeWithPx * 0.6f,
-            y = ((canvasHeight + tableHeight) / 2) + paddingBetweenTableAndChairs,
-            color = color
-        )
+            drawTopChairs(
+                sizeWithPx = sizeWithPx,
+                x = sizeWithPx * 0.6f,
+                y = ((canvasHeight - tableHeight) / 2) - (sizeWithPx * 0.1f) - paddingBetweenTableAndChairs,
+                color = color
+            )
 
-        drawTextInEachSideOfTable(
-            canvasWidth = canvasWidth,
-            canvasHeight = canvasHeight,
-            tableHeight = tableHeight,
-            textMeasurer = textMeasurer,
-            centerText = "Center",
-            topLeftText = "topLeft",
-            topRightText = "topRight",
-            bottomLeftText = "bottomLeft",
-            bottomRightText = "bottomRight"
-        )
+            drawRoundRect(
+                topLeft = Offset(x = 0f, y = (canvasHeight - tableHeight) / 2),
+                color = color,
+                size = Size(height = tableHeight, width = tableWidth),
+                cornerRadius = CornerRadius(15f, 15f)
+            )
+            drawBottomChairs(
+                sizeWithPx = sizeWithPx,
+                x = sizeWithPx * 0.15f,
+                y = ((canvasHeight + tableHeight) / 2) + paddingBetweenTableAndChairs,
+                color = color
+            )
+
+            drawBottomChairs(
+                sizeWithPx = sizeWithPx,
+                x = sizeWithPx * 0.6f,
+                y = ((canvasHeight + tableHeight) / 2) + paddingBetweenTableAndChairs,
+                color = color
+            )
+
+            drawTextInEachSideOfTable(
+                canvasWidth = canvasWidth,
+                canvasHeight = canvasHeight,
+                tableHeight = tableHeight,
+                tableWidth = tableWidth,
+                textMeasurer = textMeasurer,
+                centerText = tableCode,
+                topLeftText = totalAmount,
+                topRightText = covers,
+                bottomLeftText = checksCount,
+                bottomRightText = if (openTime == "null") "" else openTime
+            )
+        }
     }
 }
 
-fun DrawScope.drawTopChairs(sizeWithPx: Float, x: Float, y: Float, color: Color) {
+private fun DrawScope.drawTopChairs(sizeWithPx: Float, x: Float, y: Float, color: Color) {
     drawRect(
         topLeft = Offset(x = x, y = y),
         color = color,
@@ -99,7 +109,7 @@ fun DrawScope.drawTopChairs(sizeWithPx: Float, x: Float, y: Float, color: Color)
     )
 }
 
-fun DrawScope.drawBottomChairs(sizeWithPx: Float, x: Float, y: Float, color: Color) {
+private fun DrawScope.drawBottomChairs(sizeWithPx: Float, x: Float, y: Float, color: Color) {
     drawRect(
         topLeft = Offset(x = x, y = y),
         color = color,
@@ -113,10 +123,11 @@ fun DrawScope.drawBottomChairs(sizeWithPx: Float, x: Float, y: Float, color: Col
     )
 }
 
-fun DrawScope.drawTextInEachSideOfTable(
+private fun DrawScope.drawTextInEachSideOfTable(
     canvasWidth: Float,
     canvasHeight: Float,
     tableHeight: Float,
+    tableWidth: Float,
     textMeasurer: TextMeasurer,
     centerText: String,
     topLeftText: String,
@@ -129,7 +140,7 @@ fun DrawScope.drawTextInEachSideOfTable(
     drawText(
         textLayoutResult = centerTextLayoutResult,
         topLeft = Offset(
-            (canvasWidth - centerTextSize.width) / 2f,
+            (tableWidth - centerTextSize.width) / 2f,
             (canvasHeight - centerTextSize.height) / 2f
         ),
     )
@@ -157,7 +168,7 @@ fun DrawScope.drawTextInEachSideOfTable(
     drawText(
         textLayoutResult = topRightTextLayoutResult,
         topLeft = Offset(
-            canvasWidth - topRightTextSize.width,
+            tableWidth - topRightTextSize.width,
             (canvasHeight - tableHeight) / 2
         ),
     )
@@ -177,7 +188,7 @@ fun DrawScope.drawTextInEachSideOfTable(
     drawText(
         textLayoutResult = bottomRightTextLayoutResult,
         topLeft = Offset(
-            canvasWidth - bottomRightTextSize.width,
+            tableWidth - bottomRightTextSize.width,
             ((canvasHeight - tableHeight) / 2) + (tableHeight) - bottomRightTextSize.height
         ),
     )
