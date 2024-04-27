@@ -89,7 +89,7 @@ class HomeScreen : Screen {
             exitApplication()
         EventHandler(homeScreenModel.effect) { effect, navigator ->
             when (effect) {
-                is HomeUiEffect.NavigateToDinInScreen -> navigator.replace(DinInScreen())
+                is HomeUiEffect.NavigateToDinInScreen -> navigator.push(DinInScreen())
                 HomeUiEffect.NavigateToSetting -> navigator.push(SettingScreen())
                 HomeUiEffect.NavigateToOrderScreen -> navigator.push(
                     OrderScreen(

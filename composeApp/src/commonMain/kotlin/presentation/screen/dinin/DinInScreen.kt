@@ -88,7 +88,7 @@ class DinInScreen : Screen {
         EventHandler(dinInScreenModel.effect) { effect, navigator ->
             when (effect) {
                 is DinInUiEffect.NavigateToOrderScreen -> {
-                    navigator.replace(
+                    navigator.replaceAll(
                         OrderScreen(
                             effect.checkId,
                             effect.checkNumber,
@@ -104,7 +104,7 @@ class DinInScreen : Screen {
 
         LaunchedEffect(state.deleted) {
             if (state.deleted)
-            nav.replaceAll(HomeScreen())
+                nav.pop()
         }
 
         FadeAnimation(state.warningDialogueIsVisible) {
