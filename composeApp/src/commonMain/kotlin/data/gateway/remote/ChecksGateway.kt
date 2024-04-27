@@ -78,6 +78,7 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
                 parameter("checkId", checkId)
                 parameter("outletID", outletID)
                 parameter("restID", restID)
+                parameter("ws", StarTouchSetup.WORK_STATION_ID)
             }
         }
     }
@@ -87,6 +88,7 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
             get("/check/reopen") {
                 parameter("checkId", checkId)
                 parameter("userId", StarTouchSetup.USER_ID)
+                parameter("ws", StarTouchSetup.WORK_STATION_ID)
             }
         }.data?.map { it.toEntity() } ?: throw NotFoundException("Check not found")
     }
