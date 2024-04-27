@@ -26,7 +26,7 @@ class DinInScreenModel(
     init {
         getTables()
         getAllRooms()
-        //socketTables()
+        socketTables()
     }
 
     fun deleteTable() {
@@ -43,27 +43,21 @@ class DinInScreenModel(
                 while (true) {
                     if (state.value.roomId != 0)
                         try {
-                            if (state.value.exit) {
-                                delay(8000)
-                                viewModelScope.launch(Dispatchers.IO) {
-                                    AppLanguage.code.emit(StarTouchSetup.DEFAULT_LANGUAGE)
-                                    sendNewEffect(DinInUiEffect.NavigateBackToHome)
+                            delay(6000)
+                            if (state.value.roomId != 0) {
+                                val tables = manageDinInUseCase.getTablesDataByRoomId(
+                                    StarTouchSetup.OUTLET_ID,
+                                    StarTouchSetup.REST_ID,
+                                    state.value.roomId
+                                )
+                                updateState {
+                                    it.copy(
+                                        tablesDetails = tables.map { table ->
+                                            table.toTableDetailsState()
+                                        },
+                                    )
                                 }
                             }
-//                            if (state.value.roomId != 0) {
-//                                val tables = manageDinInUseCase.getTablesDataByRoomId(
-//                                    StarTouchSetup.OUTLET_ID,
-//                                    StarTouchSetup.REST_ID,
-//                                    state.value.roomId
-//                                )
-//                                updateState {
-//                                    it.copy(
-//                                        tablesDetails = tables.map { table ->
-//                                            table.toTableDetailsState()
-//                                        },
-//                                    )
-//                                }
-//                            }
                         } catch (e: Exception) {
                             updateState {
                                 it.copy(
