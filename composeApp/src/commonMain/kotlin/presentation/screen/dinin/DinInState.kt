@@ -29,6 +29,7 @@ data class DinInState(
     val validation: Boolean = false,
     val isTableGuest: Boolean = false,
     val deleted: Boolean = false,
+    val exit: Boolean = true,
 )
 
 @Immutable

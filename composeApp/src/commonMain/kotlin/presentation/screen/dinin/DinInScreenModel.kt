@@ -43,21 +43,27 @@ class DinInScreenModel(
                 while (true) {
                     if (state.value.roomId != 0)
                         try {
-                            delay(8000)
-                            if (state.value.roomId != 0) {
-                                val tables = manageDinInUseCase.getTablesDataByRoomId(
-                                    StarTouchSetup.OUTLET_ID,
-                                    StarTouchSetup.REST_ID,
-                                    state.value.roomId
-                                )
-                                updateState {
-                                    it.copy(
-                                        tablesDetails = tables.map { table ->
-                                            table.toTableDetailsState()
-                                        },
-                                    )
+                            if (state.value.exit) {
+                                delay(8000)
+                                viewModelScope.launch(Dispatchers.IO) {
+                                    AppLanguage.code.emit(StarTouchSetup.DEFAULT_LANGUAGE)
+                                    sendNewEffect(DinInUiEffect.NavigateBackToHome)
                                 }
                             }
+//                            if (state.value.roomId != 0) {
+//                                val tables = manageDinInUseCase.getTablesDataByRoomId(
+//                                    StarTouchSetup.OUTLET_ID,
+//                                    StarTouchSetup.REST_ID,
+//                                    state.value.roomId
+//                                )
+//                                updateState {
+//                                    it.copy(
+//                                        tablesDetails = tables.map { table ->
+//                                            table.toTableDetailsState()
+//                                        },
+//                                    )
+//                                }
+//                            }
                         } catch (e: Exception) {
                             updateState {
                                 it.copy(
@@ -249,6 +255,7 @@ class DinInScreenModel(
             it.copy(
                 isLoading = false,
                 errorMessage = "",
+                exit = false,
                 errorDinInState = null,
                 dinInDialogueState = it.dinInDialogueState.copy(
                     isVisible = true,
@@ -431,6 +438,7 @@ class DinInScreenModel(
         updateState {
             it.copy(
                 isLoading = false,
+                exit = true,
                 dinInDialogueState = DinInDialogueState(),
                 tableId = 0,
                 tableName = "0",
@@ -453,6 +461,7 @@ class DinInScreenModel(
         updateState {
             it.copy(
                 isLoading = false,
+                exit = true,
                 errorDialogueIsVisible = false,
                 dinInDialogueState = DinInDialogueState(),
                 isTableGuest = false
@@ -483,6 +492,7 @@ class DinInScreenModel(
                 isLoading = false,
                 errorMessage = "",
                 errorDinInState = null,
+                exit = true,
                 warningDialogueIsVisible = false,
                 tableName = "0",
                 tableId = 0,
@@ -496,6 +506,7 @@ class DinInScreenModel(
         updateState {
             it.copy(
                 isLoading = false,
+                exit = false,
                 errorMessage = "",
                 errorDinInState = null,
                 warningDialogueIsVisible = false,
@@ -517,6 +528,7 @@ class DinInScreenModel(
         updateState {
             it.copy(
                 isLoading = false,
+                exit = false,
                 errorMessage = "",
                 errorDinInState = null,
                 dinInDialogueState = it.dinInDialogueState.copy(
@@ -650,6 +662,7 @@ class DinInScreenModel(
         updateState {
             it.copy(
                 isLoading = true,
+                exit = false,
                 errorDinInState = null,
                 errorMessage = "",
             )
@@ -702,6 +715,7 @@ class DinInScreenModel(
             it.copy(
                 isLoading = false,
                 errorMessage = "",
+                exit = false,
                 errorDinInState = null,
                 dinInDialogueState = it.dinInDialogueState.copy(
                     isVisible = true,
@@ -719,6 +733,7 @@ class DinInScreenModel(
             it.copy(
                 isLoading = true,
                 errorDinInState = null,
+                exit = false,
                 errorMessage = "",
             )
         }
