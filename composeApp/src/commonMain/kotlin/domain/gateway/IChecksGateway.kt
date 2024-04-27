@@ -36,4 +36,5 @@ interface IChecksGateway {
     ): Boolean
 
     suspend fun openNewCheckTableGuest(openNewCheck: OpenNewCheck): OpenCheck
+    suspend fun deleteTable(checkId: Long)
 }

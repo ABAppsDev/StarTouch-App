@@ -121,6 +121,7 @@ class OrderScreenModel(
             it.copy(
                 isLoading = false,
                 errorState = errorState,
+                deleted = false,
                 errorMessage = when (errorState) {
                     is ErrorState.NetworkError -> errorState.message.toString()
                     is ErrorState.NotFound -> errorState.message.toString()
@@ -773,5 +774,13 @@ class OrderScreenModel(
                 orderItemState = newList.toList()
             )
         }
+    }
+
+    fun deleteTable() {
+        tryToExecute(
+            function = { manageChecksUseCase.deleteTable(checkId) },
+            onSuccess = { updateState { it.copy(deleted = true) } },
+            onError = ::onError
+        )
     }
 }

@@ -49,6 +49,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.beepbeep.designSystem.ui.composable.StAppBar
 import com.beepbeep.designSystem.ui.composable.StButton
 import com.beepbeep.designSystem.ui.composable.StChip
@@ -81,7 +83,7 @@ class DinInScreen : Screen {
         val state by dinInScreenModel.state.collectAsState()
         val pullRefreshState =
             rememberPullRefreshState(state.isRefreshing, { dinInScreenModel.retry() })
-
+        val nav = LocalNavigator.currentOrThrow
         EventHandler(dinInScreenModel.effect) { effect, navigator ->
             when (effect) {
                 is DinInUiEffect.NavigateToOrderScreen -> {
@@ -95,8 +97,13 @@ class DinInScreen : Screen {
                     )
                 }
 
-                DinInUiEffect.NavigateBackToHome -> navigator.pop()
+                DinInUiEffect.NavigateBackToHome -> dinInScreenModel.deleteTable()
             }
+        }
+
+        LaunchedEffect(state.deleted) {
+            if (state.deleted)
+            nav.pop()
         }
 
         FadeAnimation(state.warningDialogueIsVisible) {

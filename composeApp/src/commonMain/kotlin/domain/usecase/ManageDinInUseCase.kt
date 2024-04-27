@@ -16,4 +16,8 @@ class ManageDinInUseCase(
 
     suspend fun getAllTablesGuest(outletId: Int, restId: Int) =
         dinInGateway.getAllTablesGuest(outletId, restId)
+
+    suspend fun deleteTable() {
+        dinInGateway.deleteTable()
+    }
 }

@@ -37,6 +37,7 @@ data class OrderState(
     val qty: Float = 0f,
     val showEnterOpenPrice: Boolean = false,
     val price: String = "",
+    val deleted:Boolean=false,
 )
 
 @Immutable

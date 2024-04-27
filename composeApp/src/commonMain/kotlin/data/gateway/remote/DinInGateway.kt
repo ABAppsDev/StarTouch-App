@@ -12,6 +12,7 @@ import domain.util.NotFoundException
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import io.ktor.client.request.post
 
 class DinInGateway(client: HttpClient) : BaseGateway(client), IDinInGateway {
     override suspend fun getTableData(outletID: Int, restID: Int): List<TableData> {
@@ -61,5 +62,14 @@ class DinInGateway(client: HttpClient) : BaseGateway(client), IDinInGateway {
                 parameter("userId", StarTouchSetup.USER_ID)
             }
         }.data?.map { it.toEntity() } ?: throw NotFoundException("Tables not found")
+    }
+
+    override suspend fun deleteTable() {
+        tryToExecute<Unit> {
+            post("/dinin/delete-table") {
+                parameter("userId", StarTouchSetup.USER_ID)
+                parameter("ws", StarTouchSetup.WORK_STATION_ID)
+            }
+        }
     }
 }

@@ -83,6 +83,15 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
         }
     }
 
+    override suspend fun deleteTable(checkId: Long) {
+        tryToExecute<Unit> {
+            post("/check/delete-table") {
+                parameter("checkId", checkId)
+                parameter("ws", StarTouchSetup.WORK_STATION_ID)
+            }
+        }
+    }
+
     override suspend fun reOpenCheck(checkId: Long): List<FireItems> {
         return tryToExecute<ServerResponse<List<FireItemsDto>>> {
             get("/check/reopen") {

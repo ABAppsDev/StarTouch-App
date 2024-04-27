@@ -149,12 +149,16 @@ class OrderScreen(
         }
         FadeAnimation(state.showEnterOpenPrice) {
             EnterPriceDialogue(
-                state.price.toString(),
+                state.price,
                 screenModel as OrderInteractionListener
             )
         }
         LaunchedEffect(state.errorState) {
             if (state.errorState != null) screenModel.showErrorScreen()
+        }
+        LaunchedEffect(state.deleted) {
+            if (state.deleted)
+            nav.replace(DinInScreen())
         }
         FadeAnimation(state.warningDialogueIsVisible) {
             WarningDialogue(
@@ -186,9 +190,7 @@ class OrderScreen(
                             else if (state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && !isReopened)
                                 screenModel.showWarningDialogue()
                             else if (state.isFinishOrder) screenModel.onClickIconBack()
-                            else if (!state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && isReopened) nav.replace(
-                                DinInScreen()
-                            )
+                            else if (!state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && isReopened) screenModel.deleteTable()
                             else screenModel.backToPresets()
                         },
                         title = "${Resources.strings.checkNumber} : $checkNumber",

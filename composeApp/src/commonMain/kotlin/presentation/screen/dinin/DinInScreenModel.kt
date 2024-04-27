@@ -29,6 +29,14 @@ class DinInScreenModel(
         //socketTables()
     }
 
+    fun deleteTable() {
+        tryToExecute(
+            function = { manageDinInUseCase.deleteTable() },
+            onSuccess = { updateState { it.copy(deleted = true) } },
+            onError = ::onError
+        )
+    }
+
     private fun socketTables() {
         viewModelScope.launch(Dispatchers.Default) {
             if (state.value.roomId != 0)
@@ -325,6 +333,7 @@ class DinInScreenModel(
             it.copy(
                 isLoading = false,
                 errorDinInState = errorState,
+                deleted = false,
                 dinInDialogueState = it.dinInDialogueState.copy(
                     isLoading = false,
                     isLoadingButton = false,

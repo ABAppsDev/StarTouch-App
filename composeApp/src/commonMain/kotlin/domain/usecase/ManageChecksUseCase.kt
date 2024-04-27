@@ -62,4 +62,8 @@ class ManageChecksUseCase(
     ): Boolean {
         return checksGateway.fireItems(checkID, serverId, userID, items)
     }
+
+    suspend fun deleteTable(checkId: Long) {
+        checksGateway.deleteTable(checkId)
+    }
 }
