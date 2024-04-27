@@ -98,6 +98,8 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
                 parameter("checkId", checkId)
                 parameter("userId", StarTouchSetup.USER_ID)
                 parameter("ws", StarTouchSetup.WORK_STATION_ID)
+                parameter("outletID", StarTouchSetup.OUTLET_ID)
+                parameter("restID", StarTouchSetup.REST_ID)
                 parameter("tableId", tableId)
             }
         }.data?.map { it.toEntity() } ?: throw NotFoundException("Check not found")
