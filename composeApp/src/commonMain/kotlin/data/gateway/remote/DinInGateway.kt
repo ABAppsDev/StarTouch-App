@@ -4,6 +4,7 @@ import data.remote.mapper.toEntity
 import data.remote.model.AssignCheckDto
 import data.remote.model.ServerResponse
 import data.remote.model.TableDataDto
+import data.util.StarTouchSetup
 import domain.entity.AssignCheck
 import domain.entity.TableData
 import domain.gateway.IDinInGateway
@@ -18,6 +19,8 @@ class DinInGateway(client: HttpClient) : BaseGateway(client), IDinInGateway {
             get("/dinin/tables") {
                 parameter("outletID", outletID)
                 parameter("restID", restID)
+                parameter("ws", StarTouchSetup.WORK_STATION_ID)
+                parameter("userId", StarTouchSetup.USER_ID)
             }
         }.data?.map { it.toEntity() } ?: throw NotFoundException("Tables not found")
     }
@@ -31,7 +34,11 @@ class DinInGateway(client: HttpClient) : BaseGateway(client), IDinInGateway {
         }.data?.map { it.toEntity() } ?: throw NotFoundException("Tables not found")
     }
 
-    override suspend fun getAllOnlineUsers(outletId: Int, restId: Int,userID:Int): List<AssignCheck> {
+    override suspend fun getAllOnlineUsers(
+        outletId: Int,
+        restId: Int,
+        userID: Int
+    ): List<AssignCheck> {
         return tryToExecute<ServerResponse<List<AssignCheckDto>>> {
             get("/check/assign") {
                 parameter("outletID", outletId)
@@ -50,6 +57,8 @@ class DinInGateway(client: HttpClient) : BaseGateway(client), IDinInGateway {
             get("/dinin/room/$roomID/tables") {
                 parameter("outletID", outletID)
                 parameter("restID", restID)
+                parameter("ws", StarTouchSetup.WORK_STATION_ID)
+                parameter("userId", StarTouchSetup.USER_ID)
             }
         }.data?.map { it.toEntity() } ?: throw NotFoundException("Tables not found")
     }

@@ -3,6 +3,7 @@ package data.gateway.remote
 import data.remote.mapper.toDto
 import data.remote.model.ServerResponse
 import data.remote.model.UserAppDto
+import data.util.StarTouchSetup
 import domain.entity.UserApp
 import domain.gateway.IPermissionGateway
 import domain.util.PermissionDeniedException
@@ -35,6 +36,7 @@ class PermissionGateway(client: HttpClient) : BaseGateway(client), IPermissionGa
                 parameter("passcode", passcode)
                 parameter("outletID", outletID)
                 parameter("restID", restID)
+                parameter("ws", StarTouchSetup.WORK_STATION_ID)
             }
         }.data ?: false
     }
