@@ -62,7 +62,6 @@ import org.jetbrains.compose.resources.painterResource
 import presentation.screen.composable.AppScaffold
 import presentation.screen.composable.Chair
 import presentation.screen.composable.ErrorDialogue
-import presentation.screen.composable.RestaurantTableWithText
 import presentation.screen.composable.RestaurantTableWithTextLoading
 import presentation.screen.composable.SetLayoutDirection
 import presentation.screen.composable.ShimmerListItem
@@ -211,7 +210,7 @@ private fun OnRender(
                     columns = GridCells.Fixed(4),
                     modifier = Modifier.fillMaxSize(),
                     horizontalArrangement = Arrangement.spacedBy(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp),
                     contentPadding = PaddingValues(8.dp)
                 ) {
                     items(state.tablesDetails) { table ->
@@ -505,7 +504,8 @@ private fun ChooseTable(
     onClick: () -> Unit = {},
 ) {
     Chair(
-        tableSize = 200.dp,
+        tableSize = 120.dp,
+        tableColor = Theme.colors.contentPrimary,
         covers = table.covers.toString(),
         openTime = table.openCheckDate ?: "",
         tableCode = table.tableNumber,

@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.Dp
 @Composable
 fun Chair(
     tableSize: Dp,
+    tableColor: Color,
     modifier: Modifier,
     covers: String,
     openTime: String,
@@ -31,18 +32,14 @@ fun Chair(
 ) {
     val textMeasurer = rememberTextMeasurer()
     val color = if (printed) Color.Cyan else if (hasOrders) Color.Red else Color.Green
-    Box(modifier = modifier , contentAlignment = Alignment.Center) {
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
         Canvas(modifier = Modifier.size(tableSize)) {
             val sizeWithPx = tableSize.toPx()
 
-            val tableHeight = sizeWithPx * 0.4f
-            val tableWidth = sizeWithPx
-
+            val tableHeight = sizeWithPx * 0.6f
 
             val paddingBetweenTableAndChairs = 4f
 
-
-            val canvasWidth = size.width
             val canvasHeight = size.height
 
             drawTopChairs(
@@ -61,10 +58,11 @@ fun Chair(
 
             drawRoundRect(
                 topLeft = Offset(x = 0f, y = (canvasHeight - tableHeight) / 2),
-                color = color,
-                size = Size(height = tableHeight, width = tableWidth),
+                color = tableColor,
+                size = Size(height = tableHeight, width = sizeWithPx),
                 cornerRadius = CornerRadius(15f, 15f)
             )
+
             drawBottomChairs(
                 sizeWithPx = sizeWithPx,
                 x = sizeWithPx * 0.15f,
@@ -80,10 +78,9 @@ fun Chair(
             )
 
             drawTextInEachSideOfTable(
-                canvasWidth = canvasWidth,
                 canvasHeight = canvasHeight,
                 tableHeight = tableHeight,
-                tableWidth = tableWidth,
+                tableWidth = sizeWithPx,
                 textMeasurer = textMeasurer,
                 centerText = tableCode,
                 topLeftText = totalAmount,
@@ -124,7 +121,6 @@ private fun DrawScope.drawBottomChairs(sizeWithPx: Float, x: Float, y: Float, co
 }
 
 private fun DrawScope.drawTextInEachSideOfTable(
-    canvasWidth: Float,
     canvasHeight: Float,
     tableHeight: Float,
     tableWidth: Float,
@@ -150,8 +146,8 @@ private fun DrawScope.drawTextInEachSideOfTable(
         textMeasurer = textMeasurer,
         text = topLeftText,
         topLeft = Offset(
-            8f,
-            (canvasHeight - tableHeight) / 2
+            12f,
+            ((canvasHeight - tableHeight) / 2) + 8
         ),
     )
 
@@ -160,8 +156,8 @@ private fun DrawScope.drawTextInEachSideOfTable(
     drawText(
         textLayoutResult = topRightTextLayoutResult,
         topLeft = Offset(
-            tableWidth - topRightTextSize.width - 8,
-            (canvasHeight - tableHeight) / 2
+            tableWidth - topRightTextSize.width - 12,
+            ((canvasHeight - tableHeight) / 2) + 8
         ),
     )
 
@@ -170,8 +166,8 @@ private fun DrawScope.drawTextInEachSideOfTable(
     drawText(
         textLayoutResult = bottomLeftTextLayoutResult,
         topLeft = Offset(
-            8f,
-            ((canvasHeight - tableHeight) / 2) + (tableHeight) - bottomLeftTextSize.height
+            12f,
+            (((canvasHeight - tableHeight) / 2) + (tableHeight) - bottomLeftTextSize.height) - 8
         ),
     )
 
@@ -180,8 +176,8 @@ private fun DrawScope.drawTextInEachSideOfTable(
     drawText(
         textLayoutResult = bottomRightTextLayoutResult,
         topLeft = Offset(
-            tableWidth - bottomRightTextSize.width - 8 ,
-            ((canvasHeight - tableHeight) / 2) + (tableHeight) - bottomRightTextSize.height
+            tableWidth - bottomRightTextSize.width - 12,
+            (((canvasHeight - tableHeight) / 2) + (tableHeight) - bottomRightTextSize.height) - 8
         ),
     )
 }
