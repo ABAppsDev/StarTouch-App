@@ -2,9 +2,11 @@ package data.gateway.remote
 
 import data.remote.mapper.toEntity
 import data.remote.model.ItemDto
+import data.remote.model.ModifierItemDto
 import data.remote.model.PresetsDto
 import data.remote.model.ServerResponse
 import domain.entity.Item
+import domain.entity.ModifierItem
 import domain.entity.Preset
 import domain.gateway.IOrderGateway
 import domain.util.NotFoundException
@@ -53,8 +55,8 @@ class OrderGateway(client: HttpClient) : BaseGateway(client), IOrderGateway {
         restID: Int,
         itemID: Int,
         outletID: Int,
-    ): List<Item> {
-        return tryToExecute<ServerResponse<List<ItemDto>>> {
+    ): List<ModifierItem> {
+        return tryToExecute<ServerResponse<List<ModifierItemDto>>> {
             get("/item/$itemID") {
                 parameter("restID", restID)
                 parameter("outletID", outletID)

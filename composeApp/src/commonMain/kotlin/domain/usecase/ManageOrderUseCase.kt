@@ -1,6 +1,7 @@
 package domain.usecase
 
 import domain.entity.Item
+import domain.entity.ModifierItem
 import domain.entity.Preset
 import domain.gateway.IOrderGateway
 
@@ -27,7 +28,7 @@ class ManageOrderUseCase(
         restID: Int,
         itemID: Int,
         outletID: Int,
-    ): List<Item> {
+    ): List<ModifierItem> {
         return orderGateway.checkItemHasModifiers(restID, itemID,outletID)
     }
 

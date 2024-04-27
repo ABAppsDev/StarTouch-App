@@ -1,6 +1,7 @@
 package domain.gateway
 
 import domain.entity.Item
+import domain.entity.ModifierItem
 import domain.entity.Preset
 
 interface IOrderGateway {
@@ -21,7 +22,7 @@ interface IOrderGateway {
         restID: Int,
         itemID: Int,
         outletID: Int,
-    ): List<Item>
+    ): List<ModifierItem>
 
     suspend fun checkItemHasChildren(
         outletID: Int,

@@ -5,6 +5,7 @@ import data.util.AppLanguage
 import data.util.StarTouchSetup
 import domain.entity.FireItems
 import domain.entity.Item
+import domain.entity.ModifierItem
 import domain.entity.Preset
 import domain.usecase.ManageChecksUseCase
 import domain.usecase.ManageOrderUseCase
@@ -244,7 +245,7 @@ class OrderScreenModel(
         )
     }
 
-    private fun onGetAllItemsModifierSuccess(items: List<Item>) {
+    private fun onGetAllItemsModifierSuccess(items: List<ModifierItem>) {
         updateState {
             it.copy(
                 isLoading = false,

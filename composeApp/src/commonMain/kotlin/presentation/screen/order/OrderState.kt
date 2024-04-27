@@ -5,6 +5,7 @@ import data.util.AppLanguage
 import data.util.StarTouchSetup
 import domain.entity.FireItems
 import domain.entity.Item
+import domain.entity.ModifierItem
 import domain.entity.Preset
 import presentation.base.ErrorState
 import util.LanguageCode
@@ -37,7 +38,7 @@ data class OrderState(
     val qty: Float = 0f,
     val showEnterOpenPrice: Boolean = false,
     val price: String = "",
-    val deleted:Boolean=false,
+    val deleted: Boolean = false,
 )
 
 @Immutable
@@ -164,18 +165,18 @@ data class ItemState(
 )
 
 
-fun Item.toItemModifierState(): ItemModifierState = ItemModifierState(
-    id = id,
+fun ModifierItem.toItemModifierState(): ItemModifierState = ItemModifierState(
+    id = itemID,
     name = if (AppLanguage.code.value == LanguageCode.EN.value) name else name2,
     price = staticPrice,
     isModifier = isModifier,
     taxable = taxable,
     prePaidCard = prePaidCard,
-    pickFollowItemQty = false,
-    modifierGroupID = 0,
+    pickFollowItemQty = pickFollowItemQty,
+    modifierGroupID = modifierGroupID,
     noServiceCharge = noServiceCharge,
     pOnReport = printOnReport,
-    pOnCheck = printItemOnCheck,
+    pOnCheck = printOnChick,
 )
 
 fun Item.toItemState(): ItemState = ItemState(
