@@ -5,12 +5,18 @@ import domain.entity.FireItems
 import domain.entity.OpenCheck
 import domain.entity.OpenNewCheck
 import domain.gateway.IChecksGateway
+import domain.gateway.IDinInGateway
 
 class ManageChecksUseCase(
     private val checksGateway: IChecksGateway,
+    private val dinInGateway: IDinInGateway,
 ) {
     suspend fun openNewCheck(openNewCheck: OpenNewCheck): OpenCheck {
         return checksGateway.openNewCheck(openNewCheck)
+    }
+
+    suspend fun deleteTable() {
+        dinInGateway.deleteTable()
     }
 
     suspend fun openNewCheckTableGuest(openNewCheck: OpenNewCheck): OpenCheck {
@@ -25,7 +31,8 @@ class ManageChecksUseCase(
         checksGateway.makeCheckAborted(checkId, outletID, restID)
     }
 
-    suspend fun reOpenCheck(checkId: Long,tableId: Int?=null): List<FireItems> = checksGateway.reOpenCheck(checkId,tableId)
+    suspend fun reOpenCheck(checkId: Long, tableId: Int? = null): List<FireItems> =
+        checksGateway.reOpenCheck(checkId, tableId)
 
     suspend fun addItemsToExistCheck(
         checkID: Long,

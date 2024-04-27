@@ -132,7 +132,7 @@ class OrderScreen(
                 }
 
                 is OrderUiEffect.NavigateBackToHome -> {
-                    navigator.popUntil<HomeScreen, Screen>()
+                    navigator.replace(HomeScreen())
                 }
             }
         }

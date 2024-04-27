@@ -12,6 +12,7 @@ import domain.entity.FireItems
 import domain.entity.OpenCheck
 import domain.entity.OpenNewCheck
 import domain.gateway.IChecksGateway
+import domain.gateway.local.ILocalConfigurationGateway
 import domain.util.NotFoundException
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -21,7 +22,10 @@ import io.ktor.client.request.setBody
 import io.ktor.util.InternalAPI
 import kotlinx.serialization.json.Json
 
-class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
+class ChecksGateway(
+    client: HttpClient,
+    private val localConfigurationGateway: ILocalConfigurationGateway,
+) : BaseGateway(client), IChecksGateway {
     @OptIn(InternalAPI::class)
     override suspend fun openNewCheck(openNewCheck: OpenNewCheck): OpenCheck {
         return tryToExecute<ServerResponse<OpenCheckDto>> {
@@ -112,6 +116,7 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
         items: List<FireItems>
     ): Boolean {
         return tryToExecute<ServerResponse<Boolean>> {
+            val fastLoop = localConfigurationGateway.getIsBackToHome()
             post("/check/fire/reopen") {
                 setBody(items.map { it.toDto() })
                 parameter("checkID", checkID)
@@ -119,6 +124,7 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
                 parameter("serverID", userID)
                 parameter("outletID", StarTouchSetup.OUTLET_ID)
                 parameter("restID", StarTouchSetup.REST_ID)
+                parameter("fastBack", !fastLoop)
             }
         }.data ?: throw Exception("")
     }
@@ -129,6 +135,7 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
         userID: String, items: List<FireItems>
     ): Boolean {
         return tryToExecute<ServerResponse<Boolean>> {
+            val fastLoop = localConfigurationGateway.getIsBackToHome()
             post("/check/fire") {
                 setBody(items.map { it.toDto() })
                 parameter("checkID", checkID)
@@ -136,6 +143,7 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
                 parameter("serverID", userID)
                 parameter("outletID", StarTouchSetup.OUTLET_ID)
                 parameter("restID", StarTouchSetup.REST_ID)
+                parameter("fastBack", !fastLoop)
             }
         }.data ?: throw Exception("")
     }

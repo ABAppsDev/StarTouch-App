@@ -70,6 +70,7 @@ import presentation.screen.composable.ShimmerListItem
 import presentation.screen.composable.WarningDialogue
 import presentation.screen.composable.extensions.bottomBorder
 import presentation.screen.composable.modifier.bounceClick
+import presentation.screen.home.HomeScreen
 import presentation.screen.order.OrderScreen
 import presentation.util.EventHandler
 import resource.Resources
@@ -103,7 +104,7 @@ class DinInScreen : Screen {
 
         LaunchedEffect(state.deleted) {
             if (state.deleted)
-            nav.pop()
+            nav.replace(HomeScreen())
         }
 
         FadeAnimation(state.warningDialogueIsVisible) {

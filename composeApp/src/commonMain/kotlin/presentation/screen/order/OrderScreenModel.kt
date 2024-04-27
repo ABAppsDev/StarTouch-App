@@ -11,6 +11,8 @@ import domain.usecase.ManageChecksUseCase
 import domain.usecase.ManageOrderUseCase
 import domain.usecase.ManageSettingUseCase
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import presentation.base.BaseScreenModel
 import presentation.base.ErrorState
@@ -63,10 +65,11 @@ class OrderScreenModel(
             },
             onSuccess = {
                 updateState { it.copy(orderItemState = emptyList()) }
-                viewModelScope.launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     val fastLoop = manageSetting.getIsBackToHome()
                     if (fastLoop) sendNewEffect(OrderUiEffect.NavigateBackToDinIn)
                     else {
+                        //deleteTable2()
                         AppLanguage.code.emit(StarTouchSetup.DEFAULT_LANGUAGE)
                         sendNewEffect(OrderUiEffect.NavigateBackToHome)
                     }
@@ -781,6 +784,14 @@ class OrderScreenModel(
         tryToExecute(
             function = { manageChecksUseCase.deleteTable(checkId) },
             onSuccess = { updateState { it.copy(deleted = true) } },
+            onError = ::onError
+        )
+    }
+
+    private suspend fun deleteTable2() {
+        tryToExecute(
+            function = { manageChecksUseCase.deleteTable() },
+            onSuccess = { },
             onError = ::onError
         )
     }
