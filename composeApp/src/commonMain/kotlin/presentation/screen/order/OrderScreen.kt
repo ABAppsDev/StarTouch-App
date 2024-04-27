@@ -78,7 +78,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.core.stack.popUntil
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.beepbeep.designSystem.ui.composable.StAppBar
@@ -132,7 +131,7 @@ class OrderScreen(
                 }
 
                 is OrderUiEffect.NavigateBackToHome -> {
-                    navigator.popUntil<HomeScreen, Screen>()
+                    navigator.replaceAll(HomeScreen())
                 }
             }
         }
@@ -158,7 +157,7 @@ class OrderScreen(
         }
         LaunchedEffect(state.deleted) {
             if (state.deleted)
-            nav.replace(DinInScreen())
+                nav.replace(DinInScreen())
         }
         FadeAnimation(state.warningDialogueIsVisible) {
             WarningDialogue(
