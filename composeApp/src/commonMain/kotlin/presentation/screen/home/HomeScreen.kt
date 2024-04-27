@@ -236,13 +236,13 @@ private fun OnRender(
                             .bounceClick { listener.onClickDinIn() },
                         iconSize = 65.kms,
                     )
-                    IconWithBackground(
-                        icon = painterResource(Res.drawable.take_away),
-                        contentDescription = Resources.strings.settings,
-                        modifier = Modifier.size(80.kms)
-                            .bounceClick { listener.onClickTakeAway() },
-                        iconSize = 65.kms,
-                    )
+//                    IconWithBackground(
+//                        icon = painterResource(Res.drawable.take_away),
+//                        contentDescription = Resources.strings.settings,
+//                        modifier = Modifier.size(80.kms)
+//                            .bounceClick { listener.onClickTakeAway() },
+//                        iconSize = 65.kms,
+//                    )
                     IconWithBackground(
                         icon = painterResource(Res.drawable.exit),
                         contentDescription = Resources.strings.exit,
