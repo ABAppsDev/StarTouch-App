@@ -606,7 +606,7 @@ class DinInScreenModel(
         } else {
             tryToExecute(
                 function = {
-                    manageChecksUseCase.reOpenCheck(tableId)
+                    manageChecksUseCase.reOpenCheck(tableId, 0)
                 },
                 onSuccess = { items ->
                     updateState {

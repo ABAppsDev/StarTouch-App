@@ -92,12 +92,13 @@ class ChecksGateway(client: HttpClient) : BaseGateway(client), IChecksGateway {
         }
     }
 
-    override suspend fun reOpenCheck(checkId: Long): List<FireItems> {
+    override suspend fun reOpenCheck(checkId: Long, tableId: Int?): List<FireItems> {
         return tryToExecute<ServerResponse<List<FireItemsDto>>> {
             get("/check/reopen") {
                 parameter("checkId", checkId)
                 parameter("userId", StarTouchSetup.USER_ID)
                 parameter("ws", StarTouchSetup.WORK_STATION_ID)
+                parameter("tableId", tableId)
             }
         }.data?.map { it.toEntity() } ?: throw NotFoundException("Check not found")
     }

@@ -25,7 +25,7 @@ class ManageChecksUseCase(
         checksGateway.makeCheckAborted(checkId, outletID, restID)
     }
 
-    suspend fun reOpenCheck(checkId: Long): List<FireItems> = checksGateway.reOpenCheck(checkId)
+    suspend fun reOpenCheck(checkId: Long,tableId: Int?=null): List<FireItems> = checksGateway.reOpenCheck(checkId,tableId)
 
     suspend fun addItemsToExistCheck(
         checkID: Long,
