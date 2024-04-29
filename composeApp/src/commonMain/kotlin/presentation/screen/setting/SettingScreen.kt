@@ -54,6 +54,8 @@ import presentation.screen.composable.DropDownState
 import presentation.screen.composable.DropDownTextField
 import presentation.screen.composable.SetLayoutDirection
 import presentation.screen.composable.extensions.bottomBorder
+import presentation.screen.composable.forms.CategoriesForm
+import presentation.screen.composable.forms.SettingsForm
 import presentation.screen.composable.snackbar.rememberStackedSnackbarHostState
 import presentation.util.EventHandler
 
@@ -133,126 +135,14 @@ private fun OnRender(
                         color = Theme.colors.contentPrimary
                     )
                 }
-                Card(
-                    Modifier.fillMaxWidth().fillMaxHeight()
-                        .padding(top = 24.dp, start = 16.dp, end = 16.dp, bottom = 8.dp),
-                    shape = RoundedCornerShape(Theme.radius.large),
-                    colors = CardDefaults.cardColors(containerColor = Theme.colors.surface),
-                    elevation = CardDefaults.cardElevation(8.dp)
-                ) {
-                    Row(
-                        Modifier.fillMaxWidth().bottomBorder(1.dp, Theme.colors.divider)
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        Image(
-                            painter = painterResource(Res.drawable.logo),
-                            contentDescription = "",
-                            modifier = Modifier.size(40.dp),
-                        )
-                        Text(
-                            text = "Admin",
-                            style = Theme.typography.titleLarge,
-                            color = Theme.colors.contentPrimary
-                        )
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    SlideAnimation(
-                        visible = state.restaurants.isNotEmpty(),
-                        enter = slideInHorizontally { -it } + fadeIn(tween(600)),
-                        exit = slideOutHorizontally { it } + fadeOut(tween(600)),
-                    ) {
-                        SettingDropDownChoose(
-                            label = "Restaurant",
-                            options = state.restaurants.map { it.toDropDownState() },
-                            selectedItem = state.selectedRestaurant.toDropDownState()
-                        ) {
-                            listener.onChooseRest(it)
-                        }
-                    }
-                    SlideAnimation(
-                        visible = state.outlets.isNotEmpty(),
-                        enter = slideInHorizontally { -it } + fadeIn(tween(600)),
-                        exit = slideOutHorizontally { it } + fadeOut(tween(600)),
-                    ) {
-                        SettingDropDownChoose(
-                            label = "Outlet",
-                            options = state.outlets.map { it.toDropDownState() },
-                            selectedItem = state.selectedOutlet.toDropDownState()
-                        ) {
-                            listener.onChooseOutlet(it)
-                        }
-                    }
-                    SlideAnimation(
-                        visible = state.rooms.isNotEmpty(),
-                        enter = slideInHorizontally { -it } + fadeIn(tween(600)),
-                        exit = slideOutHorizontally { it } + fadeOut(tween(600)),
-                    ) {
-                        SettingDropDownChoose(
-                            label = "Dining Room",
-                            options = state.rooms.map { it.toDropDownState() },
-                            selectedItem = state.selectedMainRoom.toDropDownState()
-                        ) {
-                            listener.onChooseDinInRoom(it)
-                        }
-                    }
-                    SettingTextFieldChoose(
-                        title = "Work Station :",
-                        text = state.workStationId,
-                        hint = "Work Station ID",
-                        keyboardType = KeyboardType.Number,
-                        onValueChanged = listener::onWorkStationIdChanged
-                    )
-                    SettingTextFieldChoose(
-                        title = "Api Url :",
-                        text = state.apiUrl,
-                        onValueChanged = listener::onApiUrlChanged,
-                        hint = "IP Address",
-                        keyboardType = KeyboardType.Text,
-                    )
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        StCheckBox(
-                            label = "Call Center",
-                            isChecked = state.isCallCenter,
-                            onCheck = listener::onSelectedCallCenter,
-                        )
-                        StCheckBox(
-                            label = "Quick sale loop back",
-                            isChecked = state.isQuickSaleLoopBack,
-                            onCheck = listener::onQuickLoopBackSelected,
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        StOutlinedButton(
-                            title = "Close",
-                            onClick = listener::onClickClose,
-                            modifier = Modifier.weight(1f),
-                        )
-                        StButton(
-                            title = "Save",
-                            onClick = listener::onClickSave,
-                            modifier = Modifier.weight(1f),
-                            isLoading = state.isLoading
-                        )
-                    }
-                }
+                SettingsForm(state, listener)
             }
         }
     }
 }
 
 @Composable
-private fun SettingDropDownChoose(
+fun SettingDropDownChoose(
     label: String,
     options: List<DropDownState>,
     selectedItem: DropDownState,
@@ -275,7 +165,7 @@ private fun SettingDropDownChoose(
 }
 
 @Composable
-private fun SettingTextFieldChoose(
+fun SettingTextFieldChoose(
     title: String,
     text: String,
     hint: String,
