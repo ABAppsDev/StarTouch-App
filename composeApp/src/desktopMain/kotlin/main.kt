@@ -27,7 +27,6 @@ fun main() = application {
         resizable = true,
         icon = painterResource(DrawableResource("logo.png"))
     ) {
-        println(LocalDensity.current.density)
         startKoin {
             modules(AppModule)
             createEagerInstances()
