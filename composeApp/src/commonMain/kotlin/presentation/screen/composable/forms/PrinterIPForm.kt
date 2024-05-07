@@ -40,11 +40,11 @@ fun PrinterIPForm(
     name: String,
     codeDrawer: String,
     image: Painter,
-    printerState: SettingState,
+    printerState: SettingState = SettingState(),
     printerListener: SettingInteractionListener,
-    printerTwoState: SettingState,
+    printerTwoState: SettingState = SettingState(),
     printerTwoListener: SettingInteractionListener,
-    languageState: SettingState,
+    languageState: SettingState = SettingState(),
     languageListener: SettingInteractionListener,
 ) {
     Card(
