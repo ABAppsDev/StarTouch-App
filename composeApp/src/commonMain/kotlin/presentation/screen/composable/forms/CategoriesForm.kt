@@ -1,21 +1,14 @@
 package presentation.screen.composable.forms
 
 import abapps_startouch.composeapp.generated.resources.Res
-import abapps_startouch.composeapp.generated.resources.dinin
 import abapps_startouch.composeapp.generated.resources.dish
 import abapps_startouch.composeapp.generated.resources.logo
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -28,20 +21,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.Key.Companion.R
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.beepbeep.designSystem.ui.composable.StButton
 import com.beepbeep.designSystem.ui.composable.StCheckBox
 import com.beepbeep.designSystem.ui.composable.StOutlinedButton
-import com.beepbeep.designSystem.ui.composable.animate.SlideAnimation
 import com.beepbeep.designSystem.ui.theme.Theme
-import io.realm.kotlin.internal.interop.CodeDescription
 import org.jetbrains.compose.resources.painterResource
 import presentation.screen.composable.extensions.bottomBorder
-import presentation.screen.setting.SettingDropDownChoose
-import presentation.screen.setting.SettingTextFieldChoose
-import presentation.screen.setting.toDropDownState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

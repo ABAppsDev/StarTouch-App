@@ -32,11 +32,11 @@ import com.beepbeep.designSystem.ui.composable.StOutlinedButton
 import com.beepbeep.designSystem.ui.composable.animate.SlideAnimation
 import com.beepbeep.designSystem.ui.theme.Theme
 import org.jetbrains.compose.resources.painterResource
+import presentation.screen.composable.DropDownState
+import presentation.screen.composable.DropDownTextField
 import presentation.screen.composable.extensions.bottomBorder
-import presentation.screen.setting.SettingDropDownChoose
 import presentation.screen.setting.SettingInteractionListener
 import presentation.screen.setting.SettingState
-import presentation.screen.setting.SettingTextFieldChoose
 import presentation.screen.setting.toDropDownState
 
 @OptIn(ExperimentalMaterial3Api::class)
