@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,7 +38,18 @@ import com.beepbeep.designSystem.ui.theme.Theme
 import org.jetbrains.compose.resources.painterResource
 import presentation.screen.composable.AppScaffold
 import presentation.screen.composable.SetLayoutDirection
+import presentation.screen.composable.forms.AgingForm
+import presentation.screen.composable.forms.CashDrawerForm
 import presentation.screen.composable.forms.CategoryForm
+import presentation.screen.composable.forms.CurrencyRateForm
+import presentation.screen.composable.forms.FaxForm
+import presentation.screen.composable.forms.InvAdjustReasonForm
+import presentation.screen.composable.forms.PaymentMethodForm
+import presentation.screen.composable.forms.PilotsForm
+import presentation.screen.composable.forms.PrinterIPForm
+import presentation.screen.composable.forms.SettingsForm
+import presentation.screen.composable.forms.SubCategoryForm
+import presentation.screen.composable.forms.VoidReasonsForm
 import presentation.screen.composable.snackbar.rememberStackedSnackbarHostState
 import presentation.util.EventHandler
 
@@ -89,7 +102,7 @@ private fun OnRender(
     listener: SettingInteractionListener
 ) {
     SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
-        Box(Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             Box(
                 Modifier.fillMaxWidth().fillMaxHeight(0.30f)
                     .clip(
@@ -123,7 +136,8 @@ private fun OnRender(
                         color = Theme.colors.contentPrimary
                     )
                 }
-                CategoryForm("", "", "", "", painterResource(Res.drawable.logo))
+
+                PilotsForm("", "", "","", painterResource(Res.drawable.logo))
             }
         }
     }
