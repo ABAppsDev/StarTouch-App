@@ -1,5 +1,6 @@
 package presentation.screen.composable.forms
 
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -24,6 +25,7 @@ import com.beepbeep.designSystem.ui.composable.StButton
 import com.beepbeep.designSystem.ui.composable.StCheckBox
 import com.beepbeep.designSystem.ui.composable.StOutlinedButton
 import com.beepbeep.designSystem.ui.theme.Theme
+import org.jetbrains.skia.Color
 import presentation.screen.composable.extensions.bottomBorder
 import presentation.screen.setting.SettingInteractionListener
 import presentation.screen.setting.SettingState
@@ -31,11 +33,12 @@ import presentation.screen.setting.toDropDownState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrinterForm(
+fun OutletsForm(
     code: String,
     name: String,
     name2: String,
     image: Painter,
+    description: String,
     state: SettingState,
     listener: SettingInteractionListener
 ) {
@@ -97,8 +100,25 @@ fun PrinterForm(
             hint = "Enter Category Name2",
             keyboardType = KeyboardType.Text,
         )
+
+        SettingTextFieldChoose(
+            title = "IP Address",
+            text = description,
+            onValueChanged = {},
+            hint = "Enter a phone number",
+            keyboardType = KeyboardType.Text,
+            modifier = Modifier.height(96.dp)
+        )
+        SettingTextFieldChoose(
+            title = "Resturant",
+            text = description,
+            onValueChanged = {},
+            hint = "Enter a mobile phone",
+            keyboardType = KeyboardType.Text,
+            modifier = Modifier.height(96.dp)
+        )
         SettingDropDownChoose(
-            label = "Choose language",
+            label = "Call Center",
             options = state.restaurants.map { it.toDropDownState() },
             selectedItem = state.selectedRestaurant.toDropDownState()
         ) {

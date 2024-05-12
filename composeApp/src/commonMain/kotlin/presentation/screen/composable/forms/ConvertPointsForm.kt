@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -25,20 +26,14 @@ import com.beepbeep.designSystem.ui.composable.StCheckBox
 import com.beepbeep.designSystem.ui.composable.StOutlinedButton
 import com.beepbeep.designSystem.ui.theme.Theme
 import presentation.screen.composable.extensions.bottomBorder
-import presentation.screen.setting.SettingInteractionListener
-import presentation.screen.setting.SettingState
-import presentation.screen.setting.toDropDownState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrinterForm(
+fun ConvertPoints(
     code: String,
-    name: String,
-    name2: String,
-    image: Painter,
-    state: SettingState,
-    listener: SettingInteractionListener
-) {
+    image: Painter
+){
+
     Card(
         Modifier.fillMaxWidth().fillMaxHeight()
             .padding(top = 24.dp, start = 16.dp, end = 16.dp, bottom = 8.dp),
@@ -83,26 +78,30 @@ fun PrinterForm(
                 onCheck = {},
             )
         }
-        SettingTextFieldChoose(
-            title = "Name",
-            text = name,
-            onValueChanged = {},
-            hint = "Enter Category Name",
-            keyboardType = KeyboardType.Text,
-        )
-        SettingTextFieldChoose(
-            title = "Name2",
-            text = name2,
-            onValueChanged = {},
-            hint = "Enter Category Name2",
-            keyboardType = KeyboardType.Text,
-        )
-        SettingDropDownChoose(
-            label = "Choose language",
-            options = state.restaurants.map { it.toDropDownState() },
-            selectedItem = state.selectedRestaurant.toDropDownState()
-        ) {
-            listener.onChooseRest(it)
+        Spacer(Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically){
+
+            SettingTextFieldChoose(
+                title = "Points",
+                text = code,
+                hint = "Enter Category Code",
+                keyboardType = KeyboardType.Text,
+                onValueChanged = {},
+                modifier = Modifier.weight(1f),
+            )
+            Text(color = Color.White, text = "=")
+
+            SettingTextFieldChoose(
+                title = "Amount",
+                text = code,
+                hint = "Enter Category Code",
+                keyboardType = KeyboardType.Text,
+                onValueChanged = {},
+                modifier =Modifier.weight(1f),
+            )
         }
         Spacer(modifier = Modifier.height(16.dp))
         Row(
@@ -122,5 +121,5 @@ fun PrinterForm(
                 isLoading = false
             )
         }
-    }
-}
+
+    }}

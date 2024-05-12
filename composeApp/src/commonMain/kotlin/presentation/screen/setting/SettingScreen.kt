@@ -38,8 +38,14 @@ import com.beepbeep.designSystem.ui.theme.Theme
 import org.jetbrains.compose.resources.painterResource
 import presentation.screen.composable.AppScaffold
 import presentation.screen.composable.SetLayoutDirection
-import presentation.screen.composable.forms.CurrencyRateForm
-import presentation.screen.composable.forms.PrinterIPForm
+import presentation.screen.composable.forms.Adjusments
+import presentation.screen.composable.forms.CallCenterStation
+import presentation.screen.composable.forms.ConvertPoints
+import presentation.screen.composable.forms.ModifiersGroup
+import presentation.screen.composable.forms.OutLetAdjusment
+import presentation.screen.composable.forms.OutLetTax
+import presentation.screen.composable.forms.OutletsForm
+import presentation.screen.composable.forms.PrinterForm
 import presentation.screen.composable.snackbar.rememberStackedSnackbarHostState
 import presentation.util.EventHandler
 
@@ -127,12 +133,12 @@ private fun OnRender(
                     )
                 }
 
-                CurrencyRateForm(
-                    "",
-                    "",
-                    "",
-                    rate = "",
-                    image = painterResource(Res.drawable.logo),
+           ModifiersGroup(
+                    " ",
+                "",
+               image = painterResource(Res.drawable.logo),
+               "",
+               "",
                 )
             }
         }

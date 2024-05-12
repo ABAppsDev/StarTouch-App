@@ -25,19 +25,15 @@ import com.beepbeep.designSystem.ui.composable.StCheckBox
 import com.beepbeep.designSystem.ui.composable.StOutlinedButton
 import com.beepbeep.designSystem.ui.theme.Theme
 import presentation.screen.composable.extensions.bottomBorder
-import presentation.screen.setting.SettingInteractionListener
-import presentation.screen.setting.SettingState
-import presentation.screen.setting.toDropDownState
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrinterForm(
+fun CallCenterStation(
     code: String,
     name: String,
     name2: String,
-    image: Painter,
-    state: SettingState,
-    listener: SettingInteractionListener
+    image: Painter
 ) {
     Card(
         Modifier.fillMaxWidth().fillMaxHeight()
@@ -84,26 +80,19 @@ fun PrinterForm(
             )
         }
         SettingTextFieldChoose(
-            title = "Name",
+            title = "Station No.",
             text = name,
             onValueChanged = {},
-            hint = "Enter Category Name",
+            hint = "",
             keyboardType = KeyboardType.Text,
         )
         SettingTextFieldChoose(
-            title = "Name2",
+            title = "Call Center Station",
             text = name2,
             onValueChanged = {},
-            hint = "Enter Category Name2",
+            hint = "",
             keyboardType = KeyboardType.Text,
         )
-        SettingDropDownChoose(
-            label = "Choose language",
-            options = state.restaurants.map { it.toDropDownState() },
-            selectedItem = state.selectedRestaurant.toDropDownState()
-        ) {
-            listener.onChooseRest(it)
-        }
         Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -111,16 +100,17 @@ fun PrinterForm(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             StOutlinedButton(
-                title = "Close",
+                title = "Cancel",
                 onClick = {},
                 modifier = Modifier.weight(1f),
             )
             StButton(
-                title = "Save",
+                title = "Ok",
                 onClick = {},
                 modifier = Modifier.weight(1f),
                 isLoading = false
             )
         }
-    }
-}
+
+
+    }}

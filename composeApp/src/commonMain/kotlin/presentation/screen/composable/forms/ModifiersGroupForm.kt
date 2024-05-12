@@ -1,7 +1,9 @@
 package presentation.screen.composable.forms
 
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,20 +28,18 @@ import com.beepbeep.designSystem.ui.composable.StCheckBox
 import com.beepbeep.designSystem.ui.composable.StOutlinedButton
 import com.beepbeep.designSystem.ui.theme.Theme
 import presentation.screen.composable.extensions.bottomBorder
-import presentation.screen.setting.SettingInteractionListener
-import presentation.screen.setting.SettingState
-import presentation.screen.setting.toDropDownState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrinterForm(
+fun ModifiersGroup(
     code: String,
-    name: String,
-    name2: String,
+    name:String,
     image: Painter,
-    state: SettingState,
-    listener: SettingInteractionListener
-) {
+    name2:String,
+    description:String
+
+){
+
     Card(
         Modifier.fillMaxWidth().fillMaxHeight()
             .padding(top = 24.dp, start = 16.dp, end = 16.dp, bottom = 8.dp),
@@ -90,37 +91,106 @@ fun PrinterForm(
             hint = "Enter Category Name",
             keyboardType = KeyboardType.Text,
         )
+
         SettingTextFieldChoose(
             title = "Name2",
             text = name2,
             onValueChanged = {},
-            hint = "Enter Category Name2",
+            hint = "",
             keyboardType = KeyboardType.Text,
         )
-        SettingDropDownChoose(
-            label = "Choose language",
-            options = state.restaurants.map { it.toDropDownState() },
-            selectedItem = state.selectedRestaurant.toDropDownState()
-        ) {
-            listener.onChooseRest(it)
+
+        SettingTextFieldChoose(
+            title = "Descrption",
+            text = description,
+            onValueChanged = {},
+            hint = "",
+            keyboardType = KeyboardType.Text,
+        )
+        Column(modifier = Modifier.padding(16.dp)){
+            Row (modifier = Modifier.padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween){
+                StCheckBox(
+                    label = "Multi Pick",
+                    isChecked = true,
+                    onCheck = {},
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                StCheckBox(
+                    label = "Allow No Pick",
+                    isChecked = true,
+                    onCheck = {},
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+            }
+
+            Row(  modifier = Modifier.padding(start = 16.dp),
+                horizontalArrangement = Arrangement.SpaceAround) {
+                Text(
+                    text = "Max Pick",
+                    style = Theme.typography.titleLarge,
+                    color = Theme.colors.contentPrimary,
+                    modifier = Modifier.padding(end = 8.dp),
+                )
+                StButton(
+                    title = "-",
+                    onClick = {},
+                    modifier = Modifier.size(46.dp).padding(end = 8.dp),
+                    isLoading = false
+                )
+
+                Text(
+                    text = "10",
+                    style = Theme.typography.titleLarge,
+                    color = Theme.colors.contentPrimary,
+                    modifier = Modifier.padding(end = 8.dp),
+                )
+                StButton(
+                    title = "+",
+                    onClick = {},
+                    modifier = Modifier.size(46.dp),
+                    isLoading = false
+                )
+            }
+            Row(modifier = Modifier.padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceAround) {
+                StCheckBox(
+                    label = "Pick Follow Item Qty",
+                    isChecked = true,
+                    onCheck = {}, modifier = Modifier.padding(end = 8.dp)
+
+                )
+
+            }
+            Row (modifier = Modifier.padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceAround){
+                StCheckBox(
+                    label = "Multi choose For Same Modifier",
+                    isChecked = true,
+                    onCheck = {},
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+            }
         }
-        Spacer(modifier = Modifier.height(16.dp))
+
+
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             StOutlinedButton(
-                title = "Close",
+                title = "Cancel",
                 onClick = {},
                 modifier = Modifier.weight(1f),
             )
             StButton(
-                title = "Save",
+                title = "Ok",
                 onClick = {},
                 modifier = Modifier.weight(1f),
                 isLoading = false
             )
         }
-    }
-}
+
+    }}
