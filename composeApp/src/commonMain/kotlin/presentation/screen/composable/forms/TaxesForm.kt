@@ -1,6 +1,5 @@
 package presentation.screen.composable.forms
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,7 +33,7 @@ import presentation.screen.setting.toDropDownState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Adjusments(
+fun Taxes(
     code: String,
     name:String,
     image: Painter,
@@ -114,33 +113,25 @@ fun Adjusments(
         )
 
         Column(modifier = Modifier.padding(16.dp)){
-            Row(modifier = Modifier.padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween) {
+
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SettingDropDownChoose(
+                    label = "Type",
+                    options = state.restaurants.map { it.toDropDownState() },
+                    selectedItem = state.selectedRestaurant.toDropDownState(),
+                    modifier = Modifier.fillMaxWidth(0.4f),
+                    onClick = {}
+                )
                 StCheckBox(
-                    label = "Services Area",
+                    label = "Set As default",
                     isChecked = true,
                     onCheck = {},
-                    modifier = Modifier.padding(end = 8.dp)
-                )}
-                Row ( modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically){
-                    SettingDropDownChoose(
-                        label = "Type",
-                        options = state.restaurants.map { it.toDropDownState() },
-                        selectedItem = state.selectedRestaurant.toDropDownState()
-                        , modifier = Modifier.fillMaxWidth(.4f)
-                    ) {
-                        listener.onChooseRest(it)
-                    }
-                    StCheckBox(
-                        label = "Set As Default",
-                        isChecked = true,
-                        onCheck = {},
-                        modifier = Modifier.padding(16.dp)
-                    )
-
-                }
+                )
+            }
 
 
             Row ( modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
@@ -152,18 +143,17 @@ fun Adjusments(
                     onValueChanged = {},
                     hint = "",
                     keyboardType = KeyboardType.Text,
-                    modifier = Modifier.fillMaxWidth(0.2f)
+                    modifier = Modifier.fillMaxWidth(0.4f)
                 )
                 Text(
                     text = "%",
                     style = Theme.typography.titleLarge,
                     color = Theme.colors.contentPrimary,
-                  modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f)
 
                 )
-
                 StCheckBox(
-                    label = "Minimum Charge",
+                    label = "For Each Cover",
                     isChecked = true,
                     onCheck = {},
                     modifier = Modifier.padding(end = 8.dp)
@@ -198,16 +188,6 @@ fun Adjusments(
                     isLoading = false
                 )
             }
-            Row(modifier = Modifier.padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceAround) {
-                StCheckBox(
-                    label = "For Each Cover",
-                    isChecked = true,
-                    onCheck = {}, modifier = Modifier.padding(end = 8.dp)
-
-                )
-
-            }
             Row (modifier = Modifier.padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceAround){
                 StCheckBox(
@@ -217,25 +197,16 @@ fun Adjusments(
                     modifier = Modifier.padding(end = 8.dp)
                 )
             }
-            Row (modifier = Modifier.padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceAround){
-                StCheckBox(
-                    label = "Non Taxable",
-                    isChecked = true,
-                    onCheck = {},
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-            }
 
             SettingTextFieldChoose(
-                title = "Item Type",
+                title = "Tax Type",
                 text = name,
                 onValueChanged = {},
                 hint = "",
                 keyboardType = KeyboardType.Text,
             )
             SettingTextFieldChoose(
-                title = "Item Code",
+                title = "Tax Sub Type",
                 text = name,
                 onValueChanged = {},
                 hint = "",

@@ -1,6 +1,5 @@
 package presentation.screen.composable.forms
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,7 +33,7 @@ import presentation.screen.setting.toDropDownState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Adjusments(
+fun Promotions(
     code: String,
     name:String,
     image: Painter,
@@ -98,7 +97,7 @@ fun Adjusments(
         )
 
         SettingTextFieldChoose(
-            title = "Name2",
+            title = "Status",
             text = name2,
             onValueChanged = {},
             hint = "",
@@ -106,147 +105,107 @@ fun Adjusments(
         )
 
         SettingTextFieldChoose(
-            title = "Descrption",
+            title = "Type",
             text = description,
             onValueChanged = {},
             hint = "",
             keyboardType = KeyboardType.Text,
         )
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SettingDropDownChoose(
+                label = "Discount ",
+                options = state.restaurants.map { it.toDropDownState() },
+                selectedItem = state.selectedRestaurant.toDropDownState(),
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {}
+            )
 
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SettingDropDownChoose(
+                label = "Check Number ",
+                options = state.restaurants.map { it.toDropDownState() },
+                selectedItem = state.selectedRestaurant.toDropDownState(),
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {}
+            )
+
+        }
+        SettingTextFieldChoose(
+            title = "From",
+            text = name,
+            onValueChanged = {},
+            hint = "",
+            keyboardType = KeyboardType.Text,
+            modifier = Modifier.fillMaxWidth()
+        )
         Column(modifier = Modifier.padding(16.dp)){
-            Row(modifier = Modifier.padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween) {
+
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
                 StCheckBox(
-                    label = "Services Area",
+                    label = "By Time",
                     isChecked = true,
                     onCheck = {},
-                    modifier = Modifier.padding(end = 8.dp)
-                )}
-                Row ( modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically){
-                    SettingDropDownChoose(
-                        label = "Type",
-                        options = state.restaurants.map { it.toDropDownState() },
-                        selectedItem = state.selectedRestaurant.toDropDownState()
-                        , modifier = Modifier.fillMaxWidth(.4f)
-                    ) {
-                        listener.onChooseRest(it)
-                    }
-                    StCheckBox(
-                        label = "Set As Default",
-                        isChecked = true,
-                        onCheck = {},
-                        modifier = Modifier.padding(16.dp)
-                    )
-
-                }
+                )
+            }
 
 
-            Row ( modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically){
+            Row (
+                horizontalArrangement = Arrangement.SpaceAround){
                 SettingTextFieldChoose(
-                    title = "Value",
+                    title = "Start Time",
                     text = name,
                     onValueChanged = {},
                     hint = "",
                     keyboardType = KeyboardType.Text,
-                    modifier = Modifier.fillMaxWidth(0.2f)
+                    modifier =  Modifier.weight(1f)
                 )
-                Text(
-                    text = "%",
-                    style = Theme.typography.titleLarge,
-                    color = Theme.colors.contentPrimary,
-                  modifier = Modifier.weight(1f)
-
-                )
-
-                StCheckBox(
-                    label = "Minimum Charge",
-                    isChecked = true,
-                    onCheck = {},
-                    modifier = Modifier.padding(end = 8.dp)
+                SettingTextFieldChoose(
+                    title = "End Time",
+                    text = name,
+                    onValueChanged = {},
+                    hint = "",
+                    keyboardType = KeyboardType.Text,
+                    modifier = Modifier.weight(1f)
                 )
             }
-
-            Row(  modifier = Modifier.padding(start = 16.dp),
-                horizontalArrangement = Arrangement.SpaceAround) {
-                Text(
-                    text = "Minimum Number Of Covers",
-                    style = Theme.typography.titleLarge,
-                    color = Theme.colors.contentPrimary,
-                    modifier = Modifier.padding(end = 8.dp),
-                )
-                StButton(
-                    title = "-",
-                    onClick = {},
-                    modifier = Modifier.size(46.dp).padding(end = 8.dp),
-                    isLoading = false
-                )
-
-                Text(
-                    text = "10",
-                    style = Theme.typography.titleLarge,
-                    color = Theme.colors.contentPrimary,
-                    modifier = Modifier.padding(end = 8.dp),
-                )
-                StButton(
-                    title = "+",
-                    onClick = {},
-                    modifier = Modifier.size(46.dp),
-                    isLoading = false
-                )
-            }
-            Row(modifier = Modifier.padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceAround) {
-                StCheckBox(
-                    label = "For Each Cover",
-                    isChecked = true,
-                    onCheck = {}, modifier = Modifier.padding(end = 8.dp)
-
-                )
-
-            }
-            Row (modifier = Modifier.padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceAround){
-                StCheckBox(
-                    label = "Time",
-                    isChecked = true,
-                    onCheck = {},
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-            }
-            Row (modifier = Modifier.padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceAround){
-                StCheckBox(
-                    label = "Non Taxable",
-                    isChecked = true,
-                    onCheck = {},
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-            }
-
             SettingTextFieldChoose(
-                title = "Item Type",
+                title = "Selected Days",
                 text = name,
                 onValueChanged = {},
                 hint = "",
                 keyboardType = KeyboardType.Text,
+                modifier = Modifier.fillMaxWidth()
             )
             SettingTextFieldChoose(
-                title = "Item Code",
+                title = "Check Type",
                 text = name,
                 onValueChanged = {},
                 hint = "",
                 keyboardType = KeyboardType.Text,
+                modifier = Modifier.fillMaxWidth()
             )
-
-
-
-
-
-
+            SettingTextFieldChoose(
+                title = "Notes",
+                text = name,
+                onValueChanged = {},
+                hint = "",
+                keyboardType = KeyboardType.Text,
+                modifier = Modifier.fillMaxWidth()
+            )
 
 
         }
