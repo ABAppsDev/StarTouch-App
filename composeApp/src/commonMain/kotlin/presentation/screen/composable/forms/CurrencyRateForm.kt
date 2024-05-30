@@ -1,9 +1,10 @@
 package presentation.screen.composable.forms
 
 import abapps_startouch.composeapp.generated.resources.Res
-import abapps_startouch.composeapp.generated.resources.logo
+import abapps_startouch.composeapp.generated.resources.dish
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -19,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.beepbeep.designSystem.ui.composable.StButton
@@ -27,14 +29,16 @@ import com.beepbeep.designSystem.ui.composable.StOutlinedButton
 import com.beepbeep.designSystem.ui.theme.Theme
 import org.jetbrains.compose.resources.painterResource
 import presentation.screen.composable.extensions.bottomBorder
+import presentation.screen.setting.toDropDownState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Settings2Form(
+fun CurrencyRateForm(
     code: String,
     name: String,
     name2: String,
-    description: String
+    rate: String,
+    image: Painter
 ) {
     Card(
         Modifier.fillMaxWidth().fillMaxHeight()
@@ -43,7 +47,6 @@ fun Settings2Form(
         colors = CardDefaults.cardColors(containerColor = Theme.colors.surface),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
-
         Row(
             Modifier.fillMaxWidth().bottomBorder(1.dp, Theme.colors.divider)
                 .padding(16.dp),
@@ -51,7 +54,7 @@ fun Settings2Form(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Image(
-                painter = painterResource(Res.drawable.logo),
+                painter = image,
                 contentDescription = "",
                 modifier = Modifier.size(40.dp),
             )
@@ -72,13 +75,13 @@ fun Settings2Form(
                 text = code,
                 hint = "Enter Category Code",
                 keyboardType = KeyboardType.Text,
-                onValueChanged = {}, // todo
+                onValueChanged = {},
                 modifier = Modifier.fillMaxWidth(0.5f)
             )
             StCheckBox(
                 label = "Active",
-                isChecked = true,// todo
-                onCheck = {},// todo
+                isChecked = true,
+                onCheck = {},
             )
         }
         SettingTextFieldChoose(
@@ -89,19 +92,18 @@ fun Settings2Form(
             keyboardType = KeyboardType.Text,
         )
         SettingTextFieldChoose(
-            title = "Name2",
+            title = "Name 2",
             text = name2,
             onValueChanged = {},
-            hint = "Enter Category Name2",
-            keyboardType = KeyboardType.Text,
+            hint = "Enter a name 2",
+            keyboardType = KeyboardType.Text
         )
         SettingTextFieldChoose(
-            title = "Description",
-            text = description,
+            title = "Rate",
+            text = name2,
             onValueChanged = {},
-            hint = "Enter Category Description",
-            keyboardType = KeyboardType.Text,
-            modifier = Modifier.height(96.dp)
+            hint = "Enter a rate",
+            keyboardType = KeyboardType.Text
         )
         Spacer(modifier = Modifier.height(16.dp))
         Row(
@@ -111,14 +113,14 @@ fun Settings2Form(
         ) {
             StOutlinedButton(
                 title = "Close",
-                onClick = {},// todo
+                onClick = {},
                 modifier = Modifier.weight(1f),
             )
             StButton(
                 title = "Save",
-                onClick = {},// todo
+                onClick = {},
                 modifier = Modifier.weight(1f),
-                isLoading = false // todo
+                isLoading = false
             )
         }
     }
