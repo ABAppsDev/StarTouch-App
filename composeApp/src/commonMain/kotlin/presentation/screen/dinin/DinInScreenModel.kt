@@ -26,7 +26,6 @@ class DinInScreenModel(
     init {
         getTables()
         getAllRooms()
-       // socketTables()
     }
 
     fun deleteTable() {

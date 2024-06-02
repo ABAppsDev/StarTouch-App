@@ -330,7 +330,8 @@ class OrderScreenModel(
             orders.indexOf(orders.find { it.id == state.value.modifyLastItemDialogue.itemId }) + 1
         val item = state.value.itemsState.find { it.id == itemId }
         if (orders.filter { !it.fired || it.voided }
-                .contains(orders.filter { !it.fired || it.voided }.find { it.id == item?.id }))
+                .contains(orders.filter { (!it.fired || it.voided) && !it.isModifier }
+                    .find { it.id == item?.id }))
             showWarningItem()
         else {
             item?.let {
@@ -342,7 +343,7 @@ class OrderScreenModel(
                         qty = state.value.qty,
                         counter = serial,
                         unitPrice = item.price,
-                        isModifier = item.isModifier,
+                        isModifier = false,
                         noServiceCharge = item.noServiceCharge,
                         modifierGroupID = item.modifierGroupID,
                         pickFollowItemQty = item.pickFollowItemQty,
@@ -441,7 +442,7 @@ class OrderScreenModel(
                     counter = serial,
                     serial = Random.nextInt(),
                     unitPrice = item.price,
-                    isModifier = item.isModifier,
+                    isModifier = false,
                     noServiceCharge = item.noServiceCharge,
                     modifierGroupID = item.modifierGroupID,
                     pickFollowItemQty = item.pickFollowItemQty,
@@ -708,7 +709,7 @@ class OrderScreenModel(
                         counter = serial,
                         unitPrice = state.value.price.toFloat(),
                         totalPrice = state.value.price.toFloat() * state.value.qty,
-                        isModifier = item.isModifier,
+                        isModifier = false,
                         noServiceCharge = item.noServiceCharge,
                         modifierGroupID = item.modifierGroupID,
                         pickFollowItemQty = item.pickFollowItemQty,
