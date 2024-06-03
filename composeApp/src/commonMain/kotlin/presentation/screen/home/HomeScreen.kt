@@ -6,7 +6,6 @@ import abapps_startouch.composeapp.generated.resources.dinin
 import abapps_startouch.composeapp.generated.resources.exit
 import abapps_startouch.composeapp.generated.resources.login
 import abapps_startouch.composeapp.generated.resources.logo
-import abapps_startouch.composeapp.generated.resources.take_away
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -91,7 +90,7 @@ class HomeScreen : Screen {
         EventHandler(homeScreenModel.effect) { effect, navigator ->
             when (effect) {
                 is HomeUiEffect.NavigateToDinInScreen -> navigator.replace(DinInScreen())
-                HomeUiEffect.NavigateToSetting -> navigator.push(SettingScreen())
+                HomeUiEffect.NavigateToSetting -> navigator.replace(SettingScreen())
                 HomeUiEffect.NavigateToOrderScreen -> navigator.push(
                     OrderScreen(
                         0,

@@ -222,6 +222,7 @@ class SettingScreenModel(
             },
             onSuccess = {
                 updateState { it.copy(isLoading = false, isSuccess = true) }
+                retry()
             },
             onError = ::onError,
         )
