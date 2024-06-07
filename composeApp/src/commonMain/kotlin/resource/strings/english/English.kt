@@ -57,4 +57,7 @@ data class English(
     override val yes: String = "Yes",
     override val enterPrice: String = "Enter your price",
     override val openPrice: String = "Open Price",
+    override val fireSettle: String = "Fire & Settle",
+    override val firePrint: String = "Fire & Print",
+    override val fireHold: String = "Fire & Hold",
 ) : IStringResources
