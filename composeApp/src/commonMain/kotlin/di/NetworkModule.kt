@@ -39,8 +39,7 @@ val NetworkModule = module(createdAtStart = true) {
             }
             defaultRequest {
                 header("Content-Type", "application/json")
-                //url(get<ILocalConfigurationGateway>().getApiUrl())
-                url("http://192.168.1.4:5/")
+                url(get<ILocalConfigurationGateway>().getApiUrl())
             }
         }
         authorizationIntercept(client)
