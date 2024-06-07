@@ -6,6 +6,7 @@ import abapps_startouch.composeapp.generated.resources.dinin
 import abapps_startouch.composeapp.generated.resources.exit
 import abapps_startouch.composeapp.generated.resources.login
 import abapps_startouch.composeapp.generated.resources.logo
+import abapps_startouch.composeapp.generated.resources.take_away
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -62,6 +63,7 @@ import presentation.screen.dinin.DinInScreen
 import presentation.screen.home.util.AttendanceType
 import presentation.screen.order.OrderScreen
 import presentation.screen.setting.SettingScreen
+import presentation.screen.takeaway.TakeAwayScreen
 import presentation.util.EventHandler
 import resource.Resources
 import util.getScreenModel
@@ -99,6 +101,8 @@ class HomeScreen : Screen {
                         false
                     )
                 )
+
+                HomeUiEffect.NavigateToTakeAwayScreen -> navigator.replace(TakeAwayScreen())
             }
         }
         FadeAnimation(visible = state.attendanceDialogueState.isVisible) {
@@ -235,13 +239,13 @@ private fun OnRender(
                             .bounceClick { listener.onClickDinIn() },
                         iconSize = 65.kms,
                     )
-//                    IconWithBackground(
-//                        icon = painterResource(Res.drawable.take_away),
-//                        contentDescription = Resources.strings.settings,
-//                        modifier = Modifier.size(80.kms)
-//                            .bounceClick { listener.onClickTakeAway() },
-//                        iconSize = 65.kms,
-//                    )
+                    IconWithBackground(
+                        icon = painterResource(Res.drawable.take_away),
+                        contentDescription = Resources.strings.settings,
+                        modifier = Modifier.size(80.kms)
+                            .bounceClick { listener.onClickTakeAway() },
+                        iconSize = 65.kms,
+                    )
                     IconWithBackground(
                         icon = painterResource(Res.drawable.exit),
                         contentDescription = Resources.strings.exit,

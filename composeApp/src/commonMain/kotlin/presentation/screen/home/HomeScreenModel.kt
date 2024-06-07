@@ -425,6 +425,8 @@ class HomeScreenModel(
         }
         if (state.value.permissionDialogueState.permissionType == PermissionType.DIN_IN.name)
             checkDinIn(state.value.permissionDialogueState.passcode)
+        else if (state.value.permissionDialogueState.permissionType == PermissionType.TAKE_AWAY.name)
+            checkTakeAway(state.value.permissionDialogueState.passcode)
         else {
             updateState {
                 it.copy(
@@ -435,6 +437,24 @@ class HomeScreenModel(
             }
             showWarningDialogue()
         }
+    }
+
+    private fun checkTakeAway(passcode: String) {
+        sendNewEffect(HomeUiEffect.NavigateToTakeAwayScreen)
+//        tryToExecute(
+//            function = {
+//                validationAuth.validatePermissionPasscode(
+//                    passcode = passcode,
+//                )
+//                controlPermission.checkDinInPermission(
+//                    passcode = passcode,
+//                    restID = StarTouchSetup.REST_ID,
+//                    outletID = StarTouchSetup.OUTLET_ID,
+//                )
+//            },
+//            onSuccess = (::onDinInSuccess),
+//            onError = (::onFailed)
+//        )
     }
 
     override fun onClickExitApp() {
