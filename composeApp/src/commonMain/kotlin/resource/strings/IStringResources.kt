@@ -51,6 +51,9 @@ interface IStringResources {
     val totalItems: String
     val totalCheckPrice: String
     val fire: String
+    val fireSettle: String
+    val firePrint: String
+    val fireHold: String
     val enterComment: String
     val checkNumber: String
     val enterPrice:String

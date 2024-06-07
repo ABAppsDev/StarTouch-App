@@ -78,7 +78,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.core.stack.popUntil
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.beepbeep.designSystem.ui.composable.StAppBar
@@ -158,7 +157,7 @@ class OrderScreen(
         }
         LaunchedEffect(state.deleted) {
             if (state.deleted)
-            nav.replace(DinInScreen())
+                nav.replace(DinInScreen())
         }
         FadeAnimation(state.warningDialogueIsVisible) {
             WarningDialogue(
@@ -779,17 +778,43 @@ private fun OrdersList(
                                 )
                             }
                             Spacer(modifier = Modifier.height(42.dp))
-                            StButton(
-                                title = Resources.strings.fire,
+                            Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                containerColor = Theme.colors.primary,
-                                onClick = {
-                                    if (!isLoading)
-                                        orderInteractionListener.onClickFire()
-                                },
-                                enabled = !orderItemState.all { it.fired },
-                                isLoading = isLoading
-                            )
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                StButton(
+                                    title = Resources.strings.fire,
+                                    modifier = Modifier.weight(1f),
+                                    containerColor = Theme.colors.primary,
+                                    onClick = {
+                                        if (!isLoading)
+                                            orderInteractionListener.onClickFire()
+                                    },
+                                    enabled = !orderItemState.all { it.fired },
+                                    isLoading = isLoading
+                                )
+                                StButton(
+                                    title = Resources.strings.firePrint,
+                                    modifier = Modifier.weight(1f),
+                                    containerColor = Theme.colors.primary,
+                                    onClick = {
+                                        if (!isLoading)
+                                            orderInteractionListener.onClickFireAndPrint()
+                                    },
+                                    isLoading = isLoading
+                                )
+                                StButton(
+                                    title = Resources.strings.fireSettle,
+                                    modifier = Modifier.weight(1f),
+                                    containerColor = Theme.colors.primary,
+                                    onClick = {
+                                        if (!isLoading)
+                                            orderInteractionListener.onClickFireAndSettle()
+                                    },
+                                    isLoading = isLoading
+                                )
+                            }
                         }
                     }
                 }
