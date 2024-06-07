@@ -545,6 +545,14 @@ class OrderScreenModel(
         )
     }
 
+    override fun onClickFireAndSettle() {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onClickFireAndPrint() {
+        //TODO("Not yet implemented")
+    }
+
     override fun onClickClose() {
 
     }
