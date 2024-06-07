@@ -132,7 +132,7 @@ class OrderScreen(
                 }
 
                 is OrderUiEffect.NavigateBackToHome -> {
-                    navigator.popUntil<HomeScreen, Screen>()
+                    navigator.replace(HomeScreen())
                 }
             }
         }
@@ -147,8 +147,18 @@ class OrderScreen(
                 screenModel as OrderInteractionListener
             )
         }
+        FadeAnimation(state.showEnterOpenPrice) {
+            EnterPriceDialogue(
+                state.price,
+                screenModel as OrderInteractionListener
+            )
+        }
         LaunchedEffect(state.errorState) {
             if (state.errorState != null) screenModel.showErrorScreen()
+        }
+        LaunchedEffect(state.deleted) {
+            if (state.deleted)
+            nav.replace(DinInScreen())
         }
         FadeAnimation(state.warningDialogueIsVisible) {
             WarningDialogue(
@@ -176,13 +186,11 @@ class OrderScreen(
                 topBar = {
                     StAppBar(
                         onNavigateUp = {
-                            if (state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && !isReopened)
+                            if (state.errorState != null || state.errorMessage != "" || state.showErrorScreen) screenModel.backToPresets()
+                            else if (state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && !isReopened)
                                 screenModel.showWarningDialogue()
-                            else if (state.errorState != null) screenModel.backToPresets()
                             else if (state.isFinishOrder) screenModel.onClickIconBack()
-                            else if (!state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && isReopened) nav.replace(
-                                DinInScreen()
-                            )
+                            else if (!state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && isReopened) screenModel.deleteTable()
                             else screenModel.backToPresets()
                         },
                         title = "${Resources.strings.checkNumber} : $checkNumber",
@@ -210,19 +218,21 @@ class OrderScreen(
                                     ) {
                                         Box(
                                             modifier = Modifier
-                                                .size(24.dp)
+                                                .size(32.dp)
                                                 .background(
                                                     color = Theme.colors.contentPrimary,
                                                     shape = CircleShape
-                                                )
+                                                ).align(Alignment.Center).padding(8.dp),
+                                            contentAlignment = Alignment.Center
                                         ) {
                                             Text(
                                                 state.orderItemState.sumOf { it.qty.toDouble() }
                                                     .toInt().toString(),
                                                 style = Theme.typography.title,
-                                                textAlign = TextAlign.Center,
                                                 modifier = Modifier.fillMaxSize()
-                                                    .align(Alignment.Center)
+                                                    .align(Alignment.Center),
+                                                textAlign = TextAlign.Center,
+                                                color = Theme.colors.surface
                                             )
                                         }
                                     }
@@ -242,6 +252,14 @@ class OrderScreen(
                             .pullRefresh(pullRefreshState),
                         pullRefreshState = pullRefreshState,
                         isRefresh = state.isRefresh
+                    )
+                }
+                FadeAnimation(state.showErrorScreen) {
+                    HandleErrorState(
+                        title = state.errorMessage,
+                        error = state.errorState
+                            ?: ErrorState.UnknownError(Resources.strings.somethingWrongHappened),
+                        onClick = screenModel::retry
                     )
                 }
                 SlideAnimation(state.isFinishOrder) {
@@ -282,6 +300,7 @@ class OrderScreen(
                             onClickItem = screenModel::onClickItem,
                             id = state.selectedItemId,
                             onChooseItem = screenModel::onChooseItem,
+                            showOpenPriceDialogue = screenModel::showPriceDialogue
                             //modifier = Modifier.padding(top = it.calculateTopPadding()),
                         )
                     }
@@ -301,14 +320,6 @@ class OrderScreen(
                     }
                 }
             }
-        }
-        FadeAnimation(state.showErrorScreen) {
-            HandleErrorState(
-                title = state.errorMessage,
-                error = state.errorState
-                    ?: ErrorState.UnknownError(Resources.strings.somethingWrongHappened),
-                onClick = screenModel::retry
-            )
         }
     }
 }
@@ -349,10 +360,12 @@ private fun PresetsList(
 fun ItemCard(
     name: String,
     price: String,
+    modifier: Modifier = Modifier,
+    openPrice: Boolean = false,
     id: Int = 0,
     isChoose: Boolean = false,
+    showOpenPriceDialogue: (Int, Float) -> Unit = { _, _ -> },
     onClickOk: (Int, Float) -> Unit = { _, _ -> },
-    modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
     var qty by remember { mutableStateOf("1") }
@@ -363,42 +376,45 @@ fun ItemCard(
     if (source.collectIsPressedAsState().value) {
         qty = ""
     }
-    Box(modifier.heightIn(260.dp).width(192.dp).bounceClick { onClick() }) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.8f)
-                .align(Alignment.BottomCenter)
-                .clip(RoundedCornerShape(16.dp, 16.dp, 16.dp, 16.dp))
-                .background(Theme.colors.surface)
-        )
+    Box(
+        modifier.heightIn(100.dp)
+            .width(192.dp)
+            .background(Theme.colors.disable, shape = RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(16.dp))
+            .padding(horizontal = 8.dp)
+            .bounceClick { onClick();qty = "1" }) {
+//        Box(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .fillMaxHeight(0.8f)
+//                .align(Alignment.BottomCenter)
+//                .clip(RoundedCornerShape(16.dp, 16.dp, 16.dp, 16.dp))
+//                .background(Theme.colors.surface)
+//        )
         Column(
             modifier = Modifier
-                .align(Alignment.TopCenter),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .align(Alignment.Center),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Image(
-                painter = painterResource(DrawableResource("dish.png")),
-                contentDescription = "",
-                modifier = Modifier
-                    .size(132.dp)
-            )
+//            Image(
+//                painter = painterResource(DrawableResource("dish.png")),
+//                contentDescription = "",
+//                modifier = Modifier
+//                    .size(132.dp)
+//                    .align(Alignment.Start)
+//            )
             Text(
                 text = name,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f),
+                maxLines = 1,
                 color = Theme.colors.contentPrimary,
-                textAlign = TextAlign.Center,
-                style = Theme.typography.titleLarge,
+                style = Theme.typography.title,
             )
             SlideAnimation(!isChoose) {
                 Text(
                     text = price,
-                    modifier = Modifier
-                        .fillMaxWidth(0.8f),
+                    maxLines = 1,
                     color = Theme.colors.contentPrimary,
-                    textAlign = TextAlign.Center,
-                    style = Theme.typography.titleLarge,
+                    style = Theme.typography.title,
                 )
             }
             SlideAnimation(isChoose) {
@@ -464,6 +480,7 @@ fun ItemCard(
                                         id,
                                         qty.toFloat()
                                     )
+                                    qty = "1"
                                 }),
                                 interactionSource = source
                             )
@@ -489,13 +506,16 @@ fun ItemCard(
                                     style = Theme.typography.titleMedium
                                 )
                             }
-                            IconButton(modifier = Modifier.weight(1f).padding(start = 2.dp),
+                            IconButton(modifier = Modifier.weight(1.5f).padding(start = 2.dp),
                                 onClick = {
                                     if (qty.isEmpty() || qty.isBlank()) return@IconButton
-                                    onClickOk(id, qty.toFloat())
+                                    if (openPrice) showOpenPriceDialogue(id, qty.toFloat())
+                                    else onClickOk(id, qty.toFloat())
+                                    qty = "1"
                                 }) {
                                 Icon(
                                     Icons.Filled.CheckCircle,
+                                    modifier = Modifier.size(80.dp),
                                     contentDescription = null,
                                     tint = Theme.colors.success
                                 )
@@ -514,6 +534,7 @@ private fun ItemsList(
     id: Int = 0,
     modifier: Modifier = Modifier,
     onClickItem: (Int, Float) -> Unit,
+    showOpenPriceDialogue: (Int, Float) -> Unit,
     onChooseItem: (Int) -> Unit,
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
@@ -530,6 +551,8 @@ private fun ItemsList(
                     price = item.price.toString(),
                     id = item.id,
                     isChoose = id == item.id,
+                    openPrice = item.openPrice,
+                    showOpenPriceDialogue = showOpenPriceDialogue,
                     onClickOk = onClickItem
                 ) {
                     onChooseItem(item.id)
@@ -646,7 +669,7 @@ private fun OrdersList(
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    items(orderItemState, key = { it }) { item ->
+                    items(orderItemState, key = { it.serial }) { item ->
                         val dismissState = rememberDismissState(
                             initialValue = DismissValue.Default,
                         )
@@ -958,6 +981,58 @@ private fun EnterModifyLastItemDialogue(
                     title = Resources.strings.ok,
                     onClick = {
                         orderInteractionListener.onClickOk()
+                    },
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EnterPriceDialogue(
+    price: String,
+    orderInteractionListener: OrderInteractionListener,
+    modifier: Modifier = Modifier,
+) {
+    StDialogue(
+        onDismissRequest = orderInteractionListener::onDismissPriceDialogue,
+        modifier = modifier,
+    ) {
+        Text(
+            text = Resources.strings.openPrice,
+            style = Theme.typography.headline,
+            color = Theme.colors.contentPrimary,
+        )
+        StTextField(
+            modifier = Modifier.padding(top = 24.dp),
+            label = "",
+            text = price,
+            hint = Resources.strings.enterPrice,
+            onValueChange = orderInteractionListener::onPriceChanged,
+            imeAction = ImeAction.Go,
+            keyboardType = KeyboardType.Number,
+            keyboardActions = KeyboardActions(onGo = {
+                orderInteractionListener.onClickOkPrice()
+            })
+        )
+        SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                StOutlinedButton(
+                    title = Resources.strings.cancel,
+                    onClick = {
+                        orderInteractionListener.onDismissPriceDialogue()
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+                StButton(
+                    title = Resources.strings.ok,
+                    onClick = {
+                        orderInteractionListener.onClickOkPrice()
                     },
                     modifier = Modifier.weight(1f),
                 )

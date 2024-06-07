@@ -6,8 +6,6 @@ import abapps_startouch.composeapp.generated.resources.dinin
 import abapps_startouch.composeapp.generated.resources.exit
 import abapps_startouch.composeapp.generated.resources.login
 import abapps_startouch.composeapp.generated.resources.logo
-import abapps_startouch.composeapp.generated.resources.logout
-import abapps_startouch.composeapp.generated.resources.take_away
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -62,6 +60,7 @@ import presentation.screen.composable.modifier.bounceClick
 import presentation.screen.composable.snackbar.rememberStackedSnackbarHostState
 import presentation.screen.dinin.DinInScreen
 import presentation.screen.home.util.AttendanceType
+import presentation.screen.order.OrderScreen
 import presentation.screen.setting.SettingScreen
 import presentation.util.EventHandler
 import resource.Resources
@@ -90,8 +89,16 @@ class HomeScreen : Screen {
             exitApplication()
         EventHandler(homeScreenModel.effect) { effect, navigator ->
             when (effect) {
-                is HomeUiEffect.NavigateToDinInScreen -> navigator.push(DinInScreen())
-                HomeUiEffect.NavigateToSetting -> navigator.push(SettingScreen())
+                is HomeUiEffect.NavigateToDinInScreen -> navigator.replace(DinInScreen())
+                HomeUiEffect.NavigateToSetting -> navigator.replace(SettingScreen())
+                HomeUiEffect.NavigateToOrderScreen -> navigator.push(
+                    OrderScreen(
+                        0,
+                        0,
+                        emptyList(),
+                        false
+                    )
+                )
             }
         }
         FadeAnimation(visible = state.attendanceDialogueState.isVisible) {
@@ -197,13 +204,13 @@ private fun OnRender(
                             .bounceClick { listener.onClickLogOn() },
                         iconSize = 65.kms,
                     )
-                    IconWithBackground(
-                        icon = painterResource(Res.drawable.logout),
-                        contentDescription = Resources.strings.logout,
-                        modifier = Modifier.size(80.kms)
-                            .bounceClick { listener.onClickLogOff() },
-                        iconSize = 65.kms,
-                    )
+//                    IconWithBackground(
+//                        icon = painterResource(Res.drawable.logout),
+//                        contentDescription = Resources.strings.logout,
+//                        modifier = Modifier.size(80.kms)
+//                            .bounceClick { listener.onClickLogOff() },
+//                        iconSize = 65.kms,
+//                    )
                     IconWithBackground(
                         icon = painterResource(Res.drawable.admin),
                         contentDescription = Resources.strings.admin,
@@ -228,13 +235,13 @@ private fun OnRender(
                             .bounceClick { listener.onClickDinIn() },
                         iconSize = 65.kms,
                     )
-                    IconWithBackground(
-                        icon = painterResource(Res.drawable.take_away),
-                        contentDescription = Resources.strings.settings,
-                        modifier = Modifier.size(80.kms)
-                            .bounceClick { /*ToDo*/ },
-                        iconSize = 65.kms,
-                    )
+//                    IconWithBackground(
+//                        icon = painterResource(Res.drawable.take_away),
+//                        contentDescription = Resources.strings.settings,
+//                        modifier = Modifier.size(80.kms)
+//                            .bounceClick { listener.onClickTakeAway() },
+//                        iconSize = 65.kms,
+//                    )
                     IconWithBackground(
                         icon = painterResource(Res.drawable.exit),
                         contentDescription = Resources.strings.exit,

@@ -5,11 +5,14 @@ import data.util.AppLanguage
 import data.util.StarTouchSetup
 import domain.entity.FireItems
 import domain.entity.Item
+import domain.entity.ModifierItem
 import domain.entity.Preset
 import domain.usecase.ManageChecksUseCase
 import domain.usecase.ManageOrderUseCase
 import domain.usecase.ManageSettingUseCase
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import presentation.base.BaseScreenModel
 import presentation.base.ErrorState
@@ -44,6 +47,9 @@ class OrderScreenModel(
                 itemChildrenState = emptyList(),
                 itemModifiersState = emptyList(),
                 isPresetVisible = false,
+                errorState = null,
+                errorMessage = "",
+                showErrorScreen = false
             )
         }
     }
@@ -59,10 +65,11 @@ class OrderScreenModel(
             },
             onSuccess = {
                 updateState { it.copy(orderItemState = emptyList()) }
-                viewModelScope.launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     val fastLoop = manageSetting.getIsBackToHome()
                     if (fastLoop) sendNewEffect(OrderUiEffect.NavigateBackToDinIn)
                     else {
+                        //deleteTable2()
                         AppLanguage.code.emit(StarTouchSetup.DEFAULT_LANGUAGE)
                         sendNewEffect(OrderUiEffect.NavigateBackToHome)
                     }
@@ -93,7 +100,7 @@ class OrderScreenModel(
             },
             onSuccess = ::onGetAllPresetsSuccess,
             onError = { error ->
-                updateState { it.copy(presetItemsState = emptyList()) }
+                //updateState { it.copy(presetItemsState = emptyList()) }
                 onError(error)
             }
         )
@@ -118,6 +125,7 @@ class OrderScreenModel(
             it.copy(
                 isLoading = false,
                 errorState = errorState,
+                deleted = false,
                 errorMessage = when (errorState) {
                     is ErrorState.NetworkError -> errorState.message.toString()
                     is ErrorState.NotFound -> errorState.message.toString()
@@ -129,7 +137,6 @@ class OrderScreenModel(
                 }
             )
         }
-        println(errorState.toString())
     }
 
     private fun getAllItems(presetId: Int) {
@@ -241,7 +248,7 @@ class OrderScreenModel(
         )
     }
 
-    private fun onGetAllItemsModifierSuccess(items: List<Item>) {
+    private fun onGetAllItemsModifierSuccess(items: List<ModifierItem>) {
         updateState {
             it.copy(
                 isLoading = false,
@@ -259,7 +266,8 @@ class OrderScreenModel(
         if (state.value.itemModifiersState.isEmpty()) updateState {
             it.copy(
                 isPresetVisible = true,
-                qty = 0f
+                qty = 0f,
+                selectedItemId = 0
             )
         }
     }
@@ -322,7 +330,8 @@ class OrderScreenModel(
             orders.indexOf(orders.find { it.id == state.value.modifyLastItemDialogue.itemId }) + 1
         val item = state.value.itemsState.find { it.id == itemId }
         if (orders.filter { !it.fired || it.voided }
-                .contains(orders.filter { !it.fired || it.voided }.find { it.id == item?.id }))
+                .contains(orders.filter { (!it.fired || it.voided) && !it.isModifier }
+                    .find { it.id == item?.id }))
             showWarningItem()
         else {
             item?.let {
@@ -334,7 +343,7 @@ class OrderScreenModel(
                         qty = state.value.qty,
                         counter = serial,
                         unitPrice = item.price,
-                        isModifier = item.isModifier,
+                        isModifier = false,
                         noServiceCharge = item.noServiceCharge,
                         modifierGroupID = item.modifierGroupID,
                         pickFollowItemQty = item.pickFollowItemQty,
@@ -433,7 +442,7 @@ class OrderScreenModel(
                     counter = serial,
                     serial = Random.nextInt(),
                     unitPrice = item.price,
-                    isModifier = item.isModifier,
+                    isModifier = false,
                     noServiceCharge = item.noServiceCharge,
                     modifierGroupID = item.modifierGroupID,
                     pickFollowItemQty = item.pickFollowItemQty,
@@ -598,6 +607,10 @@ class OrderScreenModel(
         }
     }
 
+    override fun onPriceChanged(price: String) {
+        updateState { it.copy(price = price) }
+    }
+
     override fun onClickOk() {
         //== ids[state.value.modifyLastItemDialogue.itemId]
         val order =
@@ -674,12 +687,65 @@ class OrderScreenModel(
         updateState { it.copy(warningDialogueIsVisible = true) }
     }
 
+    override fun showPriceDialogue(id: Int, qty: Float) {
+        updateState { it.copy(showEnterOpenPrice = true, selectedItemId = id, qty = qty) }
+    }
+
+    override fun onClickOkPrice() {
+        val serial =
+            orders.indexOf(orders.find { it.id == state.value.modifyLastItemDialogue.itemId }) + 1
+        val item = state.value.itemsState.find { it.id == state.value.selectedItemId }
+        if (orders.filter { !it.fired || it.voided }
+                .contains(orders.filter { !it.fired || it.voided }.find { it.id == item?.id }))
+            showWarningItem()
+        else {
+            item?.let {
+                addItem(
+                    OrderItemState(
+                        id = item.id,
+                        serial = Random.nextInt(),
+                        name = item.name,
+                        qty = state.value.qty,
+                        counter = serial,
+                        unitPrice = state.value.price.toFloat(),
+                        totalPrice = state.value.price.toFloat() * state.value.qty,
+                        isModifier = false,
+                        noServiceCharge = item.noServiceCharge,
+                        modifierGroupID = item.modifierGroupID,
+                        pickFollowItemQty = item.pickFollowItemQty,
+                        prePaidCard = item.prePaidCard,
+                        taxable = item.taxable,
+                        status = "Preparing",
+                        fired = false,
+                        voided = false,
+                        modifierPick = 0,
+                        refModItem = 0,
+                        pOnReport = item.pOnReport,
+                        pOnCheck = item.pOnCheck,
+                    )
+                )
+                updateState {
+                    it.copy(
+                        orderItemState = orders.toList(),
+                        price = "",
+                        showEnterOpenPrice = false
+                    )
+                }
+            }
+            getAllItemModifiers(state.value.selectedItemId)
+        }
+    }
+
     override fun onDismissWarningDialogue() {
         updateState { it.copy(warningDialogueIsVisible = false) }
     }
 
     override fun onDismissItemDialogue() {
         updateState { it.copy(warningItemIsVisible = false) }
+    }
+
+    override fun onDismissPriceDialogue() {
+        updateState { it.copy(showEnterOpenPrice = false, price = "") }
     }
 
     override fun showWarningItem() {
@@ -713,5 +779,21 @@ class OrderScreenModel(
                 orderItemState = newList.toList()
             )
         }
+    }
+
+    fun deleteTable() {
+        tryToExecute(
+            function = { manageChecksUseCase.deleteTable(checkId) },
+            onSuccess = { updateState { it.copy(deleted = true) } },
+            onError = ::onError
+        )
+    }
+
+    private suspend fun deleteTable2() {
+        tryToExecute(
+            function = { manageChecksUseCase.deleteTable() },
+            onSuccess = { },
+            onError = ::onError
+        )
     }
 }

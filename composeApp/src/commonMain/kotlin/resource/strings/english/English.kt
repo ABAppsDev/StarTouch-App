@@ -55,4 +55,6 @@ data class English(
     override val checkNumber: String = "Check number",
     override val no: String = "No",
     override val yes: String = "Yes",
+    override val enterPrice: String = "Enter your price",
+    override val openPrice: String = "Open Price",
 ) : IStringResources

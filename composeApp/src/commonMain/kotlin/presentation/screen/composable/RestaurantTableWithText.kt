@@ -35,8 +35,8 @@ fun RestaurantTableWithText(
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-        val tableWidth = 250.dp
-        val tableHeight = 200.dp
+        val tableWidth = 220.dp
+        val tableHeight = 100.dp
         // Draw table
         SetLayoutDirection(layoutDirection = LayoutDirection.Rtl) {
             Box(

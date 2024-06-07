@@ -8,4 +8,5 @@ interface IDinInGateway {
     suspend fun getAllOnlineUsers(outletId: Int, restId: Int, userID: Int): List<AssignCheck>
     suspend fun getTablesDataByRoomId(outletID: Int, restID: Int, roomID: Int): List<TableData>
     suspend fun getAllTablesGuest(outletID: Int, restID: Int): List<TableData>
+    suspend fun deleteTable()
 }

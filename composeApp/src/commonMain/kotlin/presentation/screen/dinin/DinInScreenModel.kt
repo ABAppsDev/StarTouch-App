@@ -26,7 +26,14 @@ class DinInScreenModel(
     init {
         getTables()
         getAllRooms()
-        //socketTables()
+    }
+
+    fun deleteTable() {
+        tryToExecute(
+            function = { manageDinInUseCase.deleteTable() },
+            onSuccess = { updateState { it.copy(deleted = true) } },
+            onError = ::onError
+        )
     }
 
     private fun socketTables() {
@@ -35,7 +42,7 @@ class DinInScreenModel(
                 while (true) {
                     if (state.value.roomId != 0)
                         try {
-                            delay(8000)
+                            delay(6000)
                             if (state.value.roomId != 0) {
                                 val tables = manageDinInUseCase.getTablesDataByRoomId(
                                     StarTouchSetup.OUTLET_ID,
@@ -241,6 +248,7 @@ class DinInScreenModel(
             it.copy(
                 isLoading = false,
                 errorMessage = "",
+                exit = false,
                 errorDinInState = null,
                 dinInDialogueState = it.dinInDialogueState.copy(
                     isVisible = true,
@@ -325,6 +333,7 @@ class DinInScreenModel(
             it.copy(
                 isLoading = false,
                 errorDinInState = errorState,
+                deleted = false,
                 dinInDialogueState = it.dinInDialogueState.copy(
                     isLoading = false,
                     isLoadingButton = false,
@@ -422,6 +431,7 @@ class DinInScreenModel(
         updateState {
             it.copy(
                 isLoading = false,
+                exit = true,
                 dinInDialogueState = DinInDialogueState(),
                 tableId = 0,
                 tableName = "0",
@@ -444,6 +454,7 @@ class DinInScreenModel(
         updateState {
             it.copy(
                 isLoading = false,
+                exit = true,
                 errorDialogueIsVisible = false,
                 dinInDialogueState = DinInDialogueState(),
                 isTableGuest = false
@@ -474,6 +485,7 @@ class DinInScreenModel(
                 isLoading = false,
                 errorMessage = "",
                 errorDinInState = null,
+                exit = true,
                 warningDialogueIsVisible = false,
                 tableName = "0",
                 tableId = 0,
@@ -487,6 +499,7 @@ class DinInScreenModel(
         updateState {
             it.copy(
                 isLoading = false,
+                exit = false,
                 errorMessage = "",
                 errorDinInState = null,
                 warningDialogueIsVisible = false,
@@ -508,6 +521,7 @@ class DinInScreenModel(
         updateState {
             it.copy(
                 isLoading = false,
+                exit = false,
                 errorMessage = "",
                 errorDinInState = null,
                 dinInDialogueState = it.dinInDialogueState.copy(
@@ -597,7 +611,7 @@ class DinInScreenModel(
         } else {
             tryToExecute(
                 function = {
-                    manageChecksUseCase.reOpenCheck(tableId)
+                    manageChecksUseCase.reOpenCheck(tableId, 0)
                 },
                 onSuccess = { items ->
                     updateState {
@@ -641,6 +655,7 @@ class DinInScreenModel(
         updateState {
             it.copy(
                 isLoading = true,
+                exit = false,
                 errorDinInState = null,
                 errorMessage = "",
             )
@@ -693,6 +708,7 @@ class DinInScreenModel(
             it.copy(
                 isLoading = false,
                 errorMessage = "",
+                exit = false,
                 errorDinInState = null,
                 dinInDialogueState = it.dinInDialogueState.copy(
                     isVisible = true,
@@ -710,6 +726,7 @@ class DinInScreenModel(
             it.copy(
                 isLoading = true,
                 errorDinInState = null,
+                exit = false,
                 errorMessage = "",
             )
         }

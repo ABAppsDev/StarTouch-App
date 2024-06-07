@@ -5,6 +5,7 @@ import data.util.AppLanguage
 import data.util.StarTouchSetup
 import domain.entity.FireItems
 import domain.entity.Item
+import domain.entity.ModifierItem
 import domain.entity.Preset
 import presentation.base.ErrorState
 import util.LanguageCode
@@ -35,6 +36,9 @@ data class OrderState(
     val itemId: Int = 0,
     val isLoadingButton: Boolean = false,
     val qty: Float = 0f,
+    val showEnterOpenPrice: Boolean = false,
+    val price: String = "",
+    val deleted: Boolean = false,
 )
 
 @Immutable
@@ -157,21 +161,22 @@ data class ItemState(
     val prePaidCard: Boolean = false,
     val pOnReport: Boolean = false,
     val pOnCheck: Boolean = false,
+    val openPrice: Boolean = false,
 )
 
 
-fun Item.toItemModifierState(): ItemModifierState = ItemModifierState(
-    id = id,
+fun ModifierItem.toItemModifierState(): ItemModifierState = ItemModifierState(
+    id = itemID,
     name = if (AppLanguage.code.value == LanguageCode.EN.value) name else name2,
     price = staticPrice,
     isModifier = isModifier,
     taxable = taxable,
     prePaidCard = prePaidCard,
-    pickFollowItemQty = false,
-    modifierGroupID = 0,
+    pickFollowItemQty = pickFollowItemQty,
+    modifierGroupID = modifierGroupID,
     noServiceCharge = noServiceCharge,
     pOnReport = printOnReport,
-    pOnCheck = printItemOnCheck
+    pOnCheck = printOnChick,
 )
 
 fun Item.toItemState(): ItemState = ItemState(
@@ -185,7 +190,8 @@ fun Item.toItemState(): ItemState = ItemState(
     modifierGroupID = 0,
     noServiceCharge = noServiceCharge,
     pOnReport = printOnReport,
-    pOnCheck = printItemOnCheck
+    pOnCheck = printItemOnCheck,
+    openPrice = openPrice,
 )
 
 fun ItemState.toItemModifierState(): ItemModifierState = ItemModifierState(

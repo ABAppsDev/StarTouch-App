@@ -3,8 +3,10 @@ package data.gateway.remote
 import data.remote.mapper.toDto
 import data.remote.model.ServerResponse
 import data.remote.model.UserAppDto
+import data.util.StarTouchSetup
 import domain.entity.UserApp
 import domain.gateway.IPermissionGateway
+import domain.gateway.local.ILocalConfigurationGateway
 import domain.util.PermissionDeniedException
 import io.ktor.client.HttpClient
 import io.ktor.client.request.parameter
@@ -21,6 +23,7 @@ class PermissionGateway(client: HttpClient) : BaseGateway(client), IPermissionGa
                 parameter("passcode", passcode)
                 parameter("restID", restID)
                 parameter("outletID", outletID)
+                parameter("ws", StarTouchSetup.WORK_STATION_ID)
             }
         }.data?.toDto() ?: throw PermissionDeniedException("Logon error")
     }
@@ -35,6 +38,7 @@ class PermissionGateway(client: HttpClient) : BaseGateway(client), IPermissionGa
                 parameter("passcode", passcode)
                 parameter("outletID", outletID)
                 parameter("restID", restID)
+                parameter("ws", StarTouchSetup.WORK_STATION_ID)
             }
         }.data ?: false
     }

@@ -6,6 +6,7 @@ import data.remote.model.OutletSetupDto
 import data.remote.model.RestaurantSetupDto
 import data.remote.model.RoomSetupDto
 import data.remote.model.ServerResponse
+import data.util.StarTouchSetup
 import domain.entity.AppSetup
 import domain.entity.OutletSetup
 import domain.entity.RestaurantSetup
@@ -22,6 +23,7 @@ class SetupGateway(client: HttpClient) : BaseGateway(client), ISetupGateway {
             get("setup") {
                 parameter("outletID", outletID)
                 parameter("restID", restID)
+                parameter("ws", StarTouchSetup.WORK_STATION_ID)
             }
         }.data?.toEntity() ?: throw NotFoundException("Setup not found")
     }

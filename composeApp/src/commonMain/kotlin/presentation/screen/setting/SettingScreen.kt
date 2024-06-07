@@ -55,6 +55,7 @@ import presentation.screen.composable.DropDownTextField
 import presentation.screen.composable.SetLayoutDirection
 import presentation.screen.composable.extensions.bottomBorder
 import presentation.screen.composable.snackbar.rememberStackedSnackbarHostState
+import presentation.screen.home.HomeScreen
 import presentation.util.EventHandler
 
 class SettingScreen : Screen {
@@ -65,7 +66,7 @@ class SettingScreen : Screen {
 
         EventHandler(screenModel.effect) { effect, navigator ->
             when (effect) {
-                is SettingUiEffect.NavigateBackToHome -> navigator.pop()
+                is SettingUiEffect.NavigateBackToHome -> navigator.replaceAll(HomeScreen())
             }
         }
 

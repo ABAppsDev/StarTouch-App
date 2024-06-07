@@ -28,6 +28,8 @@ data class DinInState(
     val roomId: Int = StarTouchSetup.MAIN_ROOM_ID,
     val validation: Boolean = false,
     val isTableGuest: Boolean = false,
+    val deleted: Boolean = false,
+    val exit: Boolean = true,
 )
 
 @Immutable

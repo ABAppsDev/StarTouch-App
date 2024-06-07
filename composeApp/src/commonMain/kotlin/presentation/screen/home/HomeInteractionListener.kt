@@ -6,6 +6,7 @@ interface HomeInteractionListener {
     fun onClickLogin()
     fun onClickLogout()
     fun onClickDinIn()
+    fun onClickTakeAway()
     fun onClickEnterPasscode()
     fun onClickExitApp()
     fun onClickSettings()

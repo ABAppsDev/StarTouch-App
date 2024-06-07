@@ -49,6 +49,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.beepbeep.designSystem.ui.composable.StAppBar
 import com.beepbeep.designSystem.ui.composable.StButton
 import com.beepbeep.designSystem.ui.composable.StChip
@@ -62,13 +64,13 @@ import org.jetbrains.compose.resources.painterResource
 import presentation.screen.composable.AppScaffold
 import presentation.screen.composable.Chair
 import presentation.screen.composable.ErrorDialogue
-import presentation.screen.composable.RestaurantTableWithText
 import presentation.screen.composable.RestaurantTableWithTextLoading
 import presentation.screen.composable.SetLayoutDirection
 import presentation.screen.composable.ShimmerListItem
 import presentation.screen.composable.WarningDialogue
 import presentation.screen.composable.extensions.bottomBorder
 import presentation.screen.composable.modifier.bounceClick
+import presentation.screen.home.HomeScreen
 import presentation.screen.order.OrderScreen
 import presentation.util.EventHandler
 import resource.Resources
@@ -82,7 +84,7 @@ class DinInScreen : Screen {
         val state by dinInScreenModel.state.collectAsState()
         val pullRefreshState =
             rememberPullRefreshState(state.isRefreshing, { dinInScreenModel.retry() })
-
+        val nav = LocalNavigator.currentOrThrow
         EventHandler(dinInScreenModel.effect) { effect, navigator ->
             when (effect) {
                 is DinInUiEffect.NavigateToOrderScreen -> {
@@ -96,8 +98,13 @@ class DinInScreen : Screen {
                     )
                 }
 
-                DinInUiEffect.NavigateBackToHome -> navigator.pop()
+                DinInUiEffect.NavigateBackToHome -> dinInScreenModel.deleteTable()
             }
+        }
+
+        LaunchedEffect(state.deleted) {
+            if (state.deleted)
+            nav.replace(HomeScreen())
         }
 
         FadeAnimation(state.warningDialogueIsVisible) {
@@ -208,10 +215,10 @@ private fun OnRender(
                     }
                 }
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
+                    columns = GridCells.Fixed(4),
                     modifier = Modifier.fillMaxSize(),
                     horizontalArrangement = Arrangement.spacedBy(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp),
                     contentPadding = PaddingValues(8.dp)
                 ) {
                     items(state.tablesDetails) { table ->
@@ -505,11 +512,12 @@ private fun ChooseTable(
     onClick: () -> Unit = {},
 ) {
     Chair(
-        tableSize = 200.dp,
+        tableSize = 120.dp,
+        tableColor = Theme.colors.contentPrimary,
         covers = table.covers.toString(),
         openTime = table.openCheckDate ?: "",
         tableCode = table.tableNumber,
-        totalAmount = table.totalOrdersPrice.toString(),
+        totalAmount = table.totalOrdersPrice.toFloat().toString(),
         checksCount = table.checksCount.toString(),
         printed = table.printed,
         hasOrders = table.covers > 0 || table.openCheckDate != "null",
