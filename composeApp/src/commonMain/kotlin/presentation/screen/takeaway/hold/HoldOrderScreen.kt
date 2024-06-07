@@ -76,6 +76,11 @@ private fun CheckItem(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
+                    Resources.strings.tableName + " : ${check.tableName}",// order number
+                    style = Theme.typography.title,
+                    color = Theme.colors.contentPrimary
+                )
+                Text(
                     Resources.strings.checkNumber + " : ${check.name}",
                     style = Theme.typography.title,
                     color = Theme.colors.contentPrimary
