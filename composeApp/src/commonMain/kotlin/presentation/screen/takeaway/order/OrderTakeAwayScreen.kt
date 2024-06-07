@@ -1,4 +1,4 @@
-package presentation.screen.order
+package presentation.screen.takeaway.order
 
 import abapps_startouch.composeapp.generated.resources.Res
 import abapps_startouch.composeapp.generated.resources.ic_back
@@ -96,6 +96,8 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.core.parameter.parametersOf
 import presentation.base.ErrorState
 import presentation.screen.composable.CardEmpty
+import presentation.screen.composable.ChooseItem
+import presentation.screen.composable.ChoosePresetLoading
 import presentation.screen.composable.HandleErrorState
 import presentation.screen.composable.SetLayoutDirection
 import presentation.screen.composable.ShimmerListItem
@@ -104,13 +106,11 @@ import presentation.screen.composable.WarningItemDialogue
 import presentation.screen.composable.modifier.bounceClick
 import presentation.screen.dinin.DinInScreen
 import presentation.screen.home.HomeScreen
-import presentation.screen.composable.ChooseItem
-import presentation.screen.composable.ChoosePresetLoading
 import presentation.util.EventHandler
 import resource.Resources
 import util.getScreenModel
 
-class OrderScreen(
+class OrderTakeAwayScreen(
     private val checkId: Long,
     private val checkNumber: Int,
     private val items: List<FireItems>,
@@ -119,7 +119,7 @@ class OrderScreen(
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
-        val screenModel: OrderScreenModel =
+        val screenModel: OrderTakeAwayScreenModel =
             getScreenModel(parameters = { parametersOf(checkId, items, isReopened) })
         val state by screenModel.state.collectAsState()
         val pullRefreshState = rememberPullRefreshState(state.isRefresh, { screenModel.retry() })
@@ -127,11 +127,11 @@ class OrderScreen(
 
         EventHandler(screenModel.effect) { effect, navigator ->
             when (effect) {
-                is OrderUiEffect.NavigateBackToDinIn -> {
+                is OrderTakeAwayUiEffect.NavigateBackToTakeAway -> {
                     navigator.replace(DinInScreen())
                 }
 
-                is OrderUiEffect.NavigateBackToHome -> {
+                is OrderTakeAwayUiEffect.NavigateBackToHome -> {
                     navigator.replace(HomeScreen())
                 }
             }
@@ -144,13 +144,13 @@ class OrderScreen(
         FadeAnimation(state.modifyLastItemDialogue.isVisible) {
             EnterModifyLastItemDialogue(
                 state.modifyLastItemDialogue.comment,
-                screenModel as OrderInteractionListener
+                screenModel as OrderTakeAwayInteractionListener
             )
         }
         FadeAnimation(state.showEnterOpenPrice) {
             EnterPriceDialogue(
                 state.price,
-                screenModel as OrderInteractionListener
+                screenModel as OrderTakeAwayInteractionListener
             )
         }
         LaunchedEffect(state.errorState) {
@@ -226,7 +226,7 @@ class OrderScreen(
                                             contentAlignment = Alignment.Center
                                         ) {
                                             Text(
-                                                state.orderItemState.sumOf { it.qty.toDouble() }
+                                                state.orderTakeAwayItemState.sumOf { it.qty.toDouble() }
                                                     .toInt().toString(),
                                                 style = Theme.typography.title,
                                                 modifier = Modifier.fillMaxSize()
@@ -265,8 +265,8 @@ class OrderScreen(
                 SlideAnimation(state.isFinishOrder) {
                     OrdersList(
                         isLoading = state.isLoadingButton,
-                        orderItemState = state.orderItemState,
-                        screenModel as OrderInteractionListener,
+                        orderItemState = state.orderTakeAwayItemState,
+                        screenModel as OrderTakeAwayInteractionListener,
                         modifier = Modifier.padding(top = it.calculateTopPadding())
                     )
                 }
@@ -616,8 +616,8 @@ private fun ItemModifiersList(
 @Composable
 private fun OrdersList(
     isLoading: Boolean,
-    orderItemState: List<OrderItemState>,
-    orderInteractionListener: OrderInteractionListener,
+    orderItemState: List<OrderTakeAwayItemState>,
+    orderInteractionListener: OrderTakeAwayInteractionListener,
     modifier: Modifier = Modifier,
 ) {
     FadeAnimation(orderItemState.isEmpty()) {
@@ -796,6 +796,16 @@ private fun OrdersList(
                                     isLoading = isLoading
                                 )
                                 StButton(
+                                    title = Resources.strings.fireHold,
+                                    modifier = Modifier.weight(1f),
+                                    containerColor = Theme.colors.primary,
+                                    onClick = {
+                                        if (!isLoading)
+                                            orderInteractionListener.onClickFireAndHold()
+                                    },
+                                    isLoading = isLoading
+                                )
+                                StButton(
                                     title = Resources.strings.firePrint,
                                     modifier = Modifier.weight(1f),
                                     containerColor = Theme.colors.primary,
@@ -968,7 +978,7 @@ private fun OrderItem(
 @Composable
 private fun EnterModifyLastItemDialogue(
     comment: String,
-    orderInteractionListener: OrderInteractionListener,
+    orderInteractionListener: OrderTakeAwayInteractionListener,
     modifier: Modifier = Modifier,
 ) {
     StDialogue(
@@ -1019,7 +1029,7 @@ private fun EnterModifyLastItemDialogue(
 @Composable
 private fun EnterPriceDialogue(
     price: String,
-    orderInteractionListener: OrderInteractionListener,
+    orderInteractionListener: OrderTakeAwayInteractionListener,
     modifier: Modifier = Modifier,
 ) {
     StDialogue(

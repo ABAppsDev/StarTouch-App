@@ -1,4 +1,4 @@
-package presentation.screen.order.composable
+package presentation.screen.composable
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

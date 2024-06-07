@@ -1,4 +1,4 @@
-package presentation.screen.order
+package presentation.screen.composable
 
 import abapps_startouch.composeapp.generated.resources.Res
 import abapps_startouch.composeapp.generated.resources.cart

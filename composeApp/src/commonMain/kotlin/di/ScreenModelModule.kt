@@ -8,6 +8,7 @@ import presentation.screen.dinin.DinInScreenModel
 import presentation.screen.home.HomeScreenModel
 import presentation.screen.order.OrderScreenModel
 import presentation.screen.setting.SettingScreenModel
+import presentation.screen.takeaway.order.OrderTakeAwayScreenModel
 
 val screenModelModule = module {
     factoryOf(::AppScreenModel)
@@ -16,5 +17,8 @@ val screenModelModule = module {
     factoryOf(::SettingScreenModel)
     factory { (checkId: Long, items: List<FireItems>, isReopened: Boolean) ->
         OrderScreenModel(get(), get(), get(), checkId, items, isReopened)
+    }
+    factory { (checkId: Long, items: List<FireItems>, isReopened: Boolean) ->
+        OrderTakeAwayScreenModel(get(), get(), get(), checkId, items, isReopened)
     }
 }

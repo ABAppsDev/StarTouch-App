@@ -59,5 +59,5 @@ data class Arabic(
     override val openPrice: String = "السعر المفتوح",
     override val fireSettle: String = "اجهز و ادفع",
     override val firePrint: String = "اجهز و اطبع",
-    override val fireHold: String = "حضر بعدين",
+    override val fireHold: String = "اجهز بعدين",
 ) : IStringResources
