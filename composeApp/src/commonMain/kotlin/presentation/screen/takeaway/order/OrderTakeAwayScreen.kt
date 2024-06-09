@@ -815,16 +815,6 @@ private fun OrdersList(
                                     },
                                     isLoading = isLoading
                                 )
-                                StButton(
-                                    title = Resources.strings.fireSettle,
-                                    modifier = Modifier.weight(1f),
-                                    containerColor = Theme.colors.primary,
-                                    onClick = {
-                                        if (!isLoading)
-                                            orderInteractionListener.onClickFireAndSettle()
-                                    },
-                                    isLoading = isLoading
-                                )
                             }
                         }
                     }

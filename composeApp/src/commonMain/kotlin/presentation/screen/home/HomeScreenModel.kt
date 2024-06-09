@@ -315,6 +315,39 @@ class HomeScreenModel(
     }
 
 
+    private fun onTakeAwaySuccess(userApp: UserApp) {
+        updateState {
+            it.copy(
+                errorMessage = "",
+                errorState = null,
+                permissionDialogueState = it.permissionDialogueState.copy(
+                    isLoading = false,
+                    isVisible = false
+                )
+            )
+        }
+        launchDelayed(500) {
+            viewModelScope.launch(Dispatchers.IO) {
+                userApp.apply {
+                    StarTouchSetup.TOKEN = token
+                    StarTouchSetup.USER_ID = id
+                    StarTouchSetup.USER_LANGUAGE = getLanguageCodeByName(userApp.language).value
+                }
+                AppLanguage.code.emit(StarTouchSetup.USER_LANGUAGE)
+                updateState {
+                    it.copy(
+                        errorMessage = "",
+                        errorState = null,
+                        attendanceDialogueState = AttendanceDialogueState(
+                            message = "",
+                        )
+                    )
+                }
+                sendNewEffect(HomeUiEffect.NavigateToTakeAwayScreen)
+            }
+        }
+    }
+
     private fun onFailed(errorState: ErrorState) {
         updateState {
             it.copy(
@@ -440,21 +473,20 @@ class HomeScreenModel(
     }
 
     private fun checkTakeAway(passcode: String) {
-        sendNewEffect(HomeUiEffect.NavigateToTakeAwayScreen)
-//        tryToExecute(
-//            function = {
-//                validationAuth.validatePermissionPasscode(
-//                    passcode = passcode,
-//                )
-//                controlPermission.checkDinInPermission(
-//                    passcode = passcode,
-//                    restID = StarTouchSetup.REST_ID,
-//                    outletID = StarTouchSetup.OUTLET_ID,
-//                )
-//            },
-//            onSuccess = (::onDinInSuccess),
-//            onError = (::onFailed)
-//        )
+        tryToExecute(
+            function = {
+                validationAuth.validatePermissionPasscode(
+                    passcode = passcode,
+                )
+                controlPermission.checkTakeAwayPermission(
+                    passcode = passcode,
+                    restID = StarTouchSetup.REST_ID,
+                    outletID = StarTouchSetup.OUTLET_ID,
+                )
+            },
+            onSuccess = (::onTakeAwaySuccess),
+            onError = (::onFailed)
+        )
     }
 
     override fun onClickExitApp() {
