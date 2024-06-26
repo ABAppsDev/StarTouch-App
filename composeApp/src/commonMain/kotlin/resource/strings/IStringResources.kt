@@ -49,6 +49,8 @@ interface IStringResources {
     val quantity: String
     val price: String
     val totalItems: String
+    val vat: String
+    val service:String
     val totalCheckPrice: String
     val fire: String
     val fireSettle: String

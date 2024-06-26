@@ -96,6 +96,8 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.core.parameter.parametersOf
 import presentation.base.ErrorState
 import presentation.screen.composable.CardEmpty
+import presentation.screen.composable.ChooseItem
+import presentation.screen.composable.ChoosePresetLoading
 import presentation.screen.composable.HandleErrorState
 import presentation.screen.composable.SetLayoutDirection
 import presentation.screen.composable.ShimmerListItem
@@ -104,8 +106,6 @@ import presentation.screen.composable.WarningItemDialogue
 import presentation.screen.composable.modifier.bounceClick
 import presentation.screen.dinin.DinInScreen
 import presentation.screen.home.HomeScreen
-import presentation.screen.composable.ChooseItem
-import presentation.screen.composable.ChoosePresetLoading
 import presentation.util.EventHandler
 import resource.Resources
 import util.getScreenModel
@@ -766,13 +766,56 @@ private fun OrdersList(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
+                                    text = Resources.strings.vat,
+                                    color = Color.LightGray,
+                                    style = Theme.typography.title
+                                )
+                                Text(
+                                    text = "${
+                                        orderItemState.sumOf { it.totalPrice.toDouble() * 0.14 }
+                                            .toFloat()
+                                    }",
+                                    color = Color.White,
+                                    style = Theme.typography.titleMedium
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = Resources.strings.service,
+                                    color = Color.LightGray,
+                                    style = Theme.typography.title
+                                )
+                                Text(
+                                    text = "${
+                                        orderItemState.sumOf { it.totalPrice.toDouble() * 0.12 }
+                                            .toFloat()
+                                    }",
+                                    color = Color.White,
+                                    style = Theme.typography.titleMedium
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
                                     text = Resources.strings.totalCheckPrice,
                                     color = Color.LightGray,
                                     style = Theme.typography.title
                                 )
                                 Text(
                                     text = "${
-                                        orderItemState.sumOf { it.totalPrice.toDouble() }.toFloat()
+                                        orderItemState.sumOf {
+                                            ((it.totalPrice.toDouble() * 0.14)
+                                                    + (it.totalPrice.toDouble()) +
+                                                    (it.totalPrice.toDouble() * 0.12)
+                                                    )
+                                        }.toFloat()
                                     }",
                                     color = Color.White,
                                     style = Theme.typography.titleMedium

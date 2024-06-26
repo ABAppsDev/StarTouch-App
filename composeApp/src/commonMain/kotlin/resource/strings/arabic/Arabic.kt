@@ -61,4 +61,6 @@ data class Arabic(
     override val firePrint: String = "اجهز و اطبع",
     override val fireHold: String = "اجهز بعدين",
     override val orderNumber: String = "طلب رقم",
+    override val vat: String = "اجمالي الضريبة",
+    override val service: String = "احمالي الخدمة",
 ) : IStringResources

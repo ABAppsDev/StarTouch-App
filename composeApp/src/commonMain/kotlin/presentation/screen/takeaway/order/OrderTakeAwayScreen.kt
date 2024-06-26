@@ -766,13 +766,56 @@ private fun OrdersList(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
+                                    text = Resources.strings.vat,
+                                    color = Color.LightGray,
+                                    style = Theme.typography.title
+                                )
+                                Text(
+                                    text = "${
+                                        orderItemState.sumOf { it.totalPrice.toDouble() * 0.14 }
+                                            .toFloat()
+                                    }",
+                                    color = Color.White,
+                                    style = Theme.typography.titleMedium
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+//                            Row(
+//                                modifier = Modifier.fillMaxWidth(),
+//                                horizontalArrangement = Arrangement.SpaceBetween
+//                            ) {
+//                                Text(
+//                                    text = Resources.strings.service,
+//                                    color = Color.LightGray,
+//                                    style = Theme.typography.title
+//                                )
+//                                Text(
+//                                    text = "${
+//                                        orderItemState.sumOf { it.totalPrice.toDouble() * 0.12 }
+//                                            .toFloat()
+//                                    }",
+//                                    color = Color.White,
+//                                    style = Theme.typography.titleMedium
+//                                )
+//                            }
+//                            Spacer(modifier = Modifier.height(16.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
                                     text = Resources.strings.totalCheckPrice,
                                     color = Color.LightGray,
                                     style = Theme.typography.title
                                 )
                                 Text(
                                     text = "${
-                                        orderItemState.sumOf { it.totalPrice.toDouble() }.toFloat()
+                                        orderItemState.sumOf {
+                                            ((it.totalPrice.toDouble() * 0.14)
+                                                    + (it.totalPrice.toDouble())
+                                                    //  (it.totalPrice.toDouble() * 0.12)
+                                                    )
+                                        }.toFloat()
                                     }",
                                     color = Color.White,
                                     style = Theme.typography.titleMedium
