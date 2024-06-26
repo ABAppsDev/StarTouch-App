@@ -193,7 +193,7 @@ class OrderTakeAwayScreen(
                             else if (!state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && isReopened) screenModel.deleteTable()
                             else screenModel.backToPresets()
                         },
-                        title = "${Resources.strings.checkNumber} : $checkNumber",
+                        title = "${Resources.strings.orderNumber} : $checkNumber",
                         isBackIconVisible = state.itemModifiersState.isEmpty(),
                         painterResource = painterResource(Res.drawable.ic_back)
                     )

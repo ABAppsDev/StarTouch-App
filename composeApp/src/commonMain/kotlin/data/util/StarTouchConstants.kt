@@ -19,4 +19,5 @@ object StarTouchSetup {
     var USER_LANGUAGE = LanguageCode.EN.value
     var DEFAULT_LANGUAGE = LanguageCode.EN.value
     var SYSTEM_DATE = getDateNow()
+    var ORDER_NUMBER = 1
 }

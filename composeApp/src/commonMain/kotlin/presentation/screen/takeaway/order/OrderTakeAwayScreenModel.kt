@@ -490,13 +490,15 @@ class OrderTakeAwayScreenModel(
     }
 
     override fun onClickFire() {
+        StarTouchSetup.ORDER_NUMBER++
         updateState { it.copy(isLoadingButton = true) }
         orders.forEachIndexed { i, order ->
             if (order.isModifier) {
                 val temp = orders.find { it.serial == order.refItemId }
                 val item = orders.indexOf(orders.find {
                     it.serial == order.refItemId
-                })
+                }
+                )
                 orders[i] =
                     order.copy(
                         refModItem = if (item == 0) 1 else item + 1,
@@ -546,15 +548,15 @@ class OrderTakeAwayScreenModel(
     }
 
     override fun onClickFireAndSettle() {
-        //TODO("Not yet implemented")
+
     }
 
     override fun onClickFireAndPrint() {
-        //TODO("Not yet implemented")
+
     }
 
     override fun onClickFireAndHold() {
-        //TODO("Not yet implemented")
+
     }
 
     override fun onClickClose() {

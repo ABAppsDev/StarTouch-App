@@ -60,4 +60,5 @@ data class Arabic(
     override val fireSettle: String = "اجهز و ادفع",
     override val firePrint: String = "اجهز و اطبع",
     override val fireHold: String = "اجهز بعدين",
+    override val orderNumber: String = "طلب رقم",
 ) : IStringResources

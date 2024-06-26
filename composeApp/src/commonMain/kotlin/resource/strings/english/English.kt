@@ -60,4 +60,5 @@ data class English(
     override val fireSettle: String = "Fire & Settle",
     override val firePrint: String = "Fire & Print",
     override val fireHold: String = "Fire & Hold",
+    override val orderNumber: String = "Order Number",
 ) : IStringResources
