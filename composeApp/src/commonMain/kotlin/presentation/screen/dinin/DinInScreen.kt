@@ -32,6 +32,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.TextButton
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -51,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
@@ -116,7 +118,7 @@ class DinInScreen : Screen {
 
         LaunchedEffect(state.deleted) {
             if (state.deleted)
-            nav.replace(HomeScreen())
+                nav.replace(HomeScreen())
         }
 
         FadeAnimation(state.warningDialogueIsVisible) {
@@ -179,13 +181,13 @@ private fun OnRender(
     var isSelected by remember { mutableStateOf(false) }
 
     val items: List<MutliFabMenuItem> = listOf(
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24 , Resources.strings.splitCheck),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24 , Resources.strings.unSplitCheck),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24 , Resources.strings.combineCheck),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24 , Resources.strings.unCombineCheck),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24 , Resources.strings.moveItem),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24 , Resources.strings.moveItemToNewCheck),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24 , Resources.strings.splitAndPay),
+        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.splitCheck),
+        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.unSplitCheck),
+        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.combineCheck),
+        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.unCombineCheck),
+        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.moveItem),
+        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.moveItemToNewCheck),
+        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.splitAndPay),
     )
 
     Box(Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
@@ -195,6 +197,17 @@ private fun OnRender(
                     onNavigateUp = listener::onClickBack,
                     painterResource = painterResource(Res.drawable.ic_back),
                     title = Resources.strings.dinningIn,
+                    actions = {
+                        if (!state.selectedFabMenuItem.isNullOrBlank())
+                            TextButton(
+                                onClick = listener::onCancelMenuItemClick
+                            ) {
+                                Text(
+                                    Resources.strings.cancel,
+                                    style = TextStyle(color = Color.White)
+                                )
+                            }
+                    }
                 )
                 Row(
                     Modifier.fillMaxWidth()
@@ -264,7 +277,7 @@ private fun OnRender(
             }
         }
 
-        MutliFabView(items , onMenuItemClick = listener::onMenuItemClick)
+        MutliFabView(items, onMenuItemClick = listener::onMenuItemClick)
 
         PullRefreshIndicator(
             state.isRefreshing,

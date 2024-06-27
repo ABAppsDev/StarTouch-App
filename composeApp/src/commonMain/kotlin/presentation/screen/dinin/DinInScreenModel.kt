@@ -797,7 +797,19 @@ class DinInScreenModel(
     }
 
     override fun onMenuItemClick(mutliFabMenuItem: MutliFabMenuItem) {
-        //todo
+        updateState {
+            it.copy(
+                selectedFabMenuItem = mutliFabMenuItem.label,
+            )
+        }
+    }
+
+    override fun onCancelMenuItemClick() {
+        updateState {
+            it.copy(
+                selectedFabMenuItem = null,
+            )
+        }
     }
 
     private fun getAllRooms() {

@@ -23,4 +23,5 @@ interface DinInInteractionListener {
     fun onClickRoom(id: Int)
     fun onEnterTableName()
     fun onMenuItemClick(mutliFabMenuItem: MutliFabMenuItem)
+    fun onCancelMenuItemClick()
 }
