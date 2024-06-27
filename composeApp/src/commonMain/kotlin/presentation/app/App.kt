@@ -15,7 +15,6 @@ import cafe.adriel.voyager.transitions.SlideTransition
 import com.beepbeep.designSystem.ui.theme.Theme
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-import presentation.screen.dinin.DinInScreen
 import presentation.screen.splash.SplashScreen
 import resource.StarTouchTheme
 import util.getScreenModel
@@ -40,7 +39,7 @@ object MainApp : Screen {
                     contentDescription = "",
                     contentScale = ContentScale.Crop
                 )
-                Navigator(DinInScreen()) {
+                Navigator(SplashScreen) {
                     SlideTransition(it)
                 }
             }
