@@ -1,11 +1,13 @@
 package presentation.screen.home
 
+import PlatformContext
 import abapps_startouch.composeapp.generated.resources.Res
 import abapps_startouch.composeapp.generated.resources.admin
 import abapps_startouch.composeapp.generated.resources.dinin
 import abapps_startouch.composeapp.generated.resources.exit
 import abapps_startouch.composeapp.generated.resources.login
 import abapps_startouch.composeapp.generated.resources.logo
+import abapps_startouch.composeapp.generated.resources.logout
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,6 +50,7 @@ import com.beepbeep.designSystem.ui.composable.snackbar.StackedSnackbarDuration
 import com.beepbeep.designSystem.ui.theme.Theme
 import data.util.StarTouchSetup
 import exitApplication
+import getPlatformContext
 import kms
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
@@ -64,6 +67,8 @@ import presentation.screen.order.OrderScreen
 import presentation.screen.setting.SettingScreen
 import presentation.util.EventHandler
 import resource.Resources
+import util.browseBluetoothDevices
+import util.createPrinter
 import util.getScreenModel
 
 class HomeScreen : Screen {
@@ -180,6 +185,10 @@ private fun OnRender(
     listener: HomeInteractionListener,
     pullRefreshState: PullRefreshState
 ) {
+
+    val context = getPlatformContext()
+    val printer = createPrinter(context)
+
     Box(
         Modifier.fillMaxSize().pullRefresh(pullRefreshState).verticalScroll(rememberScrollState())
     ) {
@@ -204,13 +213,17 @@ private fun OnRender(
                             .bounceClick { listener.onClickLogOn() },
                         iconSize = 65.kms,
                     )
-//                    IconWithBackground(
-//                        icon = painterResource(Res.drawable.logout),
-//                        contentDescription = Resources.strings.logout,
-//                        modifier = Modifier.size(80.kms)
-//                            .bounceClick { listener.onClickLogOff() },
-//                        iconSize = 65.kms,
-//                    )
+                    IconWithBackground(
+                        icon = painterResource(Res.drawable.logout),
+                        contentDescription = Resources.strings.logout,
+                        modifier = Modifier.size(80.kms)
+                            .bounceClick {
+                                browseBluetoothDevices(context) {
+                                    printer.connectBtandPrintReceipt(it ?: "")
+                                }
+                            },
+                        iconSize = 65.kms,
+                    )
                     IconWithBackground(
                         icon = painterResource(Res.drawable.admin),
                         contentDescription = Resources.strings.admin,

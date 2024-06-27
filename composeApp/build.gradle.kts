@@ -64,6 +64,10 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.compose.image.loader)
             implementation(libs.mongodb.realm)
+            implementation(files("./libs/printer-lib-3.2.0.aar"))
+
+            //implementation ("com.github.DantSu:ESCPOS-ThermalPrinter-Android:3.3.0")
+
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
@@ -74,6 +78,9 @@ kotlin {
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.koin.android)
+
+            implementation ("com.github.DantSu:ESCPOS-ThermalPrinter-Android:3.3.0")
+
         }
         desktopMain.dependencies {
             implementation(compose.desktop.common)
@@ -118,6 +125,9 @@ android {
     }
     dependencies {
         debugImplementation(libs.compose.ui.tooling)
+        implementation ("com.github.DantSu:ESCPOS-ThermalPrinter-Android:3.3.0")
+        implementation(files("./libs/printer-lib-3.2.0.aar"))
+
     }
 }
 
