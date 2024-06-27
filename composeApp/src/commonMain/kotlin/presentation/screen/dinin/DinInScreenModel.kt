@@ -797,11 +797,18 @@ class DinInScreenModel(
     }
 
     override fun onMenuItemClick(mutliFabMenuItem: MutliFabMenuItem) {
-        updateState {
-            it.copy(
-                selectedFabMenuItem = mutliFabMenuItem.label,
-            )
-        }
+        if (state.value.selectedFabMenuItem != mutliFabMenuItem.label)
+            updateState {
+                it.copy(
+                    selectedFabMenuItem = mutliFabMenuItem.label,
+                )
+            }
+        else
+            updateState { it.copy(selectedFabMenuItem = null) }
+
+
+        println("selected Fab item = " + state.value.selectedFabMenuItem)
+
     }
 
     override fun onCancelMenuItemClick() {
@@ -810,6 +817,7 @@ class DinInScreenModel(
                 selectedFabMenuItem = null,
             )
         }
+        println("selected Fab item After Cancel = " + state.value.selectedFabMenuItem)
     }
 
     private fun getAllRooms() {
