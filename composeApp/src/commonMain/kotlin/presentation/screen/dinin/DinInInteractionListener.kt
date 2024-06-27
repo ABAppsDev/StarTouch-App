@@ -1,5 +1,7 @@
 package presentation.screen.dinin
 
+import presentation.screen.composable.MutliFabMenuItem
+
 interface DinInInteractionListener {
     fun onClickOk()
     fun onClickTable(tableId: Int, tableName: String)
@@ -20,4 +22,5 @@ interface DinInInteractionListener {
     fun onCreateTableGuest()
     fun onClickRoom(id: Int)
     fun onEnterTableName()
+    fun onMenuItemClick(mutliFabMenuItem: MutliFabMenuItem)
 }
