@@ -30,6 +30,7 @@ data class DinInState(
     val isTableGuest: Boolean = false,
     val deleted: Boolean = false,
     val exit: Boolean = true,
+    val selectedFabMenuItem: String? = null,
 )
 
 @Immutable

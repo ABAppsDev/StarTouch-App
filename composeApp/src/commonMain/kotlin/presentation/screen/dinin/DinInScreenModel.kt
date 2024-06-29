@@ -15,6 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import presentation.base.BaseScreenModel
 import presentation.base.ErrorState
+import presentation.screen.composable.MutliFabMenuItem
 
 class DinInScreenModel(
     private val manageDinInUseCase: ManageDinInUseCase,
@@ -793,6 +794,30 @@ class DinInScreenModel(
             }
             onClickTable(state.value.tableId, state.value.dinInDialogueState.tableName)
         }
+    }
+
+    override fun onMenuItemClick(mutliFabMenuItem: MutliFabMenuItem) {
+        if (state.value.selectedFabMenuItem != mutliFabMenuItem.label)
+            updateState {
+                it.copy(
+                    selectedFabMenuItem = mutliFabMenuItem.label,
+                )
+            }
+        else
+            updateState { it.copy(selectedFabMenuItem = null) }
+
+
+        println("selected Fab item = " + state.value.selectedFabMenuItem)
+
+    }
+
+    override fun onCancelMenuItemClick() {
+        updateState {
+            it.copy(
+                selectedFabMenuItem = null,
+            )
+        }
+        println("selected Fab item After Cancel = " + state.value.selectedFabMenuItem)
     }
 
     private fun getAllRooms() {

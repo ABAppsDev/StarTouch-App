@@ -1,10 +1,16 @@
 package presentation.screen.dinin
 
 import abapps_startouch.composeapp.generated.resources.Res
+import abapps_startouch.composeapp.generated.resources.baseline_more_vert_24
 import abapps_startouch.composeapp.generated.resources.ic_back
 import abapps_startouch.composeapp.generated.resources.ic_profile_filled
 import abapps_startouch.composeapp.generated.resources.invoice
 import abapps_startouch.composeapp.generated.resources.table
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -26,6 +32,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.TextButton
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -39,11 +46,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
@@ -64,6 +73,11 @@ import org.jetbrains.compose.resources.painterResource
 import presentation.screen.composable.AppScaffold
 import presentation.screen.composable.Chair
 import presentation.screen.composable.ErrorDialogue
+import presentation.screen.composable.FilterFab
+import presentation.screen.composable.FilterFabMenu
+import presentation.screen.composable.MutliFabMenuItem
+import presentation.screen.composable.MutliFabState
+import presentation.screen.composable.MutliFabView
 import presentation.screen.composable.RestaurantTableWithTextLoading
 import presentation.screen.composable.SetLayoutDirection
 import presentation.screen.composable.ShimmerListItem
@@ -104,7 +118,7 @@ class DinInScreen : Screen {
 
         LaunchedEffect(state.deleted) {
             if (state.deleted)
-            nav.replace(HomeScreen())
+                nav.replace(HomeScreen())
         }
 
         FadeAnimation(state.warningDialogueIsVisible) {
@@ -165,6 +179,17 @@ private fun OnRender(
     pullRefreshState: PullRefreshState
 ) {
     var isSelected by remember { mutableStateOf(false) }
+
+    val items: List<MutliFabMenuItem> = listOf(
+        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.splitCheck),
+        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.unSplitCheck),
+        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.combineCheck),
+        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.unCombineCheck),
+        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.moveItem),
+        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.moveItemToNewCheck),
+        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.splitAndPay),
+    )
+
     Box(Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
         SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
             Column(Modifier.fillMaxSize()) {
@@ -172,6 +197,17 @@ private fun OnRender(
                     onNavigateUp = listener::onClickBack,
                     painterResource = painterResource(Res.drawable.ic_back),
                     title = Resources.strings.dinningIn,
+                    actions = {
+                        if (!state.selectedFabMenuItem.isNullOrBlank())
+                            TextButton(
+                                onClick = listener::onCancelMenuItemClick
+                            ) {
+                                Text(
+                                    Resources.strings.cancel,
+                                    style = TextStyle(color = Color.White)
+                                )
+                            }
+                    }
                 )
                 Row(
                     Modifier.fillMaxWidth()
@@ -240,6 +276,9 @@ private fun OnRender(
                 }
             }
         }
+
+        MutliFabView(items, onMenuItemClick = listener::onMenuItemClick)
+
         PullRefreshIndicator(
             state.isRefreshing,
             pullRefreshState,
