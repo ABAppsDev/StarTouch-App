@@ -30,4 +30,6 @@ interface OrderTakeAwayInteractionListener {
     fun onDismissItemDialogue()
     fun onDismissPriceDialogue()
     fun showWarningItem()
+    fun updateTax(tax: Float)
+    fun updateAdj(adj: Float)
 }

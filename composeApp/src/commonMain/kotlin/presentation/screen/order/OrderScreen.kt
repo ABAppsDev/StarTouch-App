@@ -62,6 +62,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -89,6 +90,7 @@ import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
 import com.beepbeep.designSystem.ui.composable.animate.SlideAnimation
 import com.beepbeep.designSystem.ui.composable.snackbar.internal.SnackbarColor
 import com.beepbeep.designSystem.ui.theme.Theme
+import data.util.StarTouchSetup
 import domain.entity.FireItems
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
@@ -730,6 +732,9 @@ private fun OrdersList(
                         )
                     }
                     item {
+                        var taxState by remember { mutableFloatStateOf(0f) }
+                        var adjState by remember { mutableFloatStateOf(0f) }
+
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -766,39 +771,91 @@ private fun OrdersList(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = Resources.strings.vat,
+                                    text = Resources.strings.subTotal,
                                     color = Color.LightGray,
                                     style = Theme.typography.title
                                 )
                                 Text(
-                                    text = "${
-                                        orderItemState.sumOf { it.totalPrice.toDouble() * 0.14 }
-                                            .toFloat()
-                                    }",
+                                    text = orderItemState.sumOf { it.totalPrice.toDouble() }
+                                        .toFloat()
+                                        .toString(),
                                     color = Color.White,
                                     style = Theme.typography.titleMedium
                                 )
                             }
                             Spacer(modifier = Modifier.height(16.dp))
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = Resources.strings.service,
-                                    color = Color.LightGray,
-                                    style = Theme.typography.title
-                                )
-                                Text(
-                                    text = "${
-                                        orderItemState.sumOf { it.totalPrice.toDouble() * 0.12 }
-                                            .toFloat()
-                                    }",
-                                    color = Color.White,
-                                    style = Theme.typography.titleMedium
-                                )
+
+                            if (StarTouchSetup.adjustments.any { it.isDinIn }) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        text = Resources.strings.service,
+                                        color = Color.LightGray,
+                                        style = Theme.typography.title
+                                    )
+                                    Text(
+                                        text = "${
+                                            orderItemState.sumOf { order ->
+                                                var temp = 0.0
+                                                StarTouchSetup.adjustments.filter { f -> f.isDinIn }
+                                                    .forEach { adj ->
+                                                        if (adj.type == "Percentage")
+                                                            temp =
+                                                                order.totalPrice.toDouble() * (adj.value / 100)
+                                                        else if (adj.type == "Flat amount")
+                                                            temp =
+                                                                order.totalPrice.toDouble() + adj.value
+                                                    }
+                                                adjState = temp.toFloat()
+                                                temp
+                                            }.toFloat().also {
+                                                orderInteractionListener.updateAdj(it)
+                                            }
+                                        }",
+                                        color = Color.White,
+                                        style = Theme.typography.titleMedium
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(16.dp))
                             }
-                            Spacer(modifier = Modifier.height(16.dp))
+
+                            if (StarTouchSetup.taxes.any { it.isDinIn }) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        text = Resources.strings.vat,
+                                        color = Color.LightGray,
+                                        style = Theme.typography.title
+                                    )
+                                    Text(
+                                        text = "${
+                                            orderItemState.sumOf { order ->
+                                                var temp = 0.0
+                                                StarTouchSetup.taxes.filter { f -> f.isDinIn }
+                                                    .forEach { tax ->
+                                                        if (tax.type == "Percentage")
+                                                            temp =
+                                                                (adjState + order.totalPrice.toDouble()) * (tax.value / 100)
+                                                        else if (tax.type == "Flat amount")
+                                                            temp =
+                                                                (adjState + order.totalPrice.toDouble()) + tax.value
+                                                    }
+                                                taxState = temp.toFloat()
+                                                temp
+                                            }.toFloat().also {
+                                                orderInteractionListener.updateTax(it)
+                                            }
+                                        }",
+                                        color = Color.White,
+                                        style = Theme.typography.titleMedium
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(16.dp))
+                            }
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
@@ -811,10 +868,7 @@ private fun OrdersList(
                                 Text(
                                     text = "${
                                         orderItemState.sumOf {
-                                            ((it.totalPrice.toDouble() * 0.14)
-                                                    + (it.totalPrice.toDouble()) +
-                                                    (it.totalPrice.toDouble() * 0.12)
-                                                    )
+                                            ((taxState) + (it.totalPrice.toDouble()) + (adjState))
                                         }.toFloat()
                                     }",
                                     color = Color.White,

@@ -75,4 +75,5 @@ data class English(
     override val enableTable: String = "Enable Table",
     override val moveTableChecks: String = "Move Table Checks",
     override val void: String = "Void",
+    override val subTotal: String = "Sub Total",
 ) : IStringResources

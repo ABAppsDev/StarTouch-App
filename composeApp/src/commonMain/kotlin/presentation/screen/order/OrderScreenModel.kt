@@ -518,13 +518,17 @@ class OrderScreenModel(
                     checkID = checkId,
                     userID = StarTouchSetup.USER_ID.toString(),
                     serverId = StarTouchSetup.REST_ID,
-                    items = fireItems
+                    items = fireItems,
+                    taxes = state.value.tax,
+                    adjustments = state.value.adj
                 ) else
                     manageChecksUseCase.addItemsToCheck(
                         checkID = checkId,
                         userID = StarTouchSetup.USER_ID.toString(),
                         serverId = StarTouchSetup.REST_ID,
-                        items = fireItems
+                        items = fireItems,
+                        taxes = state.value.tax,
+                        adjustments = state.value.adj,
                     )
             },
             onSuccess = {
@@ -758,6 +762,14 @@ class OrderScreenModel(
 
     override fun showWarningItem() {
         updateState { it.copy(warningItemIsVisible = true) }
+    }
+
+    override fun updateTax(tax: Float) {
+        updateState { it.copy(tax = tax) }
+    }
+
+    override fun updateAdj(adj: Float) {
+        updateState { it.copy(adj = adj) }
     }
 
     override fun onClickPlus(id: Int) {

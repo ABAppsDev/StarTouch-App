@@ -113,7 +113,9 @@ class ChecksGateway(
         checkID: Long,
         serverId: Int,
         userID: String,
-        items: List<FireItems>
+        items: List<FireItems>,
+        taxes: Float,
+        adjustments: Float,
     ): Boolean {
         return tryToExecute<ServerResponse<Boolean>> {
             val fastLoop = localConfigurationGateway.getIsBackToHome()
@@ -125,6 +127,8 @@ class ChecksGateway(
                 parameter("outletID", StarTouchSetup.OUTLET_ID)
                 parameter("restID", StarTouchSetup.REST_ID)
                 parameter("fastBack", !fastLoop)
+                parameter("taxes", taxes)
+                parameter("adjustments", adjustments)
             }
         }.data ?: throw Exception("")
     }
@@ -132,7 +136,10 @@ class ChecksGateway(
     override suspend fun fireItems(
         checkID: Long,
         serverId: Int,
-        userID: String, items: List<FireItems>
+        userID: String,
+        items: List<FireItems>,
+        taxes: Float,
+        adjustments: Float,
     ): Boolean {
         return tryToExecute<ServerResponse<Boolean>> {
             val fastLoop = localConfigurationGateway.getIsBackToHome()
@@ -144,6 +151,8 @@ class ChecksGateway(
                 parameter("outletID", StarTouchSetup.OUTLET_ID)
                 parameter("restID", StarTouchSetup.REST_ID)
                 parameter("fastBack", !fastLoop)
+                parameter("taxes", taxes)
+                parameter("adjustments", adjustments)
             }
         }.data ?: throw Exception("")
     }

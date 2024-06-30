@@ -11,7 +11,10 @@ interface IChecksGateway {
     suspend fun fireItems(
         checkID: Long,
         serverId: Int,
-        userID: String, items: List<FireItems>
+        userID: String,
+        items: List<FireItems>,
+        taxes: Float,
+        adjustments: Float,
     ): Boolean
 
     suspend fun openNewCheckWithChecksOpen(openNewCheck: OpenNewCheck): OpenCheck
@@ -32,7 +35,9 @@ interface IChecksGateway {
         checkID: Long,
         serverId: Int,
         userID: String,
-        items: List<FireItems>
+        items: List<FireItems>,
+        taxes: Float,
+        adjustments: Float,
     ): Boolean
 
     suspend fun openNewCheckTableGuest(openNewCheck: OpenNewCheck): OpenCheck

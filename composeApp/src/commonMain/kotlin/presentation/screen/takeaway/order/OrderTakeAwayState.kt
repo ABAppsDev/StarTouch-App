@@ -39,6 +39,8 @@ data class OrderTakeAwayState(
     val showEnterOpenPrice: Boolean = false,
     val price: String = "",
     val deleted: Boolean = false,
+    val tax: Float = 0f,
+    val adj: Float = 0f,
 )
 
 @Immutable

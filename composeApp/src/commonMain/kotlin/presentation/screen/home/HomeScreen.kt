@@ -174,10 +174,6 @@ class HomeScreen : Screen {
                 pullRefreshState = pullRefreshState
             )
         }
-        LaunchedEffect(state.homeDetailsState.outletName) {
-            println(StarTouchSetup.taxes)
-            println(StarTouchSetup.adjustments)
-        }
     }
 }
 

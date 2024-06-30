@@ -38,9 +38,18 @@ class ManageChecksUseCase(
         checkID: Long,
         serverId: Int,
         userID: String,
-        items: List<FireItems>
+        items: List<FireItems>,
+        taxes: Float,
+        adjustments: Float,
     ): Boolean {
-        return checksGateway.addItemsToExistCheck(checkID, serverId, userID, items)
+        return checksGateway.addItemsToExistCheck(
+            checkID,
+            serverId,
+            userID,
+            items,
+            taxes,
+            adjustments
+        )
     }
 
     suspend fun getAllChecksByTableId(
@@ -66,8 +75,10 @@ class ManageChecksUseCase(
         serverId: Int,
         userID: String,
         items: List<FireItems>,
+        taxes: Float,
+        adjustments: Float,
     ): Boolean {
-        return checksGateway.fireItems(checkID, serverId, userID, items)
+        return checksGateway.fireItems(checkID, serverId, userID, items, taxes, adjustments)
     }
 
     suspend fun deleteTable(checkId: Long) {

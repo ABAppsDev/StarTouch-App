@@ -61,7 +61,7 @@ interface IStringResources {
     val orderNumber: String
     val enterPrice:String
     val openPrice:String
-
+    val subTotal:String
     val splitCheck:String
     val unSplitCheck:String
     val combineCheck:String
@@ -74,6 +74,4 @@ interface IStringResources {
     val enableTable:String
     val moveTableChecks:String
     val void:String
-
-
 }
