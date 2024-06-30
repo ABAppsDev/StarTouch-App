@@ -1,5 +1,7 @@
 package data.util
 
+import data.remote.model.AdjustmentSetup
+import data.remote.model.TaxSetup
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.Serializable
 import util.LanguageCode
@@ -24,17 +26,3 @@ object StarTouchSetup {
     var taxesSetup = listOf(TaxSetup())
     var adjustmentsSetup = listOf(AdjustmentSetup())
 }
-
-@Serializable
-data class TaxSetup(
-    val id: Int = 0,
-    val isTakeAway: Boolean = false,
-    val isDinIn: Boolean = false,
-)
-
-@Serializable
-data class AdjustmentSetup(
-    val id: Int = 0,
-    val isTakeAway: Boolean = false,
-    val isDinIn: Boolean = false,
-)
