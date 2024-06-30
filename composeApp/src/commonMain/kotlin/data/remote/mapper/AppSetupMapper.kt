@@ -14,6 +14,8 @@ fun AppSetupDto.toEntity(): AppSetup = AppSetup(
     outletName = outletName ?: "",
     systemDate = systemDate ?: getDateNow(),
     defaultLanguage = defaultLanguage ?: "English",
+    taxSetup = taxSetup,
+    adjustmentSetup = adjustmentSetup
 
 )
 
@@ -26,5 +28,5 @@ fun OutletSetupDto.toEntity(): OutletSetup = OutletSetup(
 )
 
 fun RoomSetupDto.toEntity(): RoomSetup = RoomSetup(
-    id ?: 0, code ?: 0, name ?: "",name2?:""
+    id ?: 0, code ?: 0, name ?: "", name2 ?: ""
 )

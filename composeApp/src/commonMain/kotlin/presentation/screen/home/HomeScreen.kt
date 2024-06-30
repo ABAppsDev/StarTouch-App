@@ -174,6 +174,10 @@ class HomeScreen : Screen {
                 pullRefreshState = pullRefreshState
             )
         }
+        LaunchedEffect(state.homeDetailsState.outletName) {
+            println(StarTouchSetup.taxesSetup)
+            println(StarTouchSetup.adjustmentsSetup)
+        }
     }
 }
 
