@@ -21,8 +21,8 @@ class GetAppSetupUseCase(
                 ),
                 outletName = "ABApps",
                 defaultLanguage = "English",
-                taxSetup = emptyList(),
-                adjustmentSetup = emptyList()
+                taxes = emptyList(),
+                adjustments = emptyList()
             )
         else setupGateway.getAppSetup(outletID, restID)
     }

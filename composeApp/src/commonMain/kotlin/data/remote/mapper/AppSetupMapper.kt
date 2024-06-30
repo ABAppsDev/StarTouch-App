@@ -14,8 +14,8 @@ fun AppSetupDto.toEntity(): AppSetup = AppSetup(
     outletName = outletName ?: "",
     systemDate = systemDate ?: getDateNow(),
     defaultLanguage = defaultLanguage ?: "English",
-    taxSetup = taxSetup,
-    adjustmentSetup = adjustmentSetup
+    taxes = taxes,
+    adjustments = adjustments
 
 )
 

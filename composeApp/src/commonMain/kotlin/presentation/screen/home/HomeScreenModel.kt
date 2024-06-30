@@ -96,8 +96,8 @@ class HomeScreenModel(
                     code.value == AppLanguage.code.value
                 } ?: LanguageCode.EN
             )
-            StarTouchSetup.taxesSetup = appSetup.taxSetup
-            StarTouchSetup.adjustmentsSetup = appSetup.adjustmentSetup
+            StarTouchSetup.taxes = appSetup.taxes
+            StarTouchSetup.adjustments = appSetup.adjustments
         }
     }
 

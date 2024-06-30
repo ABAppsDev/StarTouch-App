@@ -1,9 +1,8 @@
 package data.util
 
-import data.remote.model.AdjustmentSetup
-import data.remote.model.TaxSetup
+import data.remote.model.Adjustment
+import data.remote.model.Tax
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.serialization.Serializable
 import util.LanguageCode
 import util.getDateNow
 
@@ -23,6 +22,6 @@ object StarTouchSetup {
     var DEFAULT_LANGUAGE = LanguageCode.EN.value
     var SYSTEM_DATE = getDateNow()
     var ORDER_NUMBER = 1
-    var taxesSetup = listOf(TaxSetup())
-    var adjustmentsSetup = listOf(AdjustmentSetup())
+    var taxes = listOf(Tax())
+    var adjustments = listOf(Adjustment())
 }

@@ -4,10 +4,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Tax(
-    val id: Int,
-    val type: String,
-    val value: Float,
-    val minPerson: Int,
-    val forEachPerson: Boolean,
-    val isDefault: Boolean,
+    val id: Int = 0,
+    val type: String = "",
+    val value: Float = 0.0f,
+    val minPerson: Int = 0,
+    val forEachPerson: Boolean = false,
+    val isDefault: Boolean = false,
+    val isDinIn: Boolean = false,
+    val isTakeAway: Boolean = false,
 )

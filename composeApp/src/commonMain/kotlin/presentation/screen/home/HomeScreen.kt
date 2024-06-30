@@ -175,8 +175,8 @@ class HomeScreen : Screen {
             )
         }
         LaunchedEffect(state.homeDetailsState.outletName) {
-            println(StarTouchSetup.taxesSetup)
-            println(StarTouchSetup.adjustmentsSetup)
+            println(StarTouchSetup.taxes)
+            println(StarTouchSetup.adjustments)
         }
     }
 }
