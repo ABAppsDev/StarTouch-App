@@ -41,6 +41,7 @@ data class OrderTakeAwayState(
     val deleted: Boolean = false,
     val tax: Float = 0f,
     val adj: Float = 0f,
+    val amount: Float = 0f,
 )
 
 @Immutable

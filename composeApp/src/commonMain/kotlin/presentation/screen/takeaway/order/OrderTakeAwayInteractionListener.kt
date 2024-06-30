@@ -32,4 +32,5 @@ interface OrderTakeAwayInteractionListener {
     fun showWarningItem()
     fun updateTax(tax: Float)
     fun updateAdj(adj: Float)
+    fun updateAmount(amount: Float)
 }

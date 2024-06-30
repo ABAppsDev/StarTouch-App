@@ -869,7 +869,9 @@ private fun OrdersList(
                                     text = "${
                                         orderItemState.sumOf {
                                             ((taxState) + (it.totalPrice.toDouble()) + (adjState))
-                                        }.toFloat()
+                                        }.toFloat().also {
+                                            orderInteractionListener.updateAmount(it)
+                                        }
                                     }",
                                     color = Color.White,
                                     style = Theme.typography.titleMedium
