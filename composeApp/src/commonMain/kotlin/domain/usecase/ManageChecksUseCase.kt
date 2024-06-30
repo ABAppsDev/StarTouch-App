@@ -81,6 +81,28 @@ class ManageChecksUseCase(
         return checksGateway.fireItems(checkID, serverId, userID, items, taxes, adjustments)
     }
 
+    suspend fun settle(
+        checkID: Long,
+        cashierId: Int,
+        taxes: Float,
+        adjustments: Float,
+        amount: Float,
+        outletID: Int,
+        restID: Int,
+        ws: Int,
+    ): Boolean {
+        return checksGateway.settle(
+            checkID,
+            cashierId,
+            taxes,
+            adjustments,
+            amount,
+            outletID,
+            restID,
+            ws,
+        )
+    }
+
     suspend fun deleteTable(checkId: Long) {
         checksGateway.deleteTable(checkId)
     }

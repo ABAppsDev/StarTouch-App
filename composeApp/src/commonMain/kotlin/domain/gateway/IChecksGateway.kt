@@ -40,6 +40,17 @@ interface IChecksGateway {
         adjustments: Float,
     ): Boolean
 
+    suspend fun settle(
+        checkID: Long,
+        cashierId: Int,
+        taxes: Float,
+        adjustments: Float,
+        amount: Float,
+        outletID: Int,
+        restID: Int,
+        ws: Int,
+    ): Boolean
+
     suspend fun openNewCheckTableGuest(openNewCheck: OpenNewCheck): OpenCheck
     suspend fun deleteTable(checkId: Long)
 }

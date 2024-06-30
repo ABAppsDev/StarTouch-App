@@ -156,4 +156,30 @@ class ChecksGateway(
             }
         }.data ?: throw Exception("")
     }
+
+    override suspend fun settle(
+        checkID: Long,
+        cashierId: Int,
+        taxes: Float,
+        adjustments: Float,
+        amount: Float,
+        outletID: Int,
+        restID: Int,
+        ws: Int,
+    ): Boolean {
+        return tryToExecute<ServerResponse<Boolean>> {
+            val fastLoop = localConfigurationGateway.getIsBackToHome()
+            post("/check/settle") {
+                parameter("checkID", checkID)
+                parameter("cashierId", cashierId)
+                parameter("outletID", StarTouchSetup.OUTLET_ID)
+                parameter("restID", StarTouchSetup.REST_ID)
+                parameter("fastBack", !fastLoop)
+                parameter("taxes", taxes)
+                parameter("adjustments", adjustments)
+                parameter("amount", amount)
+                parameter("ws", ws)
+            }
+        }.data ?: throw Exception("")
+    }
 }

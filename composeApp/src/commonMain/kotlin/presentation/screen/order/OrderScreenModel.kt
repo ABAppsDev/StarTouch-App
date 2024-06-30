@@ -550,11 +550,39 @@ class OrderScreenModel(
     }
 
     override fun onClickFireAndSettle() {
-        //TODO("Not yet implemented")
+        tryToExecute(
+            function = {
+                manageChecksUseCase.settle(
+                    checkID = checkId,
+                    cashierId = StarTouchSetup.USER_ID,
+                    taxes = state.value.tax,
+                    adjustments = state.value.adj,
+                    outletID = StarTouchSetup.OUTLET_ID,
+                    restID = StarTouchSetup.REST_ID,
+                    ws = StarTouchSetup.WORK_STATION_ID,
+                    amount = state.value.amount,
+                )
+            },
+            onSuccess = {
+                if (it)
+                    viewModelScope.launch {
+                        updateState { state -> state.copy(orderItemState = emptyList()) }
+                        orders.clear()
+                        val fastLoop = manageSetting.getIsBackToHome()
+                        updateState { s -> s.copy(isLoadingButton = false) }
+                        if (fastLoop) sendNewEffect(OrderUiEffect.NavigateBackToDinIn)
+                        else {
+                            AppLanguage.code.emit(StarTouchSetup.DEFAULT_LANGUAGE)
+                            sendNewEffect(OrderUiEffect.NavigateBackToHome)
+                        }
+                    }
+            },
+            onError = ::onError
+        )
     }
 
     override fun onClickFireAndPrint() {
-        //TODO("Not yet implemented")
+
     }
 
     override fun onClickClose() {
@@ -770,6 +798,10 @@ class OrderScreenModel(
 
     override fun updateAdj(adj: Float) {
         updateState { it.copy(adj = adj) }
+    }
+
+    override fun updateAmount(amount: Float) {
+        updateState { it.copy(amount = amount) }
     }
 
     override fun onClickPlus(id: Int) {
