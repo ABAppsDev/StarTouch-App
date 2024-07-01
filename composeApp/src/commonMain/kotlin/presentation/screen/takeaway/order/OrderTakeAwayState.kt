@@ -9,6 +9,7 @@ import domain.entity.ModifierItem
 import domain.entity.Preset
 import presentation.base.ErrorState
 import util.LanguageCode
+import util.roundToDecimals
 import kotlin.random.Random
 
 val orders = mutableListOf<OrderTakeAwayItemState>()
@@ -75,6 +76,32 @@ data class OrderTakeAwayItemState(
     val modifierPick: Int = 0,
     val prePaidCard: Boolean = false,
     val refItemId: Int = 0,
+    val adj: Float = run {
+        var temp = 0f
+        StarTouchSetup.adjustments.filter { f -> f.isDinIn }
+            .forEach { adj ->
+                if (adj.type == "Percentage")
+                    temp =
+                        totalPrice * (adj.value / 100)
+                else if (adj.type == "Flat amount")
+                    temp =
+                        totalPrice + adj.value
+            }
+        temp.roundToDecimals(2)
+    },
+    val tax: Float = run {
+        var temp = 0f
+        StarTouchSetup.taxes.filter { f -> f.isDinIn }
+            .forEach { tax ->
+                if (tax.type == "Percentage")
+                    temp =
+                        (adj + totalPrice) * (tax.value / 100)
+                else if (tax.type == "Flat amount")
+                    temp =
+                        (adj + totalPrice) + tax.value
+            }
+        temp.roundToDecimals(2)
+    }
 )
 
 fun OrderTakeAwayItemState.toEntity(): FireItems = FireItems(
