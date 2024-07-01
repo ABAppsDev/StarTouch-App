@@ -111,6 +111,7 @@ import presentation.screen.home.HomeScreen
 import presentation.util.EventHandler
 import resource.Resources
 import util.getScreenModel
+import util.roundToDecimals
 
 class OrderTakeAwayScreen(
     private val checkId: Long,
@@ -812,7 +813,7 @@ private fun OrdersList(
                                                 temp
                                             }.toFloat().also {
                                                 orderInteractionListener.updateAdj(it)
-                                            }
+                                            }.roundToDecimals(2)
                                         }",
                                         color = Color.White,
                                         style = Theme.typography.titleMedium
@@ -848,7 +849,7 @@ private fun OrdersList(
                                                 temp
                                             }.toFloat().also {
                                                 orderInteractionListener.updateTax(it)
-                                            }
+                                            }.roundToDecimals(2)
                                         }",
                                         color = Color.White,
                                         style = Theme.typography.titleMedium
@@ -871,7 +872,7 @@ private fun OrdersList(
                                             ((taxState) + (it.totalPrice.toDouble()) + (adjState))
                                         }.toFloat().also {
                                             orderInteractionListener.updateAmount(it)
-                                        }
+                                        }.roundToDecimals(2)
                                     }",
                                     color = Color.White,
                                     style = Theme.typography.titleMedium
