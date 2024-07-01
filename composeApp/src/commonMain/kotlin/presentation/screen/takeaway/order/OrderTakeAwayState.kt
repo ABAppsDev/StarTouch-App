@@ -81,10 +81,10 @@ data class OrderTakeAwayItemState(
         StarTouchSetup.adjustments.filter { f -> f.isDinIn }
             .forEach { adj ->
                 if (adj.type == "Percentage")
-                    temp =
+                    temp +=
                         totalPrice * (adj.value / 100)
                 else if (adj.type == "Flat amount")
-                    temp =
+                    temp +=
                         totalPrice + adj.value
             }
         temp.roundToDecimals(2)
@@ -94,10 +94,10 @@ data class OrderTakeAwayItemState(
         StarTouchSetup.taxes.filter { f -> f.isDinIn }
             .forEach { tax ->
                 if (tax.type == "Percentage")
-                    temp =
+                    temp +=
                         (adj + totalPrice) * (tax.value / 100)
                 else if (tax.type == "Flat amount")
-                    temp =
+                    temp +=
                         (adj + totalPrice) + tax.value
             }
         temp.roundToDecimals(2)
