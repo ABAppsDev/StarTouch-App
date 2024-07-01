@@ -30,7 +30,7 @@ data class DinInState(
     val isTableGuest: Boolean = false,
     val deleted: Boolean = false,
     val exit: Boolean = true,
-    val selectedFabMenuItem: String? = null,
+    val selectedDininOption: DininOption? = null,
 )
 
 @Immutable
@@ -44,6 +44,7 @@ data class TableDetailsState(
     val covers: Int = 0,
     val checksCount: Int = 0,
     val printed: Boolean = false,
+    val enabled: Boolean = true,
 )
 
 @Immutable
@@ -96,3 +97,18 @@ fun AssignCheck.toAssignDrawerState(): AssignCheckState = AssignCheckState(
 fun RoomSetup.toState(): RoomDetailsState = RoomDetailsState(
     id, if (AppLanguage.code.value == LanguageCode.EN.value) name else name2, code,
 )
+
+enum class DininOption {
+    SplitCheck,
+    UnSplitCheck,
+    CombineCheck,
+    UnCombineCheck,
+    Void,
+    MoveTableChecks,
+    SplitAndPay,
+    ShareItem,
+    MoveItem,
+    MoveItemToNewCheck,
+    EnableTable,
+    DisableTable,
+}

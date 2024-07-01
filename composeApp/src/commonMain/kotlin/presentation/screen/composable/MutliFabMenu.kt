@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import com.beepbeep.designSystem.ui.theme.Theme
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import presentation.screen.dinin.DininOption
 
 @Composable
 fun FilterFabMenuButton(
@@ -226,7 +227,8 @@ fun MutliFabView(
 
 data class MenuItem(
     val icon: DrawableResource? = null,
-    val label: String
+    val label: String,
+    val option:DininOption
 )
 
 enum class MutliFabState {

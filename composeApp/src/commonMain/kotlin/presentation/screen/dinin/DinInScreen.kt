@@ -183,21 +183,52 @@ private fun OnRender(
     }
 
     val fabMenuitems: List<MenuItem> = listOf(
-        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.splitCheck),
-        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.unSplitCheck),
-        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.combineCheck),
-        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.unCombineCheck),
-        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.void),
-        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.moveTableChecks),
-        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.splitAndPay),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.splitCheck,
+            option = DininOption.SplitCheck
+        ),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.unSplitCheck,
+            option = DininOption.UnSplitCheck
+        ),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.combineCheck,
+            option = DininOption.CombineCheck
+        ),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.unCombineCheck,
+            option = DininOption.UnCombineCheck
+        ),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.void,
+            option = DininOption.Void
+        ),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.moveTableChecks,
+            option = DininOption.MoveTableChecks
+        ),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.splitAndPay,
+            option = DininOption.SplitAndPay
+        ),
     )
 
     val dropDownMenuItem: List<MenuItem> = listOf(
-        MenuItem(label = Resources.strings.shareItem),
-        MenuItem(label = Resources.strings.moveItem),
-        MenuItem(label = Resources.strings.moveItemToNewCheck),
-        MenuItem(label = Resources.strings.enableTable),
-        MenuItem(label = Resources.strings.disableTable),
+        MenuItem(label = Resources.strings.shareItem, option = DininOption.ShareItem),
+        MenuItem(label = Resources.strings.moveItem, option = DininOption.MoveItem),
+        MenuItem(
+            label = Resources.strings.moveItemToNewCheck,
+            option = DininOption.MoveItemToNewCheck
+        ),
+        MenuItem(label = Resources.strings.enableTable, option = DininOption.EnableTable),
+        MenuItem(label = Resources.strings.disableTable, option = DininOption.DisableTable),
     )
 
     Box(Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
@@ -208,7 +239,7 @@ private fun OnRender(
                     painterResource = painterResource(Res.drawable.ic_back),
                     title = Resources.strings.dinningIn,
                     actions = {
-                        if (!state.selectedFabMenuItem.isNullOrBlank()) {
+                        if (state.selectedDininOption != null) {
                             TextButton(
                                 onClick = listener::onCancelMenuItemClick
                             ) {
@@ -220,8 +251,8 @@ private fun OnRender(
                         } else {
                             IconButton(onClick = {
                                 isDropDownMenuExpanded = !isDropDownMenuExpanded
-                                if (isDropDownMenuExpanded && mutliFabState ==MutliFabState.EXPANDED)
-                                    mutliFabState =MutliFabState.COLLAPSED
+                                if (isDropDownMenuExpanded && mutliFabState == MutliFabState.EXPANDED)
+                                    mutliFabState = MutliFabState.COLLAPSED
 
                             }) {
                                 Icon(
@@ -283,18 +314,28 @@ private fun OnRender(
                 ) {
                     items(state.tablesDetails) { table ->
                         ChooseTable(
-                            table,
+                            table = table,
                             onLongClick = {
-                                if (state.roomId != 0)
-                                    listener.onLongClick(table.tableId.toLong())
-                                else listener.onLongClick(table.checkId ?: 0L)
+                                if (state.selectedDininOption == null && table.enabled) {
+                                    if (state.roomId != 0)
+                                        listener.onLongClick(table.tableId.toLong())
+                                    else listener.onLongClick(table.checkId ?: 0L)
+                                }
                             },
                             id = state.roomId
                         ) {
-                            if (table.checksCount > 0)
-                                listener.showWarningDialogue(table.tableId, table.tableNumber)
-                            else
-                                listener.onClickTable(table.tableId, table.tableNumber)
+                            if (state.selectedDininOption == null && table.enabled) {
+                                if (table.checksCount > 0)
+                                    listener.showWarningDialogue(table.tableId, table.tableNumber)
+                                else
+                                    listener.onClickTable(table.tableId, table.tableNumber)
+                            } else {
+                                listener.onClickTableWhileOptionClicked(
+                                    table.tableId,
+                                    table.tableNumber
+                                )
+                            }
+
                         }
                     }
                 }
@@ -314,7 +355,7 @@ private fun OnRender(
             mutliFabState = mutliFabState,
             onChangeFabStateState = { state ->
                 mutliFabState = state
-                if (mutliFabState== MutliFabState.EXPANDED && isDropDownMenuExpanded)
+                if (mutliFabState == MutliFabState.EXPANDED && isDropDownMenuExpanded)
                     isDropDownMenuExpanded = false
             }
         )
@@ -628,6 +669,7 @@ private fun ChooseTable(
         checksCount = table.checksCount.toString(),
         printed = table.printed,
         hasOrders = table.covers > 0 || table.openCheckDate != "null",
+        enabled = table.enabled,
         modifier = modifier
             .combinedClickable(
                 onLongClick = {
