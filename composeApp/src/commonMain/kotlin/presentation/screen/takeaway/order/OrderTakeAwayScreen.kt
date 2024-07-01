@@ -62,7 +62,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -733,9 +732,6 @@ private fun OrdersList(
                         )
                     }
                     item {
-                        var taxState by remember { mutableFloatStateOf(0f) }
-                        var adjState by remember { mutableFloatStateOf(0f) }
-
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -798,22 +794,10 @@ private fun OrdersList(
                                     )
                                     Text(
                                         text = "${
-                                            orderItemState.sumOf { order ->
-                                                var temp = 0.0
-                                                StarTouchSetup.adjustments.filter { f -> f.isTakeAway }
-                                                    .forEach { adj ->
-                                                        if (adj.type == "Percentage")
-                                                            temp =
-                                                                order.totalPrice.toDouble() * (adj.value / 100)
-                                                        else if (adj.type == "Flat amount")
-                                                            temp =
-                                                                order.totalPrice.toDouble() + adj.value
-                                                    }
-                                                adjState = temp.toFloat()
-                                                temp
-                                            }.toFloat().also {
-                                                orderInteractionListener.updateAdj(it)
-                                            }.roundToDecimals(2)
+                                            orderItemState.sumOf { it.adj.toDouble() }.toFloat()
+                                                .roundToDecimals(2).also {
+                                                    orderInteractionListener.updateAdj(it)
+                                                }
                                         }",
                                         color = Color.White,
                                         style = Theme.typography.titleMedium
@@ -834,22 +818,10 @@ private fun OrdersList(
                                     )
                                     Text(
                                         text = "${
-                                            orderItemState.sumOf { order ->
-                                                var temp = 0.0
-                                                StarTouchSetup.taxes.filter { f -> f.isTakeAway }
-                                                    .forEach { tax ->
-                                                        if (tax.type == "Percentage")
-                                                            temp =
-                                                                (adjState + order.totalPrice.toDouble()) * (tax.value / 100)
-                                                        else if (tax.type == "Flat amount")
-                                                            temp =
-                                                                (adjState + order.totalPrice.toDouble()) + tax.value
-                                                    }
-                                                taxState = temp.toFloat()
-                                                temp
-                                            }.toFloat().also {
-                                                orderInteractionListener.updateTax(it)
-                                            }.roundToDecimals(2)
+                                            orderItemState.sumOf { it.tax.toDouble() }.toFloat()
+                                                .roundToDecimals(2).also {
+                                                    orderInteractionListener.updateTax(it)
+                                                }
                                         }",
                                         color = Color.White,
                                         style = Theme.typography.titleMedium
@@ -869,10 +841,10 @@ private fun OrdersList(
                                 Text(
                                     text = "${
                                         orderItemState.sumOf {
-                                            ((taxState) + (it.totalPrice.toDouble()) + (adjState))
-                                        }.toFloat().also {
+                                            (it.tax + (it.totalPrice.toDouble()) + it.adj)
+                                        }.toFloat().roundToDecimals(2).also {
                                             orderInteractionListener.updateAmount(it)
-                                        }.roundToDecimals(2)
+                                        }
                                     }",
                                     color = Color.White,
                                     style = Theme.typography.titleMedium
