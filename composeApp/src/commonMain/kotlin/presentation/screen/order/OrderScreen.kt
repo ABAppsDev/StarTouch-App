@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -50,6 +51,8 @@ import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material.rememberDismissState
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -57,6 +60,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -71,13 +75,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -378,59 +386,78 @@ fun ItemCard(
     if (source.collectIsPressedAsState().value) {
         qty = ""
     }
-    Box(
-        modifier.heightIn(100.dp)
-            .width(192.dp)
-            .background(Theme.colors.disable, shape = RoundedCornerShape(16.dp))
-            .clip(RoundedCornerShape(16.dp))
-            .padding(horizontal = 8.dp)
-            .bounceClick { onClick();qty = "1" }) {
-//        Box(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .fillMaxHeight(0.8f)
-//                .align(Alignment.BottomCenter)
-//                .clip(RoundedCornerShape(16.dp, 16.dp, 16.dp, 16.dp))
-//                .background(Theme.colors.surface)
-//        )
-        Column(
+
+
+    ConstraintLayout(
+        modifier = Modifier.padding(top = 20.dp, start = 20.dp).clickable {
+            onClick.invoke()
+        }
+    ) {
+        val (backgroundConstrant, donutConstrant, titleConstrant, subtitle, priceConstrant) = createRefs()
+        Card(
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = Theme.colors.disable),
             modifier = Modifier
-                .align(Alignment.Center),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                .constrainAs(backgroundConstrant) {}
+                .height(180.dp)
+                .width(140.dp)
+        ) {}
+        Image(
+            alignment = Alignment.Center,
+            modifier = Modifier
+                .background(Color.Transparent)
+                .constrainAs(donutConstrant) {
+                    top.linkTo(backgroundConstrant.top)
+                    start.linkTo(backgroundConstrant.start)
+                }
+                .offset(x = (-20).dp, y = (-20).dp).height(100.dp).width(100.dp),
+            painter = painterResource(DrawableResource("dish.png")),
+            contentDescription = "Image",
+            contentScale = ContentScale.Fit
+        )
+        Text(
+            text = name,
+            maxLines = 2,
+            minLines = 2,
+            color = Theme.colors.contentPrimary,
+            style = Theme.typography.title,
+            modifier = Modifier
+                .padding(start = 8.dp, end = 8.dp)
+                .width(124.dp)
+                .constrainAs(titleConstrant) {
+                    top.linkTo(donutConstrant.bottom)
+                    start.linkTo(backgroundConstrant.start)
+                }
+        )
+        Row(
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.Bottom,
+            modifier = Modifier
+                .constrainAs(priceConstrant) {
+                    bottom.linkTo(backgroundConstrant.bottom)
+                    end.linkTo(backgroundConstrant.end)
+                }
         ) {
-//            Image(
-//                painter = painterResource(DrawableResource("dish.png")),
-//                contentDescription = "",
-//                modifier = Modifier
-//                    .size(132.dp)
-//                    .align(Alignment.Start)
-//            )
-            Text(
-                text = name,
-                maxLines = 1,
-                color = Theme.colors.contentPrimary,
-                style = Theme.typography.title,
-            )
-            SlideAnimation(!isChoose) {
+            if (!isChoose) {
                 Text(
                     text = price,
-                    maxLines = 1,
+                    fontWeight = FontWeight.SemiBold,
                     color = Theme.colors.contentPrimary,
-                    style = Theme.typography.title,
+                    style = Theme.typography.title.copy(textAlign = TextAlign.End),
+                    modifier = Modifier.fillMaxWidth().padding(end = 15.dp, bottom = 15.dp)
                 )
             }
-            SlideAnimation(isChoose) {
+            if (isChoose) {
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
+                        .width(140.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
                         modifier = Modifier
                             .heightIn(30.dp)
-                            .clip(RoundedCornerShape(8.dp))
+                            .clip(RoundedCornerShape(topStart = 8.dp , topEnd = 8.dp , bottomEnd = 20.dp , bottomStart = 20.dp))
                             .background(Color(0xFF2D303E)),
                     ) {
                         Row(
@@ -528,6 +555,154 @@ fun ItemCard(
             }
         }
     }
+
+//    Box(
+//        modifier.heightIn(100.dp)
+//            .width(192.dp)
+//            .background(Theme.colors.disable, shape = RoundedCornerShape(16.dp))
+//            .clip(RoundedCornerShape(16.dp))
+//            .padding(horizontal = 8.dp)
+//            .bounceClick { onClick();qty = "1" }) {
+//
+//
+//        Row(modifier = Modifier.align(Alignment.CenterStart) , horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+//            if(!isChoose) {
+//                Image(
+//                    painter = painterResource(DrawableResource("dish.png")),
+//                    contentDescription = "",
+//                    modifier = Modifier
+//                        .size(60.dp)
+//                )
+//            }
+//
+//            Column(
+//                modifier = Modifier,
+//                verticalArrangement = Arrangement.spacedBy(16.dp),
+//            ) {
+//                Text(
+//                    text = name,
+//                    maxLines = 1,
+//                    color = Theme.colors.contentPrimary,
+//                    style = Theme.typography.title,
+//                )
+//                if(!isChoose) {
+//                    Text(
+//                        text = price,
+//                        maxLines = 1,
+//                        color = Theme.colors.contentPrimary,
+//                        style = Theme.typography.title,
+//                    )
+//                }
+//                if(isChoose) {
+//                    Row(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(horizontal = 16.dp),
+//                        horizontalArrangement = Arrangement.SpaceBetween,
+//                        verticalAlignment = Alignment.CenterVertically
+//                    ) {
+//                        Box(
+//                            modifier = Modifier
+//                                .heightIn(30.dp)
+//                                .clip(RoundedCornerShape(8.dp))
+//                                .background(Color(0xFF2D303E)),
+//                        ) {
+//                            Row(
+//                                verticalAlignment = Alignment.CenterVertically,
+//                                modifier = Modifier.padding(start = 8.dp)
+//                            ) {
+//                                Box(
+//                                    modifier = Modifier
+//                                        .weight(1f)
+//                                        .height(30.dp)
+//                                        .clip(RoundedCornerShape(8.dp))
+//                                        .background(Color(0xFFEFE3C8))
+//                                        .clickable {
+//                                            if (qty.isEmpty() || qty.isBlank()) return@clickable
+//                                            if (qty.toFloat() > 1f) {
+//                                                var temp = qty.toFloat()
+//                                                temp -= 1f
+//                                                qty = temp.toString()
+//                                            }
+//                                        },
+//                                    contentAlignment = Alignment.Center
+//                                ) {
+//                                    Text(
+//                                        text = "-",
+//                                        color = Theme.colors.surface,
+//                                        style = Theme.typography.titleMedium
+//                                    )
+//                                }
+//                                BasicTextField(
+//                                    value = qty,
+//                                    onValueChange = {
+//                                        qty = it
+//                                    },
+//                                    textStyle = TextStyle(
+//                                        color = Theme.colors.contentPrimary,
+//                                        fontSize = 14.sp,
+//                                        textAlign = TextAlign.Center
+//                                    ),
+//                                    modifier = Modifier
+//                                        .weight(2f)
+//                                        .padding(horizontal = 4.dp),
+//                                    maxLines = 1,
+//                                    keyboardOptions = KeyboardOptions(
+//                                        keyboardType = KeyboardType.Number,
+//                                        imeAction = ImeAction.Done
+//                                    ),
+//                                    keyboardActions = KeyboardActions(onDone = {
+//                                        onClickOk(
+//                                            id,
+//                                            qty.toFloat()
+//                                        )
+//                                        qty = "1"
+//                                    }),
+//                                    interactionSource = source
+//                                )
+//                                Box(
+//                                    modifier = Modifier
+//                                        .weight(1f)
+//                                        .height(30.dp)
+//                                        .clip(RoundedCornerShape(8.dp))
+//                                        .background(Color(0xFFEFE3C8))
+//                                        .clickable {
+//                                            if (qty.isEmpty() || qty.isBlank()) return@clickable
+//                                            if (qty.toFloat() < 99f) {
+//                                                var temp = qty.toFloat()
+//                                                temp += 1
+//                                                qty = temp.toString()
+//                                            }
+//                                        },
+//                                    contentAlignment = Alignment.Center
+//                                ) {
+//                                    Text(
+//                                        text = "+",
+//                                        color = Theme.colors.surface,
+//                                        style = Theme.typography.titleMedium
+//                                    )
+//                                }
+//                                IconButton(modifier = Modifier.weight(1.5f).padding(start = 2.dp),
+//                                    onClick = {
+//                                        if (qty.isEmpty() || qty.isBlank()) return@IconButton
+//                                        if (openPrice) showOpenPriceDialogue(id, qty.toFloat())
+//                                        else onClickOk(id, qty.toFloat())
+//                                        qty = "1"
+//                                    }) {
+//                                    Icon(
+//                                        Icons.Filled.CheckCircle,
+//                                        modifier = Modifier.size(80.dp),
+//                                        contentDescription = null,
+//                                        tint = Theme.colors.success
+//                                    )
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 }
 
 @Composable
@@ -541,7 +716,7 @@ private fun ItemsList(
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
         LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
+            columns = GridCells.Adaptive(140.dp),
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
