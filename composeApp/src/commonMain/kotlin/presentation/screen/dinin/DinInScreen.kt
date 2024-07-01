@@ -185,8 +185,8 @@ private fun OnRender(
         MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.unSplitCheck),
         MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.combineCheck),
         MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.unCombineCheck),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.moveItem),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.moveItemToNewCheck),
+        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.void),
+        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.moveTableChecks),
         MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.splitAndPay),
     )
 
