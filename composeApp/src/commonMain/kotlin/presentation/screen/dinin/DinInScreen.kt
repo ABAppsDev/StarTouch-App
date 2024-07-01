@@ -6,11 +6,6 @@ import abapps_startouch.composeapp.generated.resources.ic_back
 import abapps_startouch.composeapp.generated.resources.ic_profile_filled
 import abapps_startouch.composeapp.generated.resources.invoice
 import abapps_startouch.composeapp.generated.resources.table
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -23,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -37,8 +33,11 @@ import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -73,9 +72,7 @@ import org.jetbrains.compose.resources.painterResource
 import presentation.screen.composable.AppScaffold
 import presentation.screen.composable.Chair
 import presentation.screen.composable.ErrorDialogue
-import presentation.screen.composable.FilterFab
-import presentation.screen.composable.FilterFabMenu
-import presentation.screen.composable.MutliFabMenuItem
+import presentation.screen.composable.MenuItem
 import presentation.screen.composable.MutliFabState
 import presentation.screen.composable.MutliFabView
 import presentation.screen.composable.RestaurantTableWithTextLoading
@@ -179,15 +176,28 @@ private fun OnRender(
     pullRefreshState: PullRefreshState
 ) {
     var isSelected by remember { mutableStateOf(false) }
+    var isDropDownMenuExpanded by remember { mutableStateOf(false) }
 
-    val items: List<MutliFabMenuItem> = listOf(
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.splitCheck),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.unSplitCheck),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.combineCheck),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.unCombineCheck),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.void),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.moveTableChecks),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.splitAndPay),
+    var mutliFabState by rememberSaveable {
+        mutableStateOf(MutliFabState.COLLAPSED)
+    }
+
+    val fabMenuitems: List<MenuItem> = listOf(
+        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.splitCheck),
+        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.unSplitCheck),
+        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.combineCheck),
+        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.unCombineCheck),
+        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.void),
+        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.moveTableChecks),
+        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.splitAndPay),
+    )
+
+    val dropDownMenuItem: List<MenuItem> = listOf(
+        MenuItem(label = Resources.strings.shareItem),
+        MenuItem(label = Resources.strings.moveItem),
+        MenuItem(label = Resources.strings.moveItemToNewCheck),
+        MenuItem(label = Resources.strings.enableTable),
+        MenuItem(label = Resources.strings.disableTable),
     )
 
     Box(Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
@@ -198,7 +208,7 @@ private fun OnRender(
                     painterResource = painterResource(Res.drawable.ic_back),
                     title = Resources.strings.dinningIn,
                     actions = {
-                        if (!state.selectedFabMenuItem.isNullOrBlank())
+                        if (!state.selectedFabMenuItem.isNullOrBlank()) {
                             TextButton(
                                 onClick = listener::onCancelMenuItemClick
                             ) {
@@ -207,6 +217,20 @@ private fun OnRender(
                                     style = TextStyle(color = Color.White)
                                 )
                             }
+                        } else {
+                            IconButton(onClick = {
+                                isDropDownMenuExpanded = !isDropDownMenuExpanded
+                                if (isDropDownMenuExpanded && mutliFabState ==MutliFabState.EXPANDED)
+                                    mutliFabState =MutliFabState.COLLAPSED
+
+                            }) {
+                                Icon(
+                                    painterResource(Res.drawable.baseline_more_vert_24),
+                                    contentDescription = null,
+                                    tint = Color.White
+                                )
+                            }
+                        }
                     }
                 )
                 Row(
@@ -277,7 +301,23 @@ private fun OnRender(
             }
         }
 
-        MutliFabView(items, onMenuItemClick = listener::onMenuItemClick)
+        DininDropDownMenu(
+            items = dropDownMenuItem,
+            isExpand = isDropDownMenuExpanded,
+            onDismiss = { isDropDownMenuExpanded = !isDropDownMenuExpanded },
+            onMenuItemClick = listener::onMenuItemClick
+
+        )
+        MutliFabView(
+            fabMenuitems,
+            onMenuItemClick = listener::onMenuItemClick,
+            mutliFabState = mutliFabState,
+            onChangeFabStateState = { state ->
+                mutliFabState = state
+                if (mutliFabState== MutliFabState.EXPANDED && isDropDownMenuExpanded)
+                    isDropDownMenuExpanded = false
+            }
+        )
 
         PullRefreshIndicator(
             state.isRefreshing,
@@ -285,6 +325,34 @@ private fun OnRender(
             modifier = Modifier.align(Alignment.TopCenter),
             contentColor = Color(0xFF8D7B4B)
         )
+    }
+}
+
+@Composable
+private fun DininDropDownMenu(
+    isExpand: Boolean,
+    onDismiss: () -> Unit,
+    onMenuItemClick: (MenuItem) -> Unit,
+    items: List<MenuItem>
+) {
+    Box(
+        modifier = Modifier.fillMaxWidth()
+            .wrapContentSize(Alignment.TopEnd)
+    ) {
+        DropdownMenu(
+            expanded = isExpand,
+            onDismissRequest = onDismiss
+        ) {
+            items.forEach {
+                DropdownMenuItem(
+                    text = { Text(it.label) },
+                    onClick = {
+                        onMenuItemClick(it)
+                        onDismiss.invoke()
+                    }
+                )
+            }
+        }
     }
 }
 

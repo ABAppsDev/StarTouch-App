@@ -30,10 +30,7 @@ import androidx.compose.material.Text
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -46,8 +43,8 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun FilterFabMenuButton(
-    item: MutliFabMenuItem,
-    onClick: (MutliFabMenuItem) -> Unit,
+    item: MenuItem,
+    onClick: (MenuItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -61,7 +58,7 @@ fun FilterFabMenuButton(
     ) {
         Icon(
             modifier = Modifier.size(16.dp),
-            painter = painterResource(item.icon),
+            painter = painterResource(item.icon?:Res.drawable.baseline_more_vert_24),
             contentDescription = null,
             tint = Color.White
         )
@@ -91,8 +88,8 @@ fun FilterFabMenuLabel(
 
 @Composable
 fun FilterFabMenuItem(
-    menuItem: MutliFabMenuItem,
-    onMenuItemClick: (MutliFabMenuItem) -> Unit,
+    menuItem: MenuItem,
+    onMenuItemClick: (MenuItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -115,8 +112,8 @@ fun FilterFabMenuItem(
 @Composable
 fun FilterFabMenu(
     visible: Boolean,
-    items: List<MutliFabMenuItem>,
-    onMenuItemClick: (MutliFabMenuItem) -> Unit,
+    items: List<MenuItem>,
+    onMenuItemClick: (MenuItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -189,14 +186,12 @@ fun FilterFab(
 
 @Composable
 fun MutliFabView(
-    items: List<MutliFabMenuItem>,
+    items: List<MenuItem>,
     modifier: Modifier = Modifier,
-    onMenuItemClick: (MutliFabMenuItem) -> Unit
+    onMenuItemClick: (MenuItem) -> Unit,
+    mutliFabState: MutliFabState,
+    onChangeFabStateState: (MutliFabState) -> Unit
 ) {
-
-    var mutliFabState by rememberSaveable {
-        mutableStateOf(MutliFabState.COLLAPSED)
-    }
 
     val transitionState = remember {
         MutableTransitionState(mutliFabState).apply {
@@ -221,18 +216,16 @@ fun MutliFabView(
             visible = mutliFabState == MutliFabState.EXPANDED,
             onMenuItemClick = {
                 onMenuItemClick.invoke(it)
-                mutliFabState = MutliFabState.COLLAPSED
+                onChangeFabStateState(MutliFabState.COLLAPSED)
             })
         FilterFab(
             state = mutliFabState,
-            rotation = iconRotationDegree, onClick = { state ->
-                mutliFabState = state
-            })
+            rotation = iconRotationDegree, onClick = onChangeFabStateState)
     }
 }
 
-data class MutliFabMenuItem(
-    val icon: DrawableResource,
+data class MenuItem(
+    val icon: DrawableResource? = null,
     val label: String
 )
 

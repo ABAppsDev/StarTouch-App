@@ -15,7 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import presentation.base.BaseScreenModel
 import presentation.base.ErrorState
-import presentation.screen.composable.MutliFabMenuItem
+import presentation.screen.composable.MenuItem
 
 class DinInScreenModel(
     private val manageDinInUseCase: ManageDinInUseCase,
@@ -796,11 +796,11 @@ class DinInScreenModel(
         }
     }
 
-    override fun onMenuItemClick(mutliFabMenuItem: MutliFabMenuItem) {
-        if (state.value.selectedFabMenuItem != mutliFabMenuItem.label)
+    override fun onMenuItemClick(menuItem: MenuItem) {
+        if (state.value.selectedFabMenuItem != menuItem.label)
             updateState {
                 it.copy(
-                    selectedFabMenuItem = mutliFabMenuItem.label,
+                    selectedFabMenuItem = menuItem.label,
                 )
             }
         else
