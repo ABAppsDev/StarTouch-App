@@ -89,6 +89,7 @@ import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
 import com.beepbeep.designSystem.ui.composable.animate.SlideAnimation
 import com.beepbeep.designSystem.ui.composable.snackbar.internal.SnackbarColor
 import com.beepbeep.designSystem.ui.theme.Theme
+import data.util.AppLanguage
 import data.util.StarTouchSetup
 import domain.entity.FireItems
 import kotlinx.coroutines.launch
@@ -109,6 +110,7 @@ import presentation.screen.dinin.DinInScreen
 import presentation.screen.home.HomeScreen
 import presentation.util.EventHandler
 import resource.Resources
+import util.LanguageCode
 import util.getScreenModel
 import util.roundToDecimals
 
@@ -756,8 +758,7 @@ private fun OrdersList(
                                     style = Theme.typography.title
                                 )
                                 Text(
-                                    text = orderItemState.sumOf { it.qty.toDouble() }.toFloat()
-                                        .toString(),
+                                    text = orderItemState.count().toString(),
                                     color = Color.White,
                                     style = Theme.typography.titleMedium
                                 )
@@ -783,51 +784,55 @@ private fun OrdersList(
                             Spacer(modifier = Modifier.height(16.dp))
 
                             if (StarTouchSetup.adjustments.any { it.isDinIn }) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        text = Resources.strings.service,
-                                        color = Color.LightGray,
-                                        style = Theme.typography.title
-                                    )
-                                    Text(
-                                        text = "${
-                                            orderItemState.sumOf { it.adj.toDouble() }.toFloat()
-                                                .roundToDecimals(2).also {
-                                                    orderInteractionListener.updateAdj(it)
-                                                }
-                                        }",
-                                        color = Color.White,
-                                        style = Theme.typography.titleMedium
-                                    )
+                                StarTouchSetup.adjustments.filter { it.isDinIn }.forEach { adj ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(
+                                            text = if (AppLanguage.code.value == LanguageCode.EN.value) adj.name else adj.name2,
+                                            color = Color.LightGray,
+                                            style = Theme.typography.title
+                                        )
+                                        Text(
+                                            text = "${
+                                                orderItemState.sumOf { it.adj.toDouble() }.toFloat()
+                                                    .roundToDecimals(2).also {
+                                                        orderInteractionListener.updateAdj(it)
+                                                    }
+                                            }",
+                                            color = Color.White,
+                                            style = Theme.typography.titleMedium
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(16.dp))
                                 }
-                                Spacer(modifier = Modifier.height(16.dp))
                             }
 
                             if (StarTouchSetup.taxes.any { it.isDinIn }) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        text = Resources.strings.vat,
-                                        color = Color.LightGray,
-                                        style = Theme.typography.title
-                                    )
-                                    Text(
-                                        text = "${
-                                            orderItemState.sumOf { it.tax.toDouble() }.toFloat()
-                                                .roundToDecimals(2).also {
-                                                    orderInteractionListener.updateTax(it)
-                                                }
-                                        }",
-                                        color = Color.White,
-                                        style = Theme.typography.titleMedium
-                                    )
+                                StarTouchSetup.taxes.filter { it.isDinIn }.forEach { tax ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(
+                                            text = if (AppLanguage.code.value == LanguageCode.EN.value) tax.name else tax.name2,
+                                            color = Color.LightGray,
+                                            style = Theme.typography.title
+                                        )
+                                        Text(
+                                            text = "${
+                                                orderItemState.sumOf { it.tax.toDouble() }.toFloat()
+                                                    .roundToDecimals(2).also {
+                                                        orderInteractionListener.updateTax(it)
+                                                    }
+                                            }",
+                                            color = Color.White,
+                                            style = Theme.typography.titleMedium
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(16.dp))
                                 }
-                                Spacer(modifier = Modifier.height(16.dp))
                             }
                             Row(
                                 modifier = Modifier.fillMaxWidth(),

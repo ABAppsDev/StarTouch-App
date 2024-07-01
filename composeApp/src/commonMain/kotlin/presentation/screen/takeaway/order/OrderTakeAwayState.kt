@@ -78,7 +78,7 @@ data class OrderTakeAwayItemState(
     val refItemId: Int = 0,
     val adj: Float = run {
         var temp = 0f
-        StarTouchSetup.adjustments.filter { f -> f.isDinIn }
+        StarTouchSetup.adjustments.filter { f -> f.isTakeAway }
             .forEach { adj ->
                 if (adj.type == "Percentage")
                     temp +=
@@ -91,7 +91,7 @@ data class OrderTakeAwayItemState(
     },
     val tax: Float = run {
         var temp = 0f
-        StarTouchSetup.taxes.filter { f -> f.isDinIn }
+        StarTouchSetup.taxes.filter { f -> f.isTakeAway }
             .forEach { tax ->
                 if (tax.type == "Percentage")
                     temp +=

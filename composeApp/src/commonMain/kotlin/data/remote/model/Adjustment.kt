@@ -5,11 +5,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Adjustment(
     val id: Int = 0,
+    val name: String = "",
+    val name2: String = "",
     val type: String = "",
     val value: Float = 0.0f,
     val minPerson: Int = 0,
     val forEachPerson: Boolean = false,
-    val isDefault: Boolean = false,
     val minCharge: Boolean = false,
     val openAmount: Boolean = false,
     val taxable: Boolean = false,
