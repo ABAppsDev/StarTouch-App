@@ -73,8 +73,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -99,6 +102,7 @@ import com.beepbeep.designSystem.ui.composable.snackbar.internal.SnackbarColor
 import com.beepbeep.designSystem.ui.theme.Theme
 import data.util.StarTouchSetup
 import domain.entity.FireItems
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -1218,6 +1222,16 @@ private fun EnterModifyLastItemDialogue(
     orderInteractionListener: OrderInteractionListener,
     modifier: Modifier = Modifier,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+
+
+    LaunchedEffect(Unit) {
+        keyboard?.show()
+        delay(100)
+        focusRequester.requestFocus()
+    }
+
     StDialogue(
         onDismissRequest = orderInteractionListener::onDismissDialogue,
         modifier = modifier,
@@ -1228,7 +1242,7 @@ private fun EnterModifyLastItemDialogue(
             color = Theme.colors.contentPrimary,
         )
         StTextField(
-            modifier = Modifier.padding(top = 24.dp),
+            modifier = Modifier.padding(top = 24.dp).focusRequester(focusRequester),
             label = "",
             text = comment,
             hint = Resources.strings.comment,
@@ -1269,6 +1283,16 @@ private fun EnterPriceDialogue(
     orderInteractionListener: OrderInteractionListener,
     modifier: Modifier = Modifier,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+
+
+    LaunchedEffect(Unit) {
+        keyboard?.show()
+        delay(100)
+        focusRequester.requestFocus()
+    }
+
     StDialogue(
         onDismissRequest = orderInteractionListener::onDismissPriceDialogue,
         modifier = modifier,
@@ -1279,7 +1303,7 @@ private fun EnterPriceDialogue(
             color = Theme.colors.contentPrimary,
         )
         StTextField(
-            modifier = Modifier.padding(top = 24.dp),
+            modifier = Modifier.padding(top = 24.dp).focusRequester(focusRequester),
             label = "",
             text = price,
             hint = Resources.strings.enterPrice,

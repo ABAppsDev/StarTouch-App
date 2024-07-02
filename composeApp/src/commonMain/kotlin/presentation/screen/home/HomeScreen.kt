@@ -31,9 +31,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -298,6 +304,15 @@ private fun AttendanceDialogue(
     homeInteractionListener: HomeInteractionListener,
     modifier: Modifier = Modifier,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+
+
+    LaunchedEffect(Unit) {
+        keyboard?.show()
+        delay(100)
+        focusRequester.requestFocus()
+    }
     StDialogue(
         onDismissRequest = homeInteractionListener::onDismissAttendanceDialogue,
         modifier = modifier
@@ -308,7 +323,7 @@ private fun AttendanceDialogue(
             color = Theme.colors.contentPrimary,
         )
         StTextField(
-            modifier = Modifier.padding(top = 40.dp),
+            modifier = Modifier.padding(top = 40.dp).focusRequester(focusRequester),
             label = Resources.strings.userName,
             text = username,
             hint = Resources.strings.userName,
@@ -363,6 +378,16 @@ private fun SettingsDialogue(
     homeInteractionListener: HomeInteractionListener,
     modifier: Modifier = Modifier,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+
+
+    LaunchedEffect(Unit) {
+        keyboard?.show()
+        delay(100)
+        focusRequester.requestFocus()
+    }
+
     StDialogue(
         onDismissRequest = homeInteractionListener::onDismissSettingsDialogue,
         modifier = modifier
@@ -373,11 +398,12 @@ private fun SettingsDialogue(
             color = Theme.colors.contentPrimary,
         )
         StTextField(
-            modifier = Modifier.padding(top = 40.dp),
+            modifier = Modifier.padding(top = 40.dp).focusRequester(focusRequester),
             label = Resources.strings.userName,
             text = username,
             hint = Resources.strings.userName,
             onValueChange = homeInteractionListener::onUserNameChanged,
+            imeAction = ImeAction.Next,
         )
         StTextField(
             modifier = Modifier.padding(top = 24.dp),
@@ -424,6 +450,15 @@ private fun PassCodeDialogue(
     homeInteractionListener: HomeInteractionListener,
     modifier: Modifier = Modifier,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+
+
+    LaunchedEffect(Unit) {
+        keyboard?.show()
+        delay(100)
+        focusRequester.requestFocus()
+    }
     StDialogue(
         onDismissRequest = homeInteractionListener::onDismissPermissionDialogue,
         modifier = modifier
@@ -434,7 +469,7 @@ private fun PassCodeDialogue(
             color = Theme.colors.contentPrimary,
         )
         StTextField(
-            modifier = Modifier.padding(top = 24.dp),
+            modifier = Modifier.padding(top = 24.dp).focusRequester(focusRequester),
             label = Resources.strings.passcode,
             text = passcode,
             hint = Resources.strings.passcode,

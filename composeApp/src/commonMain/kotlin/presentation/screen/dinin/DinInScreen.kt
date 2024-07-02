@@ -50,7 +50,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -68,6 +71,7 @@ import com.beepbeep.designSystem.ui.composable.StTextField
 import com.beepbeep.designSystem.ui.composable.StThreeDotLoadingIndicator
 import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
 import com.beepbeep.designSystem.ui.theme.Theme
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import presentation.screen.composable.AppScaffold
 import presentation.screen.composable.Chair
@@ -440,13 +444,23 @@ private fun EnterTableName(
     loadingButton: Boolean,
     dinInInteractionListener: DinInInteractionListener
 ) {
+    val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+
+
+    LaunchedEffect(Unit) {
+        keyboard?.show()
+        delay(100)
+        focusRequester.requestFocus()
+    }
+
     Text(
         text = Resources.strings.tableName,
         style = Theme.typography.headline,
         color = Theme.colors.contentPrimary,
     )
     StTextField(
-        modifier = Modifier.padding(top = 24.dp),
+        modifier = Modifier.padding(top = 24.dp).focusRequester(focusRequester),
         label = Resources.strings.tableName,
         text = tableName,
         hint = Resources.strings.tableName,
@@ -609,13 +623,23 @@ private fun EnterCoversNumber(
     isLoading: Boolean,
     dinInInteractionListener: DinInInteractionListener,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+
+
+    LaunchedEffect(Unit) {
+        keyboard?.show()
+        delay(100)
+        focusRequester.requestFocus()
+    }
+
     Text(
         text = Resources.strings.covers,
         style = Theme.typography.headline,
         color = Theme.colors.contentPrimary,
     )
     StTextField(
-        modifier = Modifier.padding(top = 24.dp),
+        modifier = Modifier.padding(top = 24.dp).focusRequester(focusRequester),
         label = Resources.strings.covers,
         text = covers,
         hint = Resources.strings.covers,
