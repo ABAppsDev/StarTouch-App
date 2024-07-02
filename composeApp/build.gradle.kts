@@ -64,6 +64,9 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.compose.image.loader)
             implementation(libs.mongodb.realm)
+
+            implementation(libs.constraintlayout.compose.multiplatform)
+
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

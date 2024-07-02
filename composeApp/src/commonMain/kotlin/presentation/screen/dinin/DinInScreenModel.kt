@@ -329,6 +329,34 @@ class DinInScreenModel(
         )
     }
 
+    override fun onClickTableWhileOptionClicked(tableId: Int, tableName: String) {
+        val indexOfSelectedTable = state.value.tablesDetails.indexOfLast { it.tableId == tableId }
+        val selectedTable = state.value.tablesDetails[indexOfSelectedTable]
+        val updatedList = state.value.tablesDetails.toMutableList()
+        when(state.value.selectedDininOption){
+            DininOption.SplitCheck -> {}
+            DininOption.UnSplitCheck -> {}
+            DininOption.CombineCheck -> {}
+            DininOption.UnCombineCheck -> {}
+            DininOption.Void -> {}
+            DininOption.MoveTableChecks -> {}
+            DininOption.SplitAndPay -> {}
+            DininOption.ShareItem -> {}
+            DininOption.MoveItem -> {}
+            DininOption.MoveItemToNewCheck -> {}
+            DininOption.EnableTable -> {
+                updatedList[indexOfSelectedTable] = selectedTable.copy(enabled = true)
+                updateState { it.copy(tablesDetails = updatedList) }
+            }
+            DininOption.DisableTable -> {
+                updatedList[indexOfSelectedTable] = selectedTable.copy(enabled = false)
+                updateState { it.copy(tablesDetails = updatedList) }
+            }
+            null -> {}
+        }
+        updateState { it.copy(selectedDininOption = null) }
+    }
+
     private fun onError(errorState: ErrorState) {
         updateState {
             it.copy(
@@ -797,27 +825,27 @@ class DinInScreenModel(
     }
 
     override fun onMenuItemClick(menuItem: MenuItem) {
-        if (state.value.selectedFabMenuItem != menuItem.label)
+        if (state.value.selectedDininOption != menuItem.option)
             updateState {
                 it.copy(
-                    selectedFabMenuItem = menuItem.label,
+                    selectedDininOption = menuItem.option,
                 )
             }
         else
-            updateState { it.copy(selectedFabMenuItem = null) }
+            updateState { it.copy(selectedDininOption = null) }
 
 
-        println("selected Fab item = " + state.value.selectedFabMenuItem)
+        println("selected Fab item = " + state.value.selectedDininOption)
 
     }
 
     override fun onCancelMenuItemClick() {
         updateState {
             it.copy(
-                selectedFabMenuItem = null,
+                selectedDininOption = null,
             )
         }
-        println("selected Fab item After Cancel = " + state.value.selectedFabMenuItem)
+        println("selected Fab item After Cancel = " + state.value.selectedDininOption)
     }
 
     private fun getAllRooms() {

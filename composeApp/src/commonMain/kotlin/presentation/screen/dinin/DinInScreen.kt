@@ -50,7 +50,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -68,6 +71,7 @@ import com.beepbeep.designSystem.ui.composable.StTextField
 import com.beepbeep.designSystem.ui.composable.StThreeDotLoadingIndicator
 import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
 import com.beepbeep.designSystem.ui.theme.Theme
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import presentation.screen.composable.AppScaffold
 import presentation.screen.composable.Chair
@@ -183,21 +187,52 @@ private fun OnRender(
     }
 
     val fabMenuitems: List<MenuItem> = listOf(
-        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.splitCheck),
-        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.unSplitCheck),
-        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.combineCheck),
-        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.unCombineCheck),
-        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.void),
-        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.moveTableChecks),
-        MenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.splitAndPay),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.splitCheck,
+            option = DininOption.SplitCheck
+        ),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.unSplitCheck,
+            option = DininOption.UnSplitCheck
+        ),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.combineCheck,
+            option = DininOption.CombineCheck
+        ),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.unCombineCheck,
+            option = DininOption.UnCombineCheck
+        ),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.void,
+            option = DininOption.Void
+        ),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.moveTableChecks,
+            option = DininOption.MoveTableChecks
+        ),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.splitAndPay,
+            option = DininOption.SplitAndPay
+        ),
     )
 
     val dropDownMenuItem: List<MenuItem> = listOf(
-        MenuItem(label = Resources.strings.shareItem),
-        MenuItem(label = Resources.strings.moveItem),
-        MenuItem(label = Resources.strings.moveItemToNewCheck),
-        MenuItem(label = Resources.strings.enableTable),
-        MenuItem(label = Resources.strings.disableTable),
+        MenuItem(label = Resources.strings.shareItem, option = DininOption.ShareItem),
+        MenuItem(label = Resources.strings.moveItem, option = DininOption.MoveItem),
+        MenuItem(
+            label = Resources.strings.moveItemToNewCheck,
+            option = DininOption.MoveItemToNewCheck
+        ),
+        MenuItem(label = Resources.strings.enableTable, option = DininOption.EnableTable),
+        MenuItem(label = Resources.strings.disableTable, option = DininOption.DisableTable),
     )
 
     Box(Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
@@ -208,7 +243,7 @@ private fun OnRender(
                     painterResource = painterResource(Res.drawable.ic_back),
                     title = Resources.strings.dinningIn,
                     actions = {
-                        if (!state.selectedFabMenuItem.isNullOrBlank()) {
+                        if (state.selectedDininOption != null) {
                             TextButton(
                                 onClick = listener::onCancelMenuItemClick
                             ) {
@@ -220,8 +255,8 @@ private fun OnRender(
                         } else {
                             IconButton(onClick = {
                                 isDropDownMenuExpanded = !isDropDownMenuExpanded
-                                if (isDropDownMenuExpanded && mutliFabState ==MutliFabState.EXPANDED)
-                                    mutliFabState =MutliFabState.COLLAPSED
+                                if (isDropDownMenuExpanded && mutliFabState == MutliFabState.EXPANDED)
+                                    mutliFabState = MutliFabState.COLLAPSED
 
                             }) {
                                 Icon(
@@ -283,18 +318,28 @@ private fun OnRender(
                 ) {
                     items(state.tablesDetails) { table ->
                         ChooseTable(
-                            table,
+                            table = table,
                             onLongClick = {
-                                if (state.roomId != 0)
-                                    listener.onLongClick(table.tableId.toLong())
-                                else listener.onLongClick(table.checkId ?: 0L)
+                                if (state.selectedDininOption == null && table.enabled) {
+                                    if (state.roomId != 0)
+                                        listener.onLongClick(table.tableId.toLong())
+                                    else listener.onLongClick(table.checkId ?: 0L)
+                                }
                             },
                             id = state.roomId
                         ) {
-                            if (table.checksCount > 0)
-                                listener.showWarningDialogue(table.tableId, table.tableNumber)
-                            else
-                                listener.onClickTable(table.tableId, table.tableNumber)
+                            if (state.selectedDininOption == null && table.enabled) {
+                                if (table.checksCount > 0)
+                                    listener.showWarningDialogue(table.tableId, table.tableNumber)
+                                else
+                                    listener.onClickTable(table.tableId, table.tableNumber)
+                            } else {
+                                listener.onClickTableWhileOptionClicked(
+                                    table.tableId,
+                                    table.tableNumber
+                                )
+                            }
+
                         }
                     }
                 }
@@ -314,7 +359,7 @@ private fun OnRender(
             mutliFabState = mutliFabState,
             onChangeFabStateState = { state ->
                 mutliFabState = state
-                if (mutliFabState== MutliFabState.EXPANDED && isDropDownMenuExpanded)
+                if (mutliFabState == MutliFabState.EXPANDED && isDropDownMenuExpanded)
                     isDropDownMenuExpanded = false
             }
         )
@@ -399,13 +444,23 @@ private fun EnterTableName(
     loadingButton: Boolean,
     dinInInteractionListener: DinInInteractionListener
 ) {
+    val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+
+
+    LaunchedEffect(Unit) {
+        keyboard?.show()
+        delay(100)
+        focusRequester.requestFocus()
+    }
+
     Text(
         text = Resources.strings.tableName,
         style = Theme.typography.headline,
         color = Theme.colors.contentPrimary,
     )
     StTextField(
-        modifier = Modifier.padding(top = 24.dp),
+        modifier = Modifier.padding(top = 24.dp).focusRequester(focusRequester),
         label = Resources.strings.tableName,
         text = tableName,
         hint = Resources.strings.tableName,
@@ -568,13 +623,23 @@ private fun EnterCoversNumber(
     isLoading: Boolean,
     dinInInteractionListener: DinInInteractionListener,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+
+
+    LaunchedEffect(Unit) {
+        keyboard?.show()
+        delay(100)
+        focusRequester.requestFocus()
+    }
+
     Text(
         text = Resources.strings.covers,
         style = Theme.typography.headline,
         color = Theme.colors.contentPrimary,
     )
     StTextField(
-        modifier = Modifier.padding(top = 24.dp),
+        modifier = Modifier.padding(top = 24.dp).focusRequester(focusRequester),
         label = Resources.strings.covers,
         text = covers,
         hint = Resources.strings.covers,
@@ -628,6 +693,7 @@ private fun ChooseTable(
         checksCount = table.checksCount.toString(),
         printed = table.printed,
         hasOrders = table.covers > 0 || table.openCheckDate != "null",
+        enabled = table.enabled,
         modifier = modifier
             .combinedClickable(
                 onLongClick = {
