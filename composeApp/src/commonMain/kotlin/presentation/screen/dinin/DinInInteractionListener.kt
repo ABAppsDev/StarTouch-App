@@ -5,7 +5,7 @@ import presentation.screen.composable.MenuItem
 interface DinInInteractionListener {
     fun onClickOk()
     fun onClickTable(tableId: Int, tableName: String)
-    fun onClickTableWhileOptionClicked(tableId: Int, tableName: String)
+    fun onEnableOrDisableTable(tableId: Int)
     fun onClickAssignCheck(id: Int)
     fun onClickCheck(id: Long, serial: Int)
     fun onCoversCountChanged(covers: String)
@@ -25,4 +25,5 @@ interface DinInInteractionListener {
     fun onEnterTableName()
     fun onMenuItemClick(menuItem: MenuItem)
     fun onCancelMenuItemClick()
+    fun onClickTwoTableForDininOption(selectedTablesIds: List<Int>)
 }

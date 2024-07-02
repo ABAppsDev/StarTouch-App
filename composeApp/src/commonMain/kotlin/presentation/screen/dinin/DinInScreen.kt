@@ -309,40 +309,7 @@ private fun OnRender(
                         )
                     }
                 }
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(4),
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.spacedBy(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp),
-                    contentPadding = PaddingValues(8.dp)
-                ) {
-                    items(state.tablesDetails) { table ->
-                        ChooseTable(
-                            table = table,
-                            onLongClick = {
-                                if (state.selectedDininOption == null && table.enabled) {
-                                    if (state.roomId != 0)
-                                        listener.onLongClick(table.tableId.toLong())
-                                    else listener.onLongClick(table.checkId ?: 0L)
-                                }
-                            },
-                            id = state.roomId
-                        ) {
-                            if (state.selectedDininOption == null && table.enabled) {
-                                if (table.checksCount > 0)
-                                    listener.showWarningDialogue(table.tableId, table.tableNumber)
-                                else
-                                    listener.onClickTable(table.tableId, table.tableNumber)
-                            } else {
-                                listener.onClickTableWhileOptionClicked(
-                                    table.tableId,
-                                    table.tableNumber
-                                )
-                            }
-
-                        }
-                    }
-                }
+                TablesGrid(state, listener)
             }
         }
 
@@ -370,6 +337,66 @@ private fun OnRender(
             modifier = Modifier.align(Alignment.TopCenter),
             contentColor = Color(0xFF8D7B4B)
         )
+    }
+}
+
+
+@Composable
+private fun TablesGrid(
+    state: DinInState,
+    listener: DinInInteractionListener
+) {
+    var selectedTables by remember { mutableStateOf<List<Int>>(emptyList()) }
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(4),
+        modifier = Modifier.fillMaxSize(),
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
+        contentPadding = PaddingValues(8.dp)
+    ) {
+        items(state.tablesDetails) { table ->
+            ChooseTable(
+                table = table,
+                onLongClick = {
+                    if (state.selectedDininOption == null && table.enabled) {
+                        if (state.roomId != 0)
+                            listener.onLongClick(table.tableId.toLong())
+                        else listener.onLongClick(table.checkId ?: 0L)
+                    }
+                },
+                id = state.roomId
+            ) {
+                when (state.selectedDininOption) {
+                    null -> {
+                        if (table.enabled) {
+                            if (table.checksCount > 0)
+                                listener.showWarningDialogue(table.tableId, table.tableNumber)
+                            else
+                                listener.onClickTable(table.tableId, table.tableNumber)
+                        }
+                    }
+
+                    DininOption.DisableTable, DininOption.EnableTable -> {
+                        listener.onEnableOrDisableTable(table.tableId)
+                    }
+
+                    else -> {
+                        if (selectedTables.contains(table.tableId)) {
+                            selectedTables = selectedTables - table.tableId
+                        } else {
+                            if (selectedTables.size < 2) {
+                                selectedTables = selectedTables + table.tableId
+                            }
+                        }
+                        if (selectedTables.size == 2) {
+                            listener.onClickTwoTableForDininOption(selectedTables)
+                            selectedTables = emptyList()
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
