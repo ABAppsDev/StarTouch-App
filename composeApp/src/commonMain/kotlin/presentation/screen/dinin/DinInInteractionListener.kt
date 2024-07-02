@@ -1,10 +1,11 @@
 package presentation.screen.dinin
 
-import presentation.screen.composable.MutliFabMenuItem
+import presentation.screen.composable.MenuItem
 
 interface DinInInteractionListener {
     fun onClickOk()
     fun onClickTable(tableId: Int, tableName: String)
+    fun onClickTableWhileOptionClicked(tableId: Int, tableName: String)
     fun onClickAssignCheck(id: Int)
     fun onClickCheck(id: Long, serial: Int)
     fun onCoversCountChanged(covers: String)
@@ -22,6 +23,6 @@ interface DinInInteractionListener {
     fun onCreateTableGuest()
     fun onClickRoom(id: Int)
     fun onEnterTableName()
-    fun onMenuItemClick(mutliFabMenuItem: MutliFabMenuItem)
+    fun onMenuItemClick(menuItem: MenuItem)
     fun onCancelMenuItemClick()
 }

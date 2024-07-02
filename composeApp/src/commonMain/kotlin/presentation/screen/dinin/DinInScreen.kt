@@ -6,11 +6,6 @@ import abapps_startouch.composeapp.generated.resources.ic_back
 import abapps_startouch.composeapp.generated.resources.ic_profile_filled
 import abapps_startouch.composeapp.generated.resources.invoice
 import abapps_startouch.composeapp.generated.resources.table
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -23,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -37,8 +33,11 @@ import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,7 +50,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -69,13 +71,12 @@ import com.beepbeep.designSystem.ui.composable.StTextField
 import com.beepbeep.designSystem.ui.composable.StThreeDotLoadingIndicator
 import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
 import com.beepbeep.designSystem.ui.theme.Theme
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import presentation.screen.composable.AppScaffold
 import presentation.screen.composable.Chair
 import presentation.screen.composable.ErrorDialogue
-import presentation.screen.composable.FilterFab
-import presentation.screen.composable.FilterFabMenu
-import presentation.screen.composable.MutliFabMenuItem
+import presentation.screen.composable.MenuItem
 import presentation.screen.composable.MutliFabState
 import presentation.screen.composable.MutliFabView
 import presentation.screen.composable.RestaurantTableWithTextLoading
@@ -179,15 +180,59 @@ private fun OnRender(
     pullRefreshState: PullRefreshState
 ) {
     var isSelected by remember { mutableStateOf(false) }
+    var isDropDownMenuExpanded by remember { mutableStateOf(false) }
 
-    val items: List<MutliFabMenuItem> = listOf(
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.splitCheck),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.unSplitCheck),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.combineCheck),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.unCombineCheck),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.moveItem),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.moveItemToNewCheck),
-        MutliFabMenuItem(Res.drawable.baseline_more_vert_24, Resources.strings.splitAndPay),
+    var mutliFabState by rememberSaveable {
+        mutableStateOf(MutliFabState.COLLAPSED)
+    }
+
+    val fabMenuitems: List<MenuItem> = listOf(
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.splitCheck,
+            option = DininOption.SplitCheck
+        ),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.unSplitCheck,
+            option = DininOption.UnSplitCheck
+        ),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.combineCheck,
+            option = DininOption.CombineCheck
+        ),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.unCombineCheck,
+            option = DininOption.UnCombineCheck
+        ),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.void,
+            option = DininOption.Void
+        ),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.moveTableChecks,
+            option = DininOption.MoveTableChecks
+        ),
+        MenuItem(
+            Res.drawable.baseline_more_vert_24,
+            Resources.strings.splitAndPay,
+            option = DininOption.SplitAndPay
+        ),
+    )
+
+    val dropDownMenuItem: List<MenuItem> = listOf(
+        MenuItem(label = Resources.strings.shareItem, option = DininOption.ShareItem),
+        MenuItem(label = Resources.strings.moveItem, option = DininOption.MoveItem),
+        MenuItem(
+            label = Resources.strings.moveItemToNewCheck,
+            option = DininOption.MoveItemToNewCheck
+        ),
+        MenuItem(label = Resources.strings.enableTable, option = DininOption.EnableTable),
+        MenuItem(label = Resources.strings.disableTable, option = DininOption.DisableTable),
     )
 
     Box(Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
@@ -198,7 +243,7 @@ private fun OnRender(
                     painterResource = painterResource(Res.drawable.ic_back),
                     title = Resources.strings.dinningIn,
                     actions = {
-                        if (!state.selectedFabMenuItem.isNullOrBlank())
+                        if (state.selectedDininOption != null) {
                             TextButton(
                                 onClick = listener::onCancelMenuItemClick
                             ) {
@@ -207,6 +252,20 @@ private fun OnRender(
                                     style = TextStyle(color = Color.White)
                                 )
                             }
+                        } else {
+                            IconButton(onClick = {
+                                isDropDownMenuExpanded = !isDropDownMenuExpanded
+                                if (isDropDownMenuExpanded && mutliFabState == MutliFabState.EXPANDED)
+                                    mutliFabState = MutliFabState.COLLAPSED
+
+                            }) {
+                                Icon(
+                                    painterResource(Res.drawable.baseline_more_vert_24),
+                                    contentDescription = null,
+                                    tint = Color.White
+                                )
+                            }
+                        }
                     }
                 )
                 Row(
@@ -259,25 +318,51 @@ private fun OnRender(
                 ) {
                     items(state.tablesDetails) { table ->
                         ChooseTable(
-                            table,
+                            table = table,
                             onLongClick = {
-                                if (state.roomId != 0)
-                                    listener.onLongClick(table.tableId.toLong())
-                                else listener.onLongClick(table.checkId ?: 0L)
+                                if (state.selectedDininOption == null && table.enabled) {
+                                    if (state.roomId != 0)
+                                        listener.onLongClick(table.tableId.toLong())
+                                    else listener.onLongClick(table.checkId ?: 0L)
+                                }
                             },
                             id = state.roomId
                         ) {
-                            if (table.checksCount > 0)
-                                listener.showWarningDialogue(table.tableId, table.tableNumber)
-                            else
-                                listener.onClickTable(table.tableId, table.tableNumber)
+                            if (state.selectedDininOption == null && table.enabled) {
+                                if (table.checksCount > 0)
+                                    listener.showWarningDialogue(table.tableId, table.tableNumber)
+                                else
+                                    listener.onClickTable(table.tableId, table.tableNumber)
+                            } else {
+                                listener.onClickTableWhileOptionClicked(
+                                    table.tableId,
+                                    table.tableNumber
+                                )
+                            }
+
                         }
                     }
                 }
             }
         }
 
-        MutliFabView(items, onMenuItemClick = listener::onMenuItemClick)
+        DininDropDownMenu(
+            items = dropDownMenuItem,
+            isExpand = isDropDownMenuExpanded,
+            onDismiss = { isDropDownMenuExpanded = !isDropDownMenuExpanded },
+            onMenuItemClick = listener::onMenuItemClick
+
+        )
+        MutliFabView(
+            fabMenuitems,
+            onMenuItemClick = listener::onMenuItemClick,
+            mutliFabState = mutliFabState,
+            onChangeFabStateState = { state ->
+                mutliFabState = state
+                if (mutliFabState == MutliFabState.EXPANDED && isDropDownMenuExpanded)
+                    isDropDownMenuExpanded = false
+            }
+        )
 
         PullRefreshIndicator(
             state.isRefreshing,
@@ -285,6 +370,34 @@ private fun OnRender(
             modifier = Modifier.align(Alignment.TopCenter),
             contentColor = Color(0xFF8D7B4B)
         )
+    }
+}
+
+@Composable
+private fun DininDropDownMenu(
+    isExpand: Boolean,
+    onDismiss: () -> Unit,
+    onMenuItemClick: (MenuItem) -> Unit,
+    items: List<MenuItem>
+) {
+    Box(
+        modifier = Modifier.fillMaxWidth()
+            .wrapContentSize(Alignment.TopEnd)
+    ) {
+        DropdownMenu(
+            expanded = isExpand,
+            onDismissRequest = onDismiss
+        ) {
+            items.forEach {
+                DropdownMenuItem(
+                    text = { Text(it.label) },
+                    onClick = {
+                        onMenuItemClick(it)
+                        onDismiss.invoke()
+                    }
+                )
+            }
+        }
     }
 }
 
@@ -331,13 +444,23 @@ private fun EnterTableName(
     loadingButton: Boolean,
     dinInInteractionListener: DinInInteractionListener
 ) {
+    val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+
+
+    LaunchedEffect(Unit) {
+        keyboard?.show()
+        delay(100)
+        focusRequester.requestFocus()
+    }
+
     Text(
         text = Resources.strings.tableName,
         style = Theme.typography.headline,
         color = Theme.colors.contentPrimary,
     )
     StTextField(
-        modifier = Modifier.padding(top = 24.dp),
+        modifier = Modifier.padding(top = 24.dp).focusRequester(focusRequester),
         label = Resources.strings.tableName,
         text = tableName,
         hint = Resources.strings.tableName,
@@ -500,13 +623,23 @@ private fun EnterCoversNumber(
     isLoading: Boolean,
     dinInInteractionListener: DinInInteractionListener,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+
+
+    LaunchedEffect(Unit) {
+        keyboard?.show()
+        delay(100)
+        focusRequester.requestFocus()
+    }
+
     Text(
         text = Resources.strings.covers,
         style = Theme.typography.headline,
         color = Theme.colors.contentPrimary,
     )
     StTextField(
-        modifier = Modifier.padding(top = 24.dp),
+        modifier = Modifier.padding(top = 24.dp).focusRequester(focusRequester),
         label = Resources.strings.covers,
         text = covers,
         hint = Resources.strings.covers,
@@ -560,6 +693,7 @@ private fun ChooseTable(
         checksCount = table.checksCount.toString(),
         printed = table.printed,
         hasOrders = table.covers > 0 || table.openCheckDate != "null",
+        enabled = table.enabled,
         modifier = modifier
             .combinedClickable(
                 onLongClick = {

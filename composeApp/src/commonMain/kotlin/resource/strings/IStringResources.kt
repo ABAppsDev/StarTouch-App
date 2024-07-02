@@ -62,16 +62,16 @@ interface IStringResources {
     val enterPrice:String
     val openPrice:String
     val subTotal:String
-    val splitCheck:String
-    val unSplitCheck:String
-    val combineCheck:String
-    val unCombineCheck:String
-    val shareItem:String
+    val splitCheck:String//
+    val unSplitCheck:String//
+    val combineCheck:String//
+    val unCombineCheck:String//
+    val shareItem:String//
     val moveItem:String
     val moveItemToNewCheck:String
-    val splitAndPay:String
+    val splitAndPay:String//
     val disableTable:String
     val enableTable:String
-    val moveTableChecks:String
-    val void:String
+    val moveTableChecks:String//
+    val void:String//
 }

@@ -28,10 +28,11 @@ fun Chair(
     totalAmount: String,
     checksCount: String,
     printed: Boolean,
-    hasOrders: Boolean
+    hasOrders: Boolean,
+    enabled: Boolean
 ) {
     val textMeasurer = rememberTextMeasurer()
-    val color = if (printed) Color.Cyan else if (hasOrders) Color.Red else Color.Green
+    val color = if(!enabled) Color.LightGray else if (printed) Color.Cyan else if (hasOrders) Color.Red else Color.Green
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         Canvas(modifier = Modifier.size(tableSize)) {
             val sizeWithPx = tableSize.toPx()
