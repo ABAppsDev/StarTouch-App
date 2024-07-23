@@ -213,7 +213,7 @@ data class ItemState(
 fun ModifierItem.toItemModifierState(): ItemModifierState = ItemModifierState(
     id = itemID,
     name = if (AppLanguage.code.value == LanguageCode.EN.value) name else name2,
-    price = modPrice,
+    price = if (modPrice0) modPrice else staticPrice,
     isModifier = isModifier,
     taxable = taxable,
     prePaidCard = prePaidCard,
