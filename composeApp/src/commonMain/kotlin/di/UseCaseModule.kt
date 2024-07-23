@@ -10,6 +10,7 @@ import domain.usecase.ManageDinInUseCase
 import domain.usecase.ManageOrderUseCase
 import domain.usecase.ManageSettingUseCase
 import domain.usecase.ValidationAuthUseCase
+import domain.usecase.ManageDininOptionsUseCase
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
@@ -24,4 +25,5 @@ val UseCaseModule = module {
     singleOf(::AdminSystemUseCase)
     singleOf(::ManageChecksUseCase)
     singleOf(::ManageDinInUseCase)
+    singleOf(::ManageDininOptionsUseCase)
 }

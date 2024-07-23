@@ -8,6 +8,7 @@ import domain.entity.TableData
 import domain.usecase.GetAppSetupUseCase
 import domain.usecase.ManageChecksUseCase
 import domain.usecase.ManageDinInUseCase
+import domain.usecase.ManageDininOptionsUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -20,6 +21,7 @@ import presentation.screen.composable.MenuItem
 class DinInScreenModel(
     private val manageDinInUseCase: ManageDinInUseCase,
     private val manageChecksUseCase: ManageChecksUseCase,
+    private val manageDininOptionsUseCase: ManageDininOptionsUseCase,
     private val setupUseCase: GetAppSetupUseCase,
 ) : BaseScreenModel<DinInState, DinInUiEffect>(DinInState()), DinInInteractionListener {
     override val viewModelScope: CoroutineScope get() = screenModelScope
@@ -329,30 +331,48 @@ class DinInScreenModel(
         )
     }
 
-    override fun onClickTableWhileOptionClicked(tableId: Int, tableName: String) {
-        val indexOfSelectedTable = state.value.tablesDetails.indexOfLast { it.tableId == tableId }
-        val selectedTable = state.value.tablesDetails[indexOfSelectedTable]
-        val updatedList = state.value.tablesDetails.toMutableList()
-        when(state.value.selectedDininOption){
-            DininOption.SplitCheck -> {}
-            DininOption.UnSplitCheck -> {}
-            DininOption.CombineCheck -> {}
-            DininOption.UnCombineCheck -> {}
-            DininOption.Void -> {}
-            DininOption.MoveTableChecks -> {}
-            DininOption.SplitAndPay -> {}
-            DininOption.ShareItem -> {}
-            DininOption.MoveItem -> {}
-            DininOption.MoveItemToNewCheck -> {}
+    override fun onEnableOrDisableTable(tableId: Int) {
+        when (state.value.selectedDininOption) {
             DininOption.EnableTable -> {
-                updatedList[indexOfSelectedTable] = selectedTable.copy(enabled = true)
-                updateState { it.copy(tablesDetails = updatedList) }
+                updateState {
+                    it.copy(
+                        tablesDetails = manageDininOptionsUseCase.enableTable(
+                            tableId,
+                            state.value.tablesDetails
+                        )
+                    )
+                }
             }
+
             DininOption.DisableTable -> {
-                updatedList[indexOfSelectedTable] = selectedTable.copy(enabled = false)
-                updateState { it.copy(tablesDetails = updatedList) }
+                updateState {
+                    it.copy(
+                        tablesDetails = manageDininOptionsUseCase.disableTable(
+                            tableId,
+                            state.value.tablesDetails
+                        )
+                    )
+                }
             }
-            null -> {}
+
+            else -> {}
+        }
+        updateState { it.copy(selectedDininOption = null) }
+    }
+
+    override fun onClickTwoTableForDininOption(selectedTablesIds: List<Int>) {
+        when (state.value.selectedDininOption) {
+            DininOption.MoveTableChecks -> {
+                updateState {
+                    it.copy(
+                        tablesDetails = manageDininOptionsUseCase.moveTableChecks(
+                            selectedTablesIds,
+                            state.value.tablesDetails
+                        )
+                    )
+                }
+            }
+            else -> {}
         }
         updateState { it.copy(selectedDininOption = null) }
     }
