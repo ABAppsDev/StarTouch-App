@@ -249,6 +249,11 @@ class OrderScreenModel(
     }
 
     private fun onGetAllItemsModifierSuccess(items: List<ModifierItem>) {
+        val groups = items.sortedBy { it.modifierGroupID }.distinctBy { it.modifierGroupID }
+            .map { it.modifierGroupID }
+        val newItems = mapOf(
+            *groups.map { it to items.filter { item -> item.modifierGroupID == it } }.toTypedArray()
+        )
         updateState {
             it.copy(
                 isLoading = false,
