@@ -263,9 +263,9 @@ class OrderScreenModel(
                 isPresetVisible = false,
                 itemsState = if (items.isNotEmpty()) emptyList() else state.value.itemsState,
                 itemChildrenState = emptyList(),
-                itemModifiersState = items.map { item ->
+                itemModifiersState = newItems[groups.first()]?.map { item ->
                     item.toItemModifierState()
-                }
+                } ?: emptyList()
             )
         }
         if (state.value.itemModifiersState.isEmpty()) updateState {
