@@ -24,7 +24,7 @@ data class OrderState(
     val isPresetVisible: Boolean = false,
     val presetItemsState: List<PresetItemState> = emptyList(),
     val itemModifiersState: List<ItemModifierSettings> = emptyList(),
-    val selectedItemsModifier: Map<Int , List<ItemModifierState>> = emptyMap(),
+    val selectedItemsModifier: Map<Int, List<ItemModifierState>> = emptyMap(),
     val currentModifierGroupIndex: Int = 0,
     val itemChildrenState: List<ItemState> = emptyList(),
     val itemsState: List<ItemState> = emptyList(),
@@ -45,6 +45,7 @@ data class OrderState(
     val tax: Float = 0f,
     val adj: Float = 0f,
     val amount: Float = 0f,
+    val errorDialogueIsVisible: Boolean = false,
 )
 
 data class ItemModifierSettings(

@@ -9,7 +9,7 @@ interface OrderInteractionListener {
     fun onClickFire()
     fun onClickFireAndSettle()
     fun onClickFireAndPrint()
-    fun showWarningModifier(maxPick:Int)
+    fun showWarningModifier(maxPick: Int)
     fun onClickClose()
     fun showErrorScreen()
     fun onClickIconBack()
@@ -33,4 +33,5 @@ interface OrderInteractionListener {
     fun updateTax(tax: Float)
     fun updateAdj(adj: Float)
     fun updateAmount(amount: Float)
+    fun onDismissErrorDialogue()
 }

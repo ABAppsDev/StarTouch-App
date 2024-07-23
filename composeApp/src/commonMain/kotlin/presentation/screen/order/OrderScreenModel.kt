@@ -301,9 +301,7 @@ class OrderScreenModel(
                 name.contains(it.name)
             }
 
-
-
-        if (state.value.currentModifierGroupIndex + 1 == state.value.itemModifiersState.size) {
+        if (state.value.currentModifierGroupIndex == state.value.itemModifiersState.size) {
             updateState {
                 it.copy(
                     selectedPresetId = 0,
@@ -314,6 +312,7 @@ class OrderScreenModel(
                     itemChildrenState = emptyList(),
                     itemModifiersState = emptyList(),
                     isPresetVisible = false,
+                    qty = 0f,
                 )
             }
         } else {
@@ -344,20 +343,36 @@ class OrderScreenModel(
                         pOnCheck = item.pOnCheck
                     )
                 )
-                updateState { it.copy(orderItemState = orders.toList(), qty = 0f) }
+                updateState { it.copy(orderItemState = orders.toList()) }
             }
-            updateState {
-                it.copy(
-                    selectedItemsModifier = it.selectedItemsModifier + mapOf(
-                        groupId to
-                                (state.value.itemModifiersState.find { it.groupId == groupId }?.itemModifiersState?.filter {
-                                    name.contains(
-                                        it.name
-                                    )
-                                } ?: emptyList())
-                    ),
-                    currentModifierGroupIndex = it.currentModifierGroupIndex + 1
-                )
+            if (state.value.currentModifierGroupIndex + 1 == state.value.itemModifiersState.size) {
+                updateState {
+                    it.copy(
+                        selectedPresetId = 0,
+                        selectedItemId = 0,
+                        itemId = 0,
+                        currentModifierGroupIndex = 0,
+                        itemsState = emptyList(),
+                        itemChildrenState = emptyList(),
+                        itemModifiersState = emptyList(),
+                        isPresetVisible = false,
+                        qty = 0f,
+                    )
+                }
+            } else {
+                updateState {
+                    it.copy(
+                        selectedItemsModifier = it.selectedItemsModifier + mapOf(
+                            groupId to
+                                    (state.value.itemModifiersState.find { it.groupId == groupId }?.itemModifiersState?.filter {
+                                        name.contains(
+                                            it.name
+                                        )
+                                    } ?: emptyList())
+                        ),
+                        currentModifierGroupIndex = it.currentModifierGroupIndex + 1
+                    )
+                }
             }
         }
     }
@@ -622,8 +637,13 @@ class OrderScreenModel(
 
     }
 
-    override fun showWarningModifier(maxPick:Int) {
-        updateState { it.copy(errorMessage = "Your Can't choose more Than $maxPick ") }
+    override fun showWarningModifier(maxPick: Int) {
+        updateState {
+            it.copy(
+                errorMessage = "Your Can't choose more Than $maxPick ",
+                errorDialogueIsVisible = true
+            )
+        }
     }
 
     override fun onClickClose() {
@@ -843,6 +863,16 @@ class OrderScreenModel(
 
     override fun updateAmount(amount: Float) {
         updateState { it.copy(amount = amount) }
+    }
+
+    override fun onDismissErrorDialogue() {
+        updateState {
+            it.copy(
+                errorMessage = "",
+                errorState = null,
+                errorDialogueIsVisible = false
+            )
+        }
     }
 
     override fun onClickPlus(id: Int) {

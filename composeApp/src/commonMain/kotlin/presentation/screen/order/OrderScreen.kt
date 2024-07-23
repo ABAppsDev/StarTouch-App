@@ -63,7 +63,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -109,6 +108,7 @@ import presentation.base.ErrorState
 import presentation.screen.composable.CardEmpty
 import presentation.screen.composable.ChooseItem
 import presentation.screen.composable.ChoosePresetLoading
+import presentation.screen.composable.ErrorDialogue
 import presentation.screen.composable.HandleErrorState
 import presentation.screen.composable.SetLayoutDirection
 import presentation.screen.composable.ShimmerListItem
@@ -191,6 +191,15 @@ class OrderScreen(
                 onClickConfirmButton = { screenModel.addInExistItem() },
                 onClickRejectButton = { screenModel.add() },
                 onClickDismissButton = screenModel::onDismissItemDialogue
+            )
+        }
+
+        FadeAnimation(state.errorDialogueIsVisible) {
+            ErrorDialogue(
+                title = Resources.strings.error,
+                text = state.errorMessage,
+                onDismissRequest = screenModel::onDismissErrorDialogue,
+                onClickConfirmButton = screenModel::onDismissErrorDialogue,
             )
         }
 
@@ -392,8 +401,6 @@ fun ItemCard(
     if (source.collectIsPressedAsState().value) {
         qty = ""
     }
-
-
     ConstraintLayout(
         modifier = Modifier.padding(top = 20.dp, start = 20.dp).clickable {
             onClick.invoke()
@@ -799,7 +806,7 @@ private fun ItemModifiersList(
                 ItemCard(
                     item.name,
                     item.price.toString(),
-                    backGroundColor = if(selectedItems.contains(item)) Color.LightGray else Theme.colors.disable
+                    backGroundColor = if (selectedItems.contains(item)) Color.LightGray else Theme.colors.disable
                 ) {
                     if (selectedItems.contains(item)) {
                         selectedItems -= item
@@ -811,8 +818,9 @@ private fun ItemModifiersList(
                         } else if (temp + item.modCount <= currentItemSettings.maxPick) {
                             temp += item.modCount
                             selectedItems += item
-                        } else if (temp + item.modCount > currentItemSettings.maxPick){
+                        } else if (temp + item.modCount > currentItemSettings.maxPick) {
                             showDialgue(currentItemSettings.maxPick)
+                            temp = 0
                         }
                     }
                     if (currentItemSettings.maxPick == selectedItems.size || temp == currentItemSettings.maxPick) {
