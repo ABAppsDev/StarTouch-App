@@ -51,8 +51,6 @@ import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material.rememberDismissState
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -60,12 +58,12 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -83,7 +81,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -329,8 +326,10 @@ class OrderScreen(
                     }
                     FadeAnimation(state.itemModifiersState.isNotEmpty()) {
                         ItemModifiersList(
-                            state.itemModifiersState,
+                            items = state.itemModifiersState,
+                            currentModifierGroupIndex = state.currentModifierGroupIndex,
                             onClickItemModifier = screenModel::onClickItemModifier,
+                            showDialgue = screenModel::showWarningModifier,
                             modifier = Modifier.padding(top = it.calculateTopPadding()),
                         )
                     }
@@ -380,6 +379,7 @@ fun ItemCard(
     openPrice: Boolean = false,
     id: Int = 0,
     isChoose: Boolean = false,
+    backGroundColor: Color = Theme.colors.disable,
     showOpenPriceDialogue: (Int, Float) -> Unit = { _, _ -> },
     onClickOk: (Int, Float) -> Unit = { _, _ -> },
     onClick: () -> Unit,
@@ -402,7 +402,7 @@ fun ItemCard(
         val (backgroundConstrant, donutConstrant, titleConstrant, subtitle, priceConstrant) = createRefs()
         Card(
             shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = Theme.colors.disable),
+            colors = CardDefaults.cardColors(containerColor = backGroundColor),
             modifier = Modifier
                 .constrainAs(backgroundConstrant) {}
                 .height(180.dp)
@@ -463,7 +463,14 @@ fun ItemCard(
                     Box(
                         modifier = Modifier
                             .heightIn(30.dp)
-                            .clip(RoundedCornerShape(topStart = 8.dp , topEnd = 8.dp , bottomEnd = 20.dp , bottomStart = 20.dp))
+                            .clip(
+                                RoundedCornerShape(
+                                    topStart = 8.dp,
+                                    topEnd = 8.dp,
+                                    bottomEnd = 20.dp,
+                                    bottomStart = 20.dp
+                                )
+                            )
                             .background(Color(0xFF2D303E)),
                     ) {
                         Row(
@@ -770,10 +777,16 @@ private fun ItemChildrenList(
 
 @Composable
 private fun ItemModifiersList(
-    items: List<ItemModifierState>,
+    items: List<ItemModifierSettings>,
+    currentModifierGroupIndex: Int,
     modifier: Modifier = Modifier,
-    onClickItemModifier: (String) -> Unit,
+    onClickItemModifier: (List<String>, Int) -> Unit,
+    showDialgue: (Int) -> Unit,
 ) {
+    var selectedItems by mutableStateOf(listOf<ItemModifierState>())
+    val currentItemSettings =
+        if (items.isNotEmpty()) items[currentModifierGroupIndex] else ItemModifierSettings()
+    var temp by remember { mutableStateOf(0) }
     Box(modifier = modifier.fillMaxWidth()) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
@@ -782,9 +795,33 @@ private fun ItemModifiersList(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(8.dp)
         ) {
-            items(items) { item ->
-                ItemCard(item.name, item.price.toString()) {
-                    onClickItemModifier(item.name)
+            items(currentItemSettings.itemModifiersState) { item ->
+                ItemCard(
+                    item.name,
+                    item.price.toString(),
+                    backGroundColor = if(selectedItems.contains(item)) Color.LightGray else Theme.colors.disable
+                ) {
+                    if (selectedItems.contains(item)) {
+                        selectedItems -= item
+                        temp -= 1
+                    } else {
+                        if (item.modCount == 0 && temp < currentItemSettings.maxPick) {
+                            selectedItems += item
+                            temp += 1
+                        } else if (temp + item.modCount <= currentItemSettings.maxPick) {
+                            temp += item.modCount
+                            selectedItems += item
+                        } else if (temp + item.modCount > currentItemSettings.maxPick){
+                            showDialgue(currentItemSettings.maxPick)
+                        }
+                    }
+                    if (currentItemSettings.maxPick == selectedItems.size || temp == currentItemSettings.maxPick) {
+                        onClickItemModifier(
+                            selectedItems.map { it.name },
+                            currentItemSettings.groupId
+                        )
+                        temp = 0
+                    }
                 }
             }
         }
@@ -1051,16 +1088,16 @@ private fun OrdersList(
                                     enabled = !orderItemState.all { it.fired },
                                     isLoading = isLoading
                                 )
-                                StButton(
-                                    title = Resources.strings.firePrint,
-                                    modifier = Modifier.weight(1f),
-                                    containerColor = Theme.colors.primary,
-                                    onClick = {
-                                        if (!isLoading)
-                                            orderInteractionListener.onClickFireAndPrint()
-                                    },
-                                    isLoading = isLoading
-                                )
+//                                StButton(
+//                                    title = Resources.strings.firePrint,
+//                                    modifier = Modifier.weight(1f),
+//                                    containerColor = Theme.colors.primary,
+//                                    onClick = {
+//                                        if (!isLoading)
+//                                            orderInteractionListener.onClickFireAndPrint()
+//                                    },
+//                                    isLoading = isLoading
+//                                )
                                 StButton(
                                     title = Resources.strings.fireSettle,
                                     modifier = Modifier.weight(1f),

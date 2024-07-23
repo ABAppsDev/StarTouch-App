@@ -23,7 +23,9 @@ data class OrderState(
     val showErrorScreen: Boolean = false,
     val isPresetVisible: Boolean = false,
     val presetItemsState: List<PresetItemState> = emptyList(),
-    val itemModifiersState: List<ItemModifierState> = emptyList(),
+    val itemModifiersState: List<ItemModifierSettings> = emptyList(),
+    val selectedItemsModifier: Map<Int , List<ItemModifierState>> = emptyMap(),
+    val currentModifierGroupIndex: Int = 0,
     val itemChildrenState: List<ItemState> = emptyList(),
     val itemsState: List<ItemState> = emptyList(),
     val selectedPresetId: Int = 0,
@@ -43,6 +45,14 @@ data class OrderState(
     val tax: Float = 0f,
     val adj: Float = 0f,
     val amount: Float = 0f,
+)
+
+data class ItemModifierSettings(
+    val groupId: Int = 0,
+    val multiPick: Boolean = false,
+    val allowNoPick: Boolean = false,
+    val maxPick: Int = 0,
+    val itemModifiersState: List<ItemModifierState> = emptyList(),
 )
 
 @Immutable

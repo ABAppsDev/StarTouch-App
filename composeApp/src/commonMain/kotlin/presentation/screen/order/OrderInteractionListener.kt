@@ -2,13 +2,14 @@ package presentation.screen.order
 
 interface OrderInteractionListener {
     fun onClickPreset(presetId: Int)
-    fun onClickItemModifier(name: String)
+    fun onClickItemModifier(name: List<String>, groupId: Int)
     fun onClickItemChild(itemId: Int)
     fun onClickItem(itemId: Int, qty: Float)
     fun onClickFloatActionButton()
     fun onClickFire()
     fun onClickFireAndSettle()
     fun onClickFireAndPrint()
+    fun showWarningModifier(maxPick:Int)
     fun onClickClose()
     fun showErrorScreen()
     fun onClickIconBack()

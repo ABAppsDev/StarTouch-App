@@ -263,8 +263,17 @@ class OrderScreenModel(
                 isPresetVisible = false,
                 itemsState = if (items.isNotEmpty()) emptyList() else state.value.itemsState,
                 itemChildrenState = emptyList(),
-                itemModifiersState = items.map { item ->
-                    item.toItemModifierState()
+                currentModifierGroupIndex = 0,
+                itemModifiersState = groups.map {
+                    ItemModifierSettings(
+                        itemModifiersState = newItems.get(it)?.map {
+                            it.toItemModifierState()
+                        } ?: emptyList(),
+                        groupId = it,
+                        multiPick = newItems.get(it)?.first()?.multiPick ?: throw Exception(),
+                        maxPick = newItems.get(it)?.first()?.maxPick ?: throw Exception(),
+                        allowNoPick = newItems.get(it)?.first()?.allowNoPick ?: throw Exception()
+                    )
                 }
             )
         }
@@ -286,47 +295,70 @@ class OrderScreenModel(
         updateState { it.copy(selectedPresetId = presetId) }
     }
 
-    override fun onClickItemModifier(name: String) {
-        val item = state.value.itemModifiersState.find { it.name == name }
-        item?.let {
-            val order =
-                orders.reversed().find { it.id == state.value.selectedItemId }
-            val serial =
-                orders.indexOf(order) + 1
-            val x = Random.nextInt()
-            addItem(
-                OrderItemState(
-                    id = item.id,
-                    serial = x,
-                    name = item.name,
-                    counter = serial + 1,
-                    qty = state.value.qty,
-                    unitPrice = item.price,
-                    isModifier = item.isModifier,
-                    noServiceCharge = item.noServiceCharge,
-                    refModItem = serial,
-                    status = item.name,
-                    refItemId = order?.serial ?: 0,
-                    modifierGroupID = item.modifierGroupID,
-                    pickFollowItemQty = item.pickFollowItemQty,
-                    prePaidCard = item.prePaidCard,
-                    taxable = item.taxable,
-                    pOnReport = item.pOnReport,
-                    pOnCheck = item.pOnCheck
+    override fun onClickItemModifier(name: List<String>, groupId: Int) {
+        val items =
+            state.value.itemModifiersState.find { it.groupId == groupId }?.itemModifiersState?.filter {
+                name.contains(it.name)
+            }
+
+
+
+        if (state.value.currentModifierGroupIndex + 1 == state.value.itemModifiersState.size) {
+            updateState {
+                it.copy(
+                    selectedPresetId = 0,
+                    selectedItemId = 0,
+                    itemId = 0,
+                    currentModifierGroupIndex = 0,
+                    itemsState = emptyList(),
+                    itemChildrenState = emptyList(),
+                    itemModifiersState = emptyList(),
+                    isPresetVisible = false,
                 )
-            )
-            updateState { it.copy(orderItemState = orders.toList(), qty = 0f) }
-        }
-        updateState {
-            it.copy(
-                selectedPresetId = 0,
-                selectedItemId = 0,
-                itemId = 0,
-                itemsState = emptyList(),
-                itemChildrenState = emptyList(),
-                itemModifiersState = emptyList(),
-                isPresetVisible = false,
-            )
+            }
+        } else {
+            items?.forEach { item ->
+                val order =
+                    orders.reversed().find { it.id == state.value.selectedItemId }
+                val serial =
+                    orders.indexOf(order) + 1
+                val x = Random.nextInt()
+                addItem(
+                    OrderItemState(
+                        id = item.id,
+                        serial = x,
+                        name = item.name,
+                        counter = serial + 1,
+                        qty = state.value.qty,
+                        unitPrice = item.price,
+                        isModifier = item.isModifier,
+                        noServiceCharge = item.noServiceCharge,
+                        refModItem = serial,
+                        status = item.name,
+                        refItemId = order?.serial ?: 0,
+                        modifierGroupID = item.modifierGroupID,
+                        pickFollowItemQty = item.pickFollowItemQty,
+                        prePaidCard = item.prePaidCard,
+                        taxable = item.taxable,
+                        pOnReport = item.pOnReport,
+                        pOnCheck = item.pOnCheck
+                    )
+                )
+                updateState { it.copy(orderItemState = orders.toList(), qty = 0f) }
+            }
+            updateState {
+                it.copy(
+                    selectedItemsModifier = it.selectedItemsModifier + mapOf(
+                        groupId to
+                                (state.value.itemModifiersState.find { it.groupId == groupId }?.itemModifiersState?.filter {
+                                    name.contains(
+                                        it.name
+                                    )
+                                } ?: emptyList())
+                    ),
+                    currentModifierGroupIndex = it.currentModifierGroupIndex + 1
+                )
+            }
         }
     }
 
@@ -588,6 +620,10 @@ class OrderScreenModel(
 
     override fun onClickFireAndPrint() {
 
+    }
+
+    override fun showWarningModifier(maxPick:Int) {
+        updateState { it.copy(errorMessage = "Your Can't choose more Than $maxPick ") }
     }
 
     override fun onClickClose() {
