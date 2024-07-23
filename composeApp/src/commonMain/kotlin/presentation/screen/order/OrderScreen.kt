@@ -1008,55 +1008,59 @@ private fun OrdersList(
                             Spacer(modifier = Modifier.height(16.dp))
 
                             if (StarTouchSetup.adjustments.any { it.isDinIn }) {
-                                StarTouchSetup.adjustments.filter { it.isDinIn }.forEach { adj ->
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
-                                        Text(
-                                            text = if (AppLanguage.code.value == LanguageCode.EN.value) adj.name else adj.name2,
-                                            color = Color.LightGray,
-                                            style = Theme.typography.title
-                                        )
-                                        Text(
-                                            text = "${
-                                                orderItemState.sumOf { it.adj.toDouble() }.toFloat()
-                                                    .roundToDecimals(2).also {
-                                                        orderInteractionListener.updateAdj(it)
-                                                    }
-                                            }",
-                                            color = Color.White,
-                                            style = Theme.typography.titleMedium
-                                        )
+                                StarTouchSetup.adjustments.filter { it.isDinIn }
+                                    .forEachIndexed { index, adj ->
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Text(
+                                                text = if (AppLanguage.code.value == LanguageCode.EN.value) adj.name else adj.name2,
+                                                color = Color.LightGray,
+                                                style = Theme.typography.title
+                                            )
+                                            Text(
+                                                text = "${
+                                                    orderItemState.sumOf { it.adj[index].toDouble() }
+                                                        .toFloat()
+                                                        .roundToDecimals(2).also {
+                                                            orderInteractionListener.updateAdj(it)
+                                                        }
+                                                }",
+                                                color = Color.White,
+                                                style = Theme.typography.titleMedium
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(16.dp))
                                     }
-                                    Spacer(modifier = Modifier.height(16.dp))
-                                }
                             }
 
                             if (StarTouchSetup.taxes.any { it.isDinIn }) {
-                                StarTouchSetup.taxes.filter { it.isDinIn }.forEach { tax ->
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
-                                        Text(
-                                            text = if (AppLanguage.code.value == LanguageCode.EN.value) tax.name else tax.name2,
-                                            color = Color.LightGray,
-                                            style = Theme.typography.title
-                                        )
-                                        Text(
-                                            text = "${
-                                                orderItemState.sumOf { it.tax.toDouble() }.toFloat()
-                                                    .roundToDecimals(2).also {
-                                                        orderInteractionListener.updateTax(it)
-                                                    }
-                                            }",
-                                            color = Color.White,
-                                            style = Theme.typography.titleMedium
-                                        )
+                                StarTouchSetup.taxes.filter { it.isDinIn }
+                                    .forEachIndexed { index, tax ->
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Text(
+                                                text = if (AppLanguage.code.value == LanguageCode.EN.value) tax.name else tax.name2,
+                                                color = Color.LightGray,
+                                                style = Theme.typography.title
+                                            )
+                                            Text(
+                                                text = "${
+                                                    orderItemState.sumOf { it.tax[index].toDouble() }
+                                                        .toFloat()
+                                                        .roundToDecimals(2).also {
+                                                            orderInteractionListener.updateTax(it)
+                                                        }
+                                                }",
+                                                color = Color.White,
+                                                style = Theme.typography.titleMedium
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(16.dp))
                                     }
-                                    Spacer(modifier = Modifier.height(16.dp))
-                                }
                             }
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -1070,7 +1074,7 @@ private fun OrdersList(
                                 Text(
                                     text = "${
                                         orderItemState.sumOf {
-                                            (it.tax + (it.totalPrice.toDouble()) + it.adj)
+                                            (it.tax.sum() + (it.totalPrice.toDouble()) + it.adj.sum())
                                         }.toFloat().roundToDecimals(2).also {
                                             orderInteractionListener.updateAmount(it)
                                         }
@@ -1106,16 +1110,16 @@ private fun OrdersList(
 //                                    },
 //                                    isLoading = isLoading
 //                                )
-                                StButton(
-                                    title = Resources.strings.fireSettle,
-                                    modifier = Modifier.weight(1f),
-                                    containerColor = Theme.colors.primary,
-                                    onClick = {
-                                        if (!isLoading)
-                                            orderInteractionListener.onClickFireAndSettle()
-                                    },
-                                    isLoading = isLoading
-                                )
+//                                StButton(
+//                                    title = Resources.strings.fireSettle,
+//                                    modifier = Modifier.weight(1f),
+//                                    containerColor = Theme.colors.primary,
+//                                    onClick = {
+//                                        if (!isLoading)
+//                                            orderInteractionListener.onClickFireAndSettle()
+//                                    },
+//                                    isLoading = isLoading
+//                                )
                             }
                         }
                     }

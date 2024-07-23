@@ -16,6 +16,7 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import presentation.base.BaseScreenModel
 import presentation.base.ErrorState
+import util.roundToDecimals
 import kotlin.random.Random
 
 class OrderScreenModel(
@@ -754,6 +755,7 @@ class OrderScreenModel(
 
     override fun onClickMinus(id: Int) {
         val order = orders.find { it.serial == id && !it.fired && !it.voided && !it.isModifier }
+        var tempAdj: List<Float>
         order?.let { or ->
             if (or.qty == 1f) {
                 orders.remove(or)
@@ -769,7 +771,37 @@ class OrderScreenModel(
                 }
             } else {
                 orders[orders.indexOf(order)] =
-                    or.copy(qty = or.qty - 1, totalPrice = (or.qty - 1) * or.unitPrice)
+                    or.copy(
+                        qty = or.qty - 1,
+                        totalPrice = (or.qty - 1) * or.unitPrice,
+                        adj = run {
+                            var temp = 0f
+                            val list = mutableListOf<Float>()
+                            StarTouchSetup.adjustments.filter { f -> f.isDinIn }
+                                .forEach { adj ->
+                                    if (adj.type == "Percentage")
+                                        temp = (or.qty - 1) * or.unitPrice * (adj.value / 100)
+                                    else if (adj.type == "Flat amount")
+                                        temp = (or.qty - 1) * or.unitPrice + adj.value
+                                    list.add(temp.roundToDecimals(2))
+                                }
+                            list
+                        }.also { tempAdj = it;updateAdj(it.sum()) },
+                        tax = run {
+                            var temp = 0f
+                            val list = mutableListOf<Float>()
+                            StarTouchSetup.taxes.filter { f -> f.isDinIn }
+                                .forEach { tax ->
+                                    if (tax.type == "Percentage")
+                                        temp =
+                                            (tempAdj.sum() + (or.qty - 1) * or.unitPrice) * (tax.value / 100)
+                                    else if (tax.type == "Flat amount")
+                                        temp =
+                                            (tempAdj.sum() + (or.qty - 1) * or.unitPrice) + tax.value
+                                    list.add(temp.roundToDecimals(2))
+                                }
+                            list
+                        }.also { updateTax(it.sum()) })
                 val newList = orders
                 updateState {
                     it.copy(
@@ -877,13 +909,44 @@ class OrderScreenModel(
 
     override fun onClickPlus(id: Int) {
         val order = orders.find { it.serial == id && !it.fired && !it.voided && !it.isModifier }
+        var tempAdj: List<Float>
         order?.let { or ->
             orders[orders.indexOf(order)] =
-                or.copy(qty = or.qty + 1, totalPrice = (or.qty + 1) * or.unitPrice)
+                or.copy(
+                    qty = or.qty + 1,
+                    totalPrice = (or.qty + 1) * or.unitPrice,
+                    adj = run {
+                        var temp = 0f
+                        val list = mutableListOf<Float>()
+                        StarTouchSetup.adjustments.filter { f -> f.isDinIn }
+                            .forEach { adj ->
+                                if (adj.type == "Percentage")
+                                    temp = (or.qty + 1) * or.unitPrice * (adj.value / 100)
+                                else if (adj.type == "Flat amount")
+                                    temp = (or.qty + 1) * or.unitPrice + adj.value
+                                list.add(temp.roundToDecimals(2))
+                            }
+                        list
+                    }.also { tempAdj = it;updateAdj(it.sum()) },
+                    tax = run {
+                        var temp = 0f
+                        val list = mutableListOf<Float>()
+                        StarTouchSetup.taxes.filter { f -> f.isDinIn }
+                            .forEach { tax ->
+                                if (tax.type == "Percentage")
+                                    temp =
+                                        (tempAdj.sum() + (or.qty + 1) * or.unitPrice) * (tax.value / 100)
+                                else if (tax.type == "Flat amount")
+                                    temp = (tempAdj.sum() + (or.qty + 1) * or.unitPrice) + tax.value
+                                list.add(temp.roundToDecimals(2))
+                            }
+                        list
+                    }.also { updateTax(it.sum()) }
+                )
             val newList = orders
             updateState {
                 it.copy(
-                    orderItemState = newList.toList()
+                    orderItemState = newList.toList(),
                 )
             }
         }
