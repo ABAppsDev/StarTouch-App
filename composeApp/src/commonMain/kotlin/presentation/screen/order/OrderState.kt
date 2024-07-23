@@ -176,6 +176,10 @@ data class ItemModifierState(
     val pOnReport: Boolean = false,
     val pOnCheck: Boolean = false,
     val refModItem: Int = 0,
+    val modCount: Int = 0,
+    val multiPick: Boolean = false,
+    val maxPick: Int = 0,
+    val allowNoPick: Boolean = false,
 )
 
 @Immutable
@@ -207,6 +211,10 @@ fun ModifierItem.toItemModifierState(): ItemModifierState = ItemModifierState(
     noServiceCharge = noServiceCharge,
     pOnReport = printOnReport,
     pOnCheck = printOnChick,
+    allowNoPick = allowNoPick,
+    maxPick = maxPick,
+    modCount = modCount,
+    multiPick = multiPick,
 )
 
 fun Item.toItemState(): ItemState = ItemState(
