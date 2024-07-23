@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 import presentation.base.BaseScreenModel
 import presentation.base.ErrorState
 import util.roundToDecimals
-import kotlin.math.abs
 import kotlin.random.Random
 
 class OrderScreenModel(
@@ -566,6 +565,7 @@ class OrderScreenModel(
         }
         println("kiko" + state.value.adj)
         println("kiko" + state.value.tax)
+        println("kiko" + state.value.orderItemState)
         tryToExecute(
             function = {
                 val fireItems =
@@ -789,7 +789,7 @@ class OrderScreenModel(
                                     list.add(temp.roundToDecimals(2))
                                 }
                             list
-                        }.also { tempAdj = it;updateAdj(abs(state.value.adj - it.sum())) },
+                        }.also { tempAdj = it;updateAdj(it.sum()) },
                         tax = run {
                             var temp = 0f
                             val list = mutableListOf<Float>()
@@ -804,7 +804,7 @@ class OrderScreenModel(
                                     list.add(temp.roundToDecimals(2))
                                 }
                             list
-                        }.also { updateTax(abs(state.value.tax - it.sum())) })
+                        }.also { updateTax(it.sum()) })
                 val newList = orders
                 updateState {
                     it.copy(
@@ -930,7 +930,7 @@ class OrderScreenModel(
                                 list.add(temp.roundToDecimals(2))
                             }
                         list
-                    }.also { tempAdj = it;updateAdj(state.value.adj + it.sum()) },
+                    }.also { tempAdj = it;updateAdj(it.sum()) },
                     tax = run {
                         var temp = 0f
                         val list = mutableListOf<Float>()
@@ -944,7 +944,7 @@ class OrderScreenModel(
                                 list.add(temp.roundToDecimals(2))
                             }
                         list
-                    }.also { updateTax(state.value.tax + it.sum()) }
+                    }.also { updateTax(it.sum()) }
                 )
             val newList = orders
             updateState {
