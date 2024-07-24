@@ -87,16 +87,20 @@ data class OrderItemState(
     val modifierPick: Int = 0,
     val prePaidCard: Boolean = false,
     val refItemId: Int = 0,
+    val tempAdj: List<Float> = listOf(0f),
     val adj: List<Float> =
         run {
             var temp = 0f
             val list = mutableListOf<Float>()
+            val tempList = mutableListOf<Float>()
             StarTouchSetup.adjustments.filter { f -> f.isDinIn }
                 .forEach { adj ->
                     if (adj.type == "Percentage")
                         temp = totalPrice * (adj.value / 100)
                     else if (adj.type == "Flat amount")
                         temp = totalPrice + adj.value
+                    if (adj.taxable)
+                        tempList.add(temp.roundToDecimals(2))
                     list.add(temp.roundToDecimals(2))
                 }
             list
@@ -108,9 +112,9 @@ data class OrderItemState(
             StarTouchSetup.taxes.filter { f -> f.isDinIn }
                 .forEach { tax ->
                     if (tax.type == "Percentage")
-                        temp = (adj.sum() + totalPrice) * (tax.value / 100)
+                        temp = (tempAdj.sum() + totalPrice) * (tax.value / 100)
                     else if (tax.type == "Flat amount")
-                        temp = (adj.sum() + totalPrice) + tax.value
+                        temp = (tempAdj.sum() + totalPrice) + tax.value
                     list.add(temp.roundToDecimals(2))
                 }
             list

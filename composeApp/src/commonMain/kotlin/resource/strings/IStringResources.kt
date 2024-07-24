@@ -14,6 +14,7 @@ interface IStringResources {
     val password: String
     val ok: String
     val no: String
+    val noOrderAgain: String
     val yes: String
     val cancel: String
     val tryAgain: String

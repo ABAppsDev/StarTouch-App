@@ -34,7 +34,7 @@ fun WarningItemDialogue(
 ) {
     AppDialogue(
         onDismissRequest = onDismissRequest,
-        modifier = modifier.fillMaxWidth(LocalDensity.current.density / 2f),
+        modifier = modifier.fillMaxWidth(LocalDensity.current.density / 1.5f),
         containerColor = Color.White
     ) {
         Icon(
@@ -71,7 +71,7 @@ fun WarningItemDialogue(
                     contentColor = Color.White,
                 )
                 AppButton(
-                    title = Resources.strings.no,
+                    title = Resources.strings.noOrderAgain,
                     onClick = onClickRejectButton,
                     modifier = Modifier.height(52.dp)
                         .padding(bottom = 8.dp)

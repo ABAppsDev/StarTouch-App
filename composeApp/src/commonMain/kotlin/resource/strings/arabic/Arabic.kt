@@ -76,4 +76,5 @@ data class Arabic(
     override val moveTableChecks: String = "تحريك شيكات الطرابيزه لاخري",
     override val void: String = "الغاء",
     override val subTotal: String = "الاجمالي",
+    override val noOrderAgain: String = "اطلب مجددا",
 ) : IStringResources

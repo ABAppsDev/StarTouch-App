@@ -264,6 +264,27 @@ class OrderScreen(
                             }
                         }
                     }
+                    val items = state.itemModifiersState
+                    val currentModifierGroupIndex = state.currentModifierGroupIndex
+                    val currentItemSettings =
+                        if (items.isNotEmpty()) items[currentModifierGroupIndex] else ItemModifierSettings()
+                    SlideAnimation(state.itemModifiersState.isNotEmpty() && currentItemSettings.allowNoPick) {
+                        FloatingActionButton(
+                            containerColor = Theme.colors.primary,
+                            onClick = {
+                                screenModel.onClickItemModifier(
+                                    emptyList(),
+                                    currentItemSettings.groupId
+                                )
+                            },
+                        ) {
+                            Text(
+                                Resources.strings.ok,
+                                style = Theme.typography.body,
+                                color = Theme.colors.contentPrimary
+                            )
+                        }
+                    }
                 })
             {
                 FadeAnimation(state.presetItemsState.isNotEmpty() && !state.isPresetVisible && state.itemsState.isEmpty() && state.itemModifiersState.isEmpty() && state.errorState == null && !state.isLoading) {

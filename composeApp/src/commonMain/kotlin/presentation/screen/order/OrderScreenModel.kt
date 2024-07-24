@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import presentation.base.BaseScreenModel
 import presentation.base.ErrorState
 import util.roundToDecimals
+import kotlin.math.abs
 import kotlin.random.Random
 
 class OrderScreenModel(
@@ -460,15 +461,53 @@ class OrderScreenModel(
     fun addInExistItem() {
         val order =
             orders.filter { !it.fired || it.voided }.find { state.value.selectedItemId == it.id }
+        var tempAdj: List<Float>
+        var tempAdjTax: List<Float>
         val indexOfOrder = orders.indexOf(orders.filter { !it.fired || it.voided }
             .find { state.value.selectedItemId == it.id })
         val updatedOrder = order?.copy(
             qty = state.value.qty + order.qty,
+            totalPrice = (state.value.qty + order.qty) * order.totalPrice,
+            adj = run {
+                var temp = 0f
+                val list = mutableListOf<Float>()
+                val tempList = mutableListOf<Float>()
+                StarTouchSetup.adjustments.filter { f -> f.isDinIn }
+                    .forEach { adj ->
+                        if (adj.type == "Percentage")
+                            temp = (order.qty + 1) * order.unitPrice * (adj.value / 100)
+                        else if (adj.type == "Flat amount")
+                            temp = (order.qty + 1) * order.unitPrice + adj.value
+                        if (adj.taxable)
+                            tempList.add(temp.roundToDecimals(2))
+                        list.add(temp.roundToDecimals(2))
+                    }
+                tempAdjTax = tempList
+                list
+            }.also { tempAdj = it;updateAdj(it.sum()) },
+            tax = run {
+                var temp = 0f
+                val list = mutableListOf<Float>()
+                StarTouchSetup.taxes.filter { f -> f.isDinIn }
+                    .forEach { tax ->
+                        if (tax.type == "Percentage")
+                            temp =
+                                (tempAdjTax.sum() + (order.qty + 1) * order.unitPrice) * (tax.value / 100)
+                        else if (tax.type == "Flat amount")
+                            temp =
+                                (tempAdjTax.sum() + (order.qty + 1) * order.unitPrice) + tax.value
+                        list.add(temp.roundToDecimals(2))
+                    }
+                list
+            }.also { updateTax(it.sum()) }
         )
         orders[indexOfOrder] = updatedOrder!!
         orders.forEachIndexed { index, item ->
             if (item.isModifier && item.refItemId == order.serial && item.qty > 0) {
-                val newModifier = item.copy(qty = state.value.qty + order.qty)
+                val newModifier = item.copy(
+                    qty = state.value.qty + order.qty,
+                    totalPrice = (state.value.qty + order.qty) * item.totalPrice
+                )
                 orders[index] = newModifier
             }
         }
@@ -759,6 +798,16 @@ class OrderScreenModel(
     override fun onClickMinus(id: Int) {
         val order = orders.find { it.serial == id && !it.fired && !it.voided && !it.isModifier }
         var tempAdj: List<Float>
+        var tempAdjTax: List<Float>
+        orders.forEachIndexed { index, item ->
+            if (item.isModifier && item.refItemId == order?.serial && item.qty > 0) {
+                val newModifier = item.copy(
+                    qty = abs(state.value.qty - order.qty),
+                    totalPrice = abs((state.value.qty - order.qty) * item.totalPrice)
+                )
+                orders[index] = newModifier
+            }
+        }
         order?.let { or ->
             if (or.qty == 1f) {
                 orders.remove(or)
@@ -780,14 +829,18 @@ class OrderScreenModel(
                         adj = run {
                             var temp = 0f
                             val list = mutableListOf<Float>()
+                            val tempList = mutableListOf<Float>()
                             StarTouchSetup.adjustments.filter { f -> f.isDinIn }
                                 .forEach { adj ->
                                     if (adj.type == "Percentage")
                                         temp = (or.qty - 1) * or.unitPrice * (adj.value / 100)
                                     else if (adj.type == "Flat amount")
                                         temp = (or.qty - 1) * or.unitPrice + adj.value
+                                    if (adj.taxable)
+                                        tempList.add(temp.roundToDecimals(2))
                                     list.add(temp.roundToDecimals(2))
                                 }
+                            tempAdjTax = tempList
                             list
                         }.also { tempAdj = it;updateAdj(it.sum()) },
                         tax = run {
@@ -797,10 +850,10 @@ class OrderScreenModel(
                                 .forEach { tax ->
                                     if (tax.type == "Percentage")
                                         temp =
-                                            (tempAdj.sum() + (or.qty - 1) * or.unitPrice) * (tax.value / 100)
+                                            (tempAdjTax.sum() + (or.qty - 1) * or.unitPrice) * (tax.value / 100)
                                     else if (tax.type == "Flat amount")
                                         temp =
-                                            (tempAdj.sum() + (or.qty - 1) * or.unitPrice) + tax.value
+                                            (tempAdjTax.sum() + (or.qty - 1) * or.unitPrice) + tax.value
                                     list.add(temp.roundToDecimals(2))
                                 }
                             list
@@ -912,7 +965,17 @@ class OrderScreenModel(
 
     override fun onClickPlus(id: Int) {
         val order = orders.find { it.serial == id && !it.fired && !it.voided && !it.isModifier }
+        orders.forEachIndexed { index, item ->
+            if (item.isModifier && item.refItemId == order?.serial && item.qty > 0) {
+                val newModifier = item.copy(
+                    qty = state.value.qty + order.qty,
+                    totalPrice = (state.value.qty + order.qty) * item.totalPrice
+                )
+                orders[index] = newModifier
+            }
+        }
         var tempAdj: List<Float>
+        var tempAdjTax: List<Float>
         order?.let { or ->
             orders[orders.indexOf(order)] =
                 or.copy(
@@ -921,14 +984,18 @@ class OrderScreenModel(
                     adj = run {
                         var temp = 0f
                         val list = mutableListOf<Float>()
+                        val tempList = mutableListOf<Float>()
                         StarTouchSetup.adjustments.filter { f -> f.isDinIn }
                             .forEach { adj ->
                                 if (adj.type == "Percentage")
                                     temp = (or.qty + 1) * or.unitPrice * (adj.value / 100)
                                 else if (adj.type == "Flat amount")
                                     temp = (or.qty + 1) * or.unitPrice + adj.value
+                                if (adj.taxable)
+                                    tempList.add(temp.roundToDecimals(2))
                                 list.add(temp.roundToDecimals(2))
                             }
+                        tempAdjTax = tempList
                         list
                     }.also { tempAdj = it;updateAdj(it.sum()) },
                     tax = run {
@@ -938,9 +1005,10 @@ class OrderScreenModel(
                             .forEach { tax ->
                                 if (tax.type == "Percentage")
                                     temp =
-                                        (tempAdj.sum() + (or.qty + 1) * or.unitPrice) * (tax.value / 100)
+                                        (tempAdjTax.sum() + (or.qty + 1) * or.unitPrice) * (tax.value / 100)
                                 else if (tax.type == "Flat amount")
-                                    temp = (tempAdj.sum() + (or.qty + 1) * or.unitPrice) + tax.value
+                                    temp =
+                                        (tempAdjTax.sum() + (or.qty + 1) * or.unitPrice) + tax.value
                                 list.add(temp.roundToDecimals(2))
                             }
                         list
