@@ -1040,7 +1040,7 @@ private fun OrdersList(
                             Spacer(modifier = Modifier.height(16.dp))
 
                             if (StarTouchSetup.adjustments.any { it.isDinIn }) {
-                                StarTouchSetup.adjustments.filter { it.isDinIn }
+                                StarTouchSetup.adjustments.filter { it.isDinIn && !it.minCharge }
                                     .forEachIndexed { index, adj ->
                                         Row(
                                             modifier = Modifier.fillMaxWidth(),
