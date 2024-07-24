@@ -838,7 +838,6 @@ private fun ItemModifiersList(
                     if (selectedItems.contains(item)) {
                         selectedItems -= item
                         onChangeItem(selectedItems)
-
                         temp -= 1
                     } else {
                         if (item.modCount == 0 && temp < currentItemSettings.maxPick) {
@@ -855,7 +854,7 @@ private fun ItemModifiersList(
                             temp = 0
                         }
                     }
-                    if (currentItemSettings.maxPick == selectedItems.size || temp == currentItemSettings.maxPick) {
+                    if (currentItemSettings.maxPick == selectedItems.size || temp == currentItemSettings.maxPick || !currentItemSettings.multiPick) {
                         onClickItemModifier(
                             selectedItems.map { it.name },
                             currentItemSettings.groupId
