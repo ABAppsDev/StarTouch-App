@@ -92,7 +92,7 @@ data class OrderItemState(
         run {
             var temp = 0f
             val list = mutableListOf<Float>()
-            StarTouchSetup.adjustments.filter { f -> f.isDinIn }
+            StarTouchSetup.adjustments.filter { f -> f.isDinIn && !f.minCharge }
                 .forEach { adj ->
                     if (adj.type == "Percentage")
                         temp = totalPrice * (adj.value / 100)
@@ -108,7 +108,7 @@ data class OrderItemState(
         run {
             var temp = 0f
             val list = mutableListOf<Float>()
-            StarTouchSetup.taxes.filter { f -> f.isDinIn }
+            StarTouchSetup.taxes.filter { f -> f.isDinIn  }
                 .forEach { tax ->
                     if (tax.type == "Percentage")
                         temp = (tempAdj.sum() + totalPrice) * (tax.value / 100)

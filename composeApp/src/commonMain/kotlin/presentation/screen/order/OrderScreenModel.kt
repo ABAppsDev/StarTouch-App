@@ -472,7 +472,7 @@ class OrderScreenModel(
                 var temp = 0f
                 val list = mutableListOf<Float>()
                 val tempList = mutableListOf<Float>()
-                StarTouchSetup.adjustments.filter { f -> f.isDinIn }
+                StarTouchSetup.adjustments.filter { f -> f.isDinIn && !f.minCharge }
                     .forEach { adj ->
                         if (adj.type == "Percentage")
                             temp = (order.qty + 1) * order.unitPrice * (adj.value / 100)
@@ -830,7 +830,7 @@ class OrderScreenModel(
                             var temp = 0f
                             val list = mutableListOf<Float>()
                             val tempList = mutableListOf<Float>()
-                            StarTouchSetup.adjustments.filter { f -> f.isDinIn }
+                            StarTouchSetup.adjustments.filter { f -> f.isDinIn && !f.minCharge }
                                 .forEach { adj ->
                                     if (adj.type == "Percentage")
                                         temp = (or.qty - 1) * or.unitPrice * (adj.value / 100)
@@ -985,7 +985,7 @@ class OrderScreenModel(
                         var temp = 0f
                         val list = mutableListOf<Float>()
                         val tempList = mutableListOf<Float>()
-                        StarTouchSetup.adjustments.filter { f -> f.isDinIn }
+                        StarTouchSetup.adjustments.filter { f -> f.isDinIn && !f.minCharge }
                             .forEach { adj ->
                                 if (adj.type == "Percentage")
                                     temp = (or.qty + 1) * or.unitPrice * (adj.value / 100)
