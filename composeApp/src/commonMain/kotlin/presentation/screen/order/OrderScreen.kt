@@ -137,6 +137,8 @@ class OrderScreen(
         val state by screenModel.state.collectAsState()
         val pullRefreshState = rememberPullRefreshState(state.isRefresh, { screenModel.retry() })
         val nav = LocalNavigator.currentOrThrow
+        var selectedItemsModifier by mutableStateOf(listOf<ItemModifierState>())
+
 
         EventHandler(screenModel.effect) { effect, navigator ->
             when (effect) {
@@ -273,7 +275,7 @@ class OrderScreen(
                             containerColor = Theme.colors.primary,
                             onClick = {
                                 screenModel.onClickItemModifier(
-                                    emptyList(),
+                                    selectedItemsModifier.map { it.name },
                                     currentItemSettings.groupId
                                 )
                             },
@@ -358,6 +360,9 @@ class OrderScreen(
                         ItemModifiersList(
                             items = state.itemModifiersState,
                             currentModifierGroupIndex = state.currentModifierGroupIndex,
+                            onChangeItem = {
+                                selectedItemsModifier = it
+                            },
                             onClickItemModifier = screenModel::onClickItemModifier,
                             showDialgue = screenModel::showWarningModifier,
                             modifier = Modifier.padding(top = it.calculateTopPadding()),
@@ -808,6 +813,7 @@ private fun ItemModifiersList(
     items: List<ItemModifierSettings>,
     currentModifierGroupIndex: Int,
     modifier: Modifier = Modifier,
+    onChangeItem: (List<ItemModifierState>) -> Unit,
     onClickItemModifier: (List<String>, Int) -> Unit,
     showDialgue: (Int) -> Unit,
 ) {
@@ -831,14 +837,19 @@ private fun ItemModifiersList(
                 ) {
                     if (selectedItems.contains(item)) {
                         selectedItems -= item
+                        onChangeItem(selectedItems)
+
                         temp -= 1
                     } else {
                         if (item.modCount == 0 && temp < currentItemSettings.maxPick) {
                             selectedItems += item
+                            onChangeItem(selectedItems)
                             temp += 1
                         } else if (temp + item.modCount <= currentItemSettings.maxPick) {
                             temp += item.modCount
                             selectedItems += item
+                            onChangeItem(selectedItems)
+
                         } else if (temp + item.modCount > currentItemSettings.maxPick) {
                             showDialgue(currentItemSettings.maxPick)
                             temp = 0
