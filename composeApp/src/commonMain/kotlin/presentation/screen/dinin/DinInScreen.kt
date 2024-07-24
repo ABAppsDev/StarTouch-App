@@ -37,7 +37,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -78,7 +77,6 @@ import presentation.screen.composable.Chair
 import presentation.screen.composable.ErrorDialogue
 import presentation.screen.composable.MenuItem
 import presentation.screen.composable.MutliFabState
-import presentation.screen.composable.MutliFabView
 import presentation.screen.composable.RestaurantTableWithTextLoading
 import presentation.screen.composable.SetLayoutDirection
 import presentation.screen.composable.ShimmerListItem
@@ -253,18 +251,18 @@ private fun OnRender(
                                 )
                             }
                         } else {
-                            IconButton(onClick = {
-                                isDropDownMenuExpanded = !isDropDownMenuExpanded
-                                if (isDropDownMenuExpanded && mutliFabState == MutliFabState.EXPANDED)
-                                    mutliFabState = MutliFabState.COLLAPSED
-
-                            }) {
-                                Icon(
-                                    painterResource(Res.drawable.baseline_more_vert_24),
-                                    contentDescription = null,
-                                    tint = Color.White
-                                )
-                            }
+//                            IconButton(onClick = {
+//                                isDropDownMenuExpanded = !isDropDownMenuExpanded
+//                                if (isDropDownMenuExpanded && mutliFabState == MutliFabState.EXPANDED)
+//                                    mutliFabState = MutliFabState.COLLAPSED
+//
+//                            }) {
+//                                Icon(
+//                                    painterResource(Res.drawable.baseline_more_vert_24),
+//                                    contentDescription = null,
+//                                    tint = Color.White
+//                                )
+//                            }
                         }
                     }
                 )
@@ -313,23 +311,23 @@ private fun OnRender(
             }
         }
 
-        DininDropDownMenu(
-            items = dropDownMenuItem,
-            isExpand = isDropDownMenuExpanded,
-            onDismiss = { isDropDownMenuExpanded = !isDropDownMenuExpanded },
-            onMenuItemClick = listener::onMenuItemClick
-
-        )
-        MutliFabView(
-            fabMenuitems,
-            onMenuItemClick = listener::onMenuItemClick,
-            mutliFabState = mutliFabState,
-            onChangeFabStateState = { state ->
-                mutliFabState = state
-                if (mutliFabState == MutliFabState.EXPANDED && isDropDownMenuExpanded)
-                    isDropDownMenuExpanded = false
-            }
-        )
+//        DininDropDownMenu(
+//            items = dropDownMenuItem,
+//            isExpand = isDropDownMenuExpanded,
+//            onDismiss = { isDropDownMenuExpanded = !isDropDownMenuExpanded },
+//            onMenuItemClick = listener::onMenuItemClick
+//
+//        )
+//        MutliFabView(
+//            fabMenuitems,
+//            onMenuItemClick = listener::onMenuItemClick,
+//            mutliFabState = mutliFabState,
+//            onChangeFabStateState = { state ->
+//                mutliFabState = state
+//                if (mutliFabState == MutliFabState.EXPANDED && isDropDownMenuExpanded)
+//                    isDropDownMenuExpanded = false
+//            }
+//        )
 
         PullRefreshIndicator(
             state.isRefreshing,
