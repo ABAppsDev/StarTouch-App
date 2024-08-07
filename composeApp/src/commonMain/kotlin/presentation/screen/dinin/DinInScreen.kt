@@ -376,10 +376,20 @@ private fun TablesGrid(
                                 listener.onClickTable(table.tableId, table.tableNumber)
                         }
                     }
-
-                    DininOption.DisableTable, DininOption.EnableTable -> {
-                        listener.onEnableOrDisableTable(table.tableId)
+                    /* todo here enable or disable only */
+                    DininOption.DisableTable,
+                    DininOption.EnableTable,
+                    DininOption.SplitCheck,
+                    DininOption.UnSplitCheck,
+                    DininOption.UnCombineCheck,
+                    DininOption.Void,
+                    DininOption.SplitAndPay,
+                    DininOption.ShareItem,
+                    DininOption.MoveItemToNewCheck,
+                    -> {
+                        listener.onSingleSelectTableOption(table.tableId)
                     }
+                    /* todo here for multi select with two tables */
 
                     else -> {
                         if (selectedTables.contains(table.tableId)) {
@@ -390,7 +400,8 @@ private fun TablesGrid(
                             }
                         }
                         if (selectedTables.size == 2) {
-                            listener.onClickTwoTableForDininOption(selectedTables)
+                            /* todo here do something for */
+                            listener.onMutliSelectTableOption(selectedTables)
                             selectedTables = emptyList()
                         }
                     }
