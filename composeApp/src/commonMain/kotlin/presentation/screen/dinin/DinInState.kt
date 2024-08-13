@@ -99,16 +99,16 @@ fun RoomSetup.toState(): RoomDetailsState = RoomDetailsState(
 )
 
 enum class DininOption {
-    SplitCheck,
-    UnSplitCheck,
-    CombineCheck,
-    UnCombineCheck,
-    Void,
-    MoveTableChecks,
-    SplitAndPay,
-    ShareItem,
-    MoveItem,
-    MoveItemToNewCheck,
-    EnableTable,
-    DisableTable,
+    SplitCheck,//1
+    UnSplitCheck,//1
+    CombineCheck,//2
+    UnCombineCheck,//1
+    Void,//1
+    MoveTableChecks,//2
+    SplitAndPay,//1
+    ShareItem,//1
+    MoveItem,//2
+    MoveItemToNewCheck,//1
+    EnableTable,//1
+    DisableTable,//1
 }

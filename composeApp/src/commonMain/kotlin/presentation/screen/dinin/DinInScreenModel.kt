@@ -331,50 +331,92 @@ class DinInScreenModel(
         )
     }
 
-    override fun onEnableOrDisableTable(tableId: Int) {
-        when (state.value.selectedDininOption) {
-            DininOption.EnableTable -> {
-                updateState {
-                    it.copy(
-                        tablesDetails = manageDininOptionsUseCase.enableTable(
-                            tableId,
-                            state.value.tablesDetails
-                        )
-                    )
-                }
-            }
+    override fun onSingleSelectTableOption(tableId: Int) {
+        /* TODO Implement the function ya kamel*/
+        tryToExecute(
+            function = {
+                when (state.value.selectedDininOption) {
+                    DininOption.DisableTable -> {
+                        manageDininOptionsUseCase.disableTable(tableId, state.value.checkId)
+                    }
 
-            DininOption.DisableTable -> {
-                updateState {
-                    it.copy(
-                        tablesDetails = manageDininOptionsUseCase.disableTable(
-                            tableId,
-                            state.value.tablesDetails
-                        )
-                    )
-                }
-            }
+                    DininOption.EnableTable -> {
+                        manageDininOptionsUseCase.enableTable(tableId, state.value.checkId)
+                    }
 
-            else -> {}
-        }
-        updateState { it.copy(selectedDininOption = null) }
+                    DininOption.SplitCheck -> {
+                        manageDininOptionsUseCase.splitCheck(tableId, state.value.checkId)
+
+                    }
+
+                    DininOption.UnSplitCheck -> {
+                        manageDininOptionsUseCase.unSplitCheck(tableId, state.value.checkId)
+
+                    }
+
+                    DininOption.UnCombineCheck -> {
+                        manageDininOptionsUseCase.unCombineCheck(tableId, state.value.checkId)
+
+                    }
+
+                    DininOption.Void -> {
+                        manageDininOptionsUseCase.void(tableId, state.value.checkId)
+
+                    }
+
+                    DininOption.SplitAndPay -> {
+                        manageDininOptionsUseCase.splitAndPay(tableId, state.value.checkId)
+
+                    }
+
+                    DininOption.ShareItem -> {
+                        manageDininOptionsUseCase.shareItem(tableId, state.value.checkId)
+
+                    }
+
+                    DininOption.MoveItemToNewCheck -> {
+                        manageDininOptionsUseCase.moveItemToNewCheck(tableId, state.value.checkId)
+
+                    }
+
+                    else -> {}
+                }
+            },
+            onSuccess = {
+                retry()
+                updateState { it.copy(selectedDininOption = null) }
+            },
+            onError = ::onError
+        )
     }
 
-    override fun onClickTwoTableForDininOption(selectedTablesIds: List<Int>) {
-        when (state.value.selectedDininOption) {
-            DininOption.MoveTableChecks -> {
-                updateState {
-                    it.copy(
-                        tablesDetails = manageDininOptionsUseCase.moveTableChecks(
-                            selectedTablesIds,
-                            state.value.tablesDetails
-                        )
-                    )
+    override fun onMutliSelectTableOption(selectedTablesIds: List<Int>) {
+        /* TODO Implement the function ya kamel*/
+        tryToExecute(
+            function = {
+                when (state.value.selectedDininOption) {
+                    DininOption.MoveTableChecks -> {
+                        manageDininOptionsUseCase.moveTableChecks(selectedTablesIds, state.value.checkId)
+                    }
+
+                    DininOption.CombineCheck -> {
+                        manageDininOptionsUseCase.combineCheck(selectedTablesIds, state.value.checkId)
+                    }
+
+                    DininOption.MoveItem -> {
+                        manageDininOptionsUseCase.moveItem(selectedTablesIds, state.value.checkId)
+
+                    }
+
+                    else -> {}
                 }
-            }
-            else -> {}
-        }
-        updateState { it.copy(selectedDininOption = null) }
+            },
+            onSuccess = {
+                retry()
+                updateState { it.copy(selectedDininOption = null) }
+            },
+            onError = ::onError
+        )
     }
 
     private fun onError(errorState: ErrorState) {

@@ -1,32 +1,46 @@
 package domain.usecase
 
-import presentation.screen.dinin.TableDetailsState
+import domain.gateway.IDinInOptionsGateway
 
-class ManageDininOptionsUseCase {
+class ManageDininOptionsUseCase(
+    private val dinInOptionsGateway: IDinInOptionsGateway
+) {
 
-    fun enableTable(tableId: Int, listOfTables: List<TableDetailsState>): List<TableDetailsState> {
-        val indexOfSelectedTable = listOfTables.indexOfLast { it.tableId == tableId }
-        val selectedTable = listOfTables[indexOfSelectedTable]
-        val updatedList = listOfTables.toMutableList()
-        updatedList[indexOfSelectedTable] = selectedTable.copy(enabled = true)
-        return updatedList
-    }
-    fun disableTable(tableId: Int, listOfTables: List<TableDetailsState>): List<TableDetailsState> {
-        val indexOfSelectedTable = listOfTables.indexOfLast { it.tableId == tableId }
-        val selectedTable = listOfTables[indexOfSelectedTable]
-        val updatedList = listOfTables.toMutableList()
-        updatedList[indexOfSelectedTable] = selectedTable.copy(enabled = false)
-        return updatedList
-    }
-    fun moveTableChecks(selectedTablesIds: List<Int>, listOfTables: List<TableDetailsState>): List<TableDetailsState> {
-        val indexOfFirstSelectedTable = listOfTables.indexOfLast { it.tableId == selectedTablesIds.first() }
-        val indexOfSecondSelectedTable = listOfTables.indexOfLast { it.tableId == selectedTablesIds.last() }
-        val selectedFirstTable = listOfTables[indexOfFirstSelectedTable]
-        val selectedSecondTable = listOfTables[indexOfSecondSelectedTable]
-        val updatedList = listOfTables.toMutableList()
-        updatedList[indexOfFirstSelectedTable] = selectedFirstTable.copy(tableNumber = selectedSecondTable.tableNumber)
-        updatedList[indexOfSecondSelectedTable] = selectedSecondTable.copy(tableNumber = selectedFirstTable.tableNumber)
-        return updatedList
-    }
+    suspend fun enableTable(tableId: Int, checkId: Long) =
+        dinInOptionsGateway.enableTable(tableId, checkId)
+
+    suspend fun disableTable(tableId: Int, checkId: Long) =
+        dinInOptionsGateway.disableTable(tableId, checkId)
+
+    suspend fun splitCheck(tableId: Int, checkId: Long) =
+        dinInOptionsGateway.splitCheck(tableId, checkId)
+
+    suspend fun unSplitCheck(tableId: Int, checkId: Long) =
+        dinInOptionsGateway.unSplitCheck(tableId, checkId)
+
+    suspend fun unCombineCheck(tableId: Int, checkId: Long) =
+        dinInOptionsGateway.unCombineCheck(tableId, checkId)
+
+    suspend fun void(tableId: Int, checkId: Long) =
+        dinInOptionsGateway.void(tableId, checkId)
+
+    suspend fun splitAndPay(tableId: Int, checkId: Long) =
+        dinInOptionsGateway.splitAndPay(tableId, checkId)
+
+    suspend fun shareItem(tableId: Int, checkId: Long) =
+        dinInOptionsGateway.shareItem(tableId, checkId)
+
+    suspend fun moveItemToNewCheck(tableId: Int, checkId: Long) =
+        dinInOptionsGateway.moveItemToNewCheck(tableId, checkId)
+
+    suspend fun moveTableChecks(selectedTablesIds: List<Int>, checkId: Long) =
+        dinInOptionsGateway.moveTableChecks(selectedTablesIds, checkId)
+
+    suspend fun combineCheck(selectedTablesIds: List<Int>, checkId: Long) =
+        dinInOptionsGateway.combineCheck(selectedTablesIds, checkId)
+
+    suspend fun moveItem(selectedTablesIds: List<Int>, checkId: Long) =
+        dinInOptionsGateway.moveItem(selectedTablesIds, checkId)
+
 
 }
