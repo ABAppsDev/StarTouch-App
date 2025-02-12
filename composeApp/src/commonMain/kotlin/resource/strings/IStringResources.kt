@@ -37,6 +37,8 @@ interface IStringResources {
     val doYouWantToCloseApp: String
     val doYouWantToAbortCheck: String
     val covers: String
+    val selectItems: String
+    val choosenTable: String
     val welcome: String
     val bye: String
     val itemAddedSuccess: String

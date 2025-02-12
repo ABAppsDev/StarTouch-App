@@ -35,6 +35,8 @@ data class Arabic(
     override val authEmptyException: String = "يجب ادخال اسمك مع كلمة المرور",
     override val doYouWantToCloseApp: String = "هل تريد غلق التطبيق",
     override val covers: String = "عدد الاشخاص",
+    override val selectItems: String = "اختر العناصر",
+    override val choosenTable: String = "اختر الطاولة",
     override val welcome: String = "مرحبا",
     override val bye: String = "سلام",
     override val itemAddedSuccess: String = "تم اضافة المنتج بنجاح",

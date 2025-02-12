@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import data.util.AppLanguage
 import data.util.StarTouchSetup
 import domain.entity.AssignCheck
+import domain.entity.FireItems
 import domain.entity.RoomSetup
 import domain.entity.TableData
 import presentation.base.ErrorState
@@ -21,6 +22,13 @@ data class DinInState(
     val tablesDetails: List<TableDetailsState> = emptyList(),
     val errorDialogueIsVisible: Boolean = false,
     val warningDialogueIsVisible: Boolean = false,
+    val moveItemsDialogueIsVisible: Boolean = false,
+    val waitingForChooseCheckToMove: Boolean = false,
+    val tableItems: List<FireItems> = emptyList(),
+    val tableIdToMove: Int = 0,
+    val checkIdToMove: Long = 0,
+    val chooseTableDialogueIsVisible: Boolean = false,
+    val selectedItemToMove: List<Int> = emptyList(),
     val isRefreshing: Boolean = false,
     val showErrorScreen: Boolean = false,
     val checkId: Long = 0,

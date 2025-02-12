@@ -1,9 +1,14 @@
 package presentation.screen.composable
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -11,6 +16,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.drawText
@@ -29,11 +35,27 @@ fun Chair(
     checksCount: String,
     printed: Boolean,
     hasOrders: Boolean,
-    enabled: Boolean
+    enabled: Boolean,
+    isModeApplied: Boolean = false
 ) {
+    val rotation = remember { Animatable(0f) }
+
+    LaunchedEffect(isModeApplied) {
+        while(isModeApplied){ // Shake 4 times
+            rotation.animateTo(-5f, animationSpec = tween(200)) // Rotate left
+            rotation.animateTo(5f, animationSpec = tween(200))  // Rotate right
+        }
+        rotation.animateTo(0f, animationSpec = tween(200)) // Return to original rotation
+    }
+
+
     val textMeasurer = rememberTextMeasurer()
-    val color = if(!enabled) Color.LightGray else if (printed) Color.Cyan else if (hasOrders) Color.Red else Color.Green
-    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+    val color =
+        if (!enabled) Color.LightGray else if (printed) Color.Cyan else if (hasOrders) Color.Red else Color.Green
+    Box(
+        modifier = modifier.graphicsLayer(rotationZ = rotation.value),
+        contentAlignment = Alignment.Center
+    ) {
         Canvas(modifier = Modifier.size(tableSize)) {
             val sizeWithPx = tableSize.toPx()
 

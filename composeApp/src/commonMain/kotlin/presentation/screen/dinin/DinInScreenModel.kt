@@ -3,12 +3,14 @@ package presentation.screen.dinin
 import cafe.adriel.voyager.core.model.screenModelScope
 import data.util.AppLanguage
 import data.util.StarTouchSetup
+import domain.entity.FireItems
 import domain.entity.OpenNewCheck
 import domain.entity.TableData
 import domain.usecase.GetAppSetupUseCase
 import domain.usecase.ManageChecksUseCase
 import domain.usecase.ManageDinInUseCase
-import domain.usecase.ManageDininOptionsUseCase
+import domain.usecase.ManageDininButtonsUseCase
+import domain.util.NotFoundException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -21,7 +23,7 @@ import presentation.screen.composable.MenuItem
 class DinInScreenModel(
     private val manageDinInUseCase: ManageDinInUseCase,
     private val manageChecksUseCase: ManageChecksUseCase,
-    private val manageDininOptionsUseCase: ManageDininOptionsUseCase,
+    private val manageDininButtonsUseCase: ManageDininButtonsUseCase,
     private val setupUseCase: GetAppSetupUseCase,
 ) : BaseScreenModel<DinInState, DinInUiEffect>(DinInState()), DinInInteractionListener {
     override val viewModelScope: CoroutineScope get() = screenModelScope
@@ -41,34 +43,29 @@ class DinInScreenModel(
 
     private fun socketTables() {
         viewModelScope.launch(Dispatchers.Default) {
-            if (state.value.roomId != 0)
-                while (true) {
-                    if (state.value.roomId != 0)
-                        try {
-                            delay(6000)
-                            if (state.value.roomId != 0) {
-                                val tables = manageDinInUseCase.getTablesDataByRoomId(
-                                    StarTouchSetup.OUTLET_ID,
-                                    StarTouchSetup.REST_ID,
-                                    state.value.roomId
-                                )
-                                updateState {
-                                    it.copy(
-                                        tablesDetails = tables.map { table ->
-                                            table.toTableDetailsState()
-                                        },
-                                    )
-                                }
-                            }
-                        } catch (e: Exception) {
-                            updateState {
-                                it.copy(
-                                    errorDinInState = ErrorState.UnknownError(""),
-                                    errorMessage = ""
-                                )
-                            }
+            if (state.value.roomId != 0) while (true) {
+                if (state.value.roomId != 0) try {
+                    delay(6000)
+                    if (state.value.roomId != 0) {
+                        val tables = manageDinInUseCase.getTablesDataByRoomId(
+                            StarTouchSetup.OUTLET_ID, StarTouchSetup.REST_ID, state.value.roomId
+                        )
+                        updateState {
+                            it.copy(
+                                tablesDetails = tables.map { table ->
+                                    table.toTableDetailsState()
+                                },
+                            )
                         }
+                    }
+                } catch (e: Exception) {
+                    updateState {
+                        it.copy(
+                            errorDinInState = ErrorState.UnknownError(""), errorMessage = ""
+                        )
+                    }
                 }
+            }
         }
     }
 
@@ -84,27 +81,21 @@ class DinInScreenModel(
         tryToExecute(
             function = {
                 manageDinInUseCase.getTablesDataByRoomId(
-                    StarTouchSetup.OUTLET_ID,
-                    StarTouchSetup.REST_ID,
-                    StarTouchSetup.MAIN_ROOM_ID
+                    StarTouchSetup.OUTLET_ID, StarTouchSetup.REST_ID, StarTouchSetup.MAIN_ROOM_ID
                 )
-            },
-            onSuccess = ::onGetTablesSuccess,
-            onError = ::onGetTablesError
+            }, onSuccess = ::onGetTablesSuccess, onError = ::onGetTablesError
         )
     }
 
     private fun onGetTablesSuccess(tables: List<TableData>) {
         updateState {
-            it.copy(
-                isLoading = false,
+            it.copy(isLoading = false,
                 errorMessage = "",
                 errorDinInState = null,
                 showErrorScreen = false,
                 tablesDetails = tables.map { table ->
                     table.toTableDetailsState()
-                }
-            )
+                })
         }
     }
 
@@ -135,8 +126,11 @@ class DinInScreenModel(
     }
 
     override fun onClickOk() {
-        if (state.value.dinInDialogueState.coversCount.isEmpty())
-            onError(errorState = ErrorState.ValidationError("Enter covers number"))
+        if (state.value.dinInDialogueState.coversCount.isEmpty()) onError(
+            errorState = ErrorState.ValidationError(
+                "Enter covers number"
+            )
+        )
         else {
             updateState {
                 it.copy(
@@ -149,100 +143,94 @@ class DinInScreenModel(
                     )
                 )
             }
-            tryToExecute(
-                function = {
-                    val value = state.value
-                    if (state.value.isTableGuest) manageChecksUseCase.openNewCheckTableGuest(
-                        OpenNewCheck(
-                            tableId = value.tableId,
-                            tableName = value.tableName,
-                            serverId = value.dinInDialogueState.serverId,
-                            workStationId = StarTouchSetup.WORK_STATION_ID,
-                            outletId = StarTouchSetup.OUTLET_ID,
-                            restId = StarTouchSetup.REST_ID,
-                            covers = value.dinInDialogueState.coversCount.toInt(),
-                            userId = StarTouchSetup.USER_ID,
-                            dateTime = StarTouchSetup.SYSTEM_DATE
-                        )
+            tryToExecute(function = {
+                //add condition to open check
+                val value = state.value
+                if (state.value.isTableGuest) manageChecksUseCase.openNewCheckTableGuest(
+                    OpenNewCheck(
+                        tableId = value.tableId,
+                        tableName = value.tableName,
+                        serverId = value.dinInDialogueState.serverId,
+                        workStationId = StarTouchSetup.WORK_STATION_ID,
+                        outletId = StarTouchSetup.OUTLET_ID,
+                        restId = StarTouchSetup.REST_ID,
+                        covers = value.dinInDialogueState.coversCount.toInt(),
+                        userId = StarTouchSetup.USER_ID,
+                        dateTime = StarTouchSetup.SYSTEM_DATE
                     )
-                    else if (!state.value.validation) manageChecksUseCase.openNewCheck(
-                        OpenNewCheck(
-                            tableId = value.tableId,
-                            tableName = value.tableName,
-                            serverId = value.dinInDialogueState.serverId,
-                            workStationId = StarTouchSetup.WORK_STATION_ID,
-                            outletId = StarTouchSetup.OUTLET_ID,
-                            restId = StarTouchSetup.REST_ID,
-                            covers = value.dinInDialogueState.coversCount.toInt(),
-                            userId = StarTouchSetup.USER_ID,
-                            dateTime = StarTouchSetup.SYSTEM_DATE
-                        )
+                )
+                else if (!state.value.validation) manageChecksUseCase.openNewCheck(
+                    OpenNewCheck(
+                        tableId = value.tableId,
+                        tableName = value.tableName,
+                        serverId = value.dinInDialogueState.serverId,
+                        workStationId = StarTouchSetup.WORK_STATION_ID,
+                        outletId = StarTouchSetup.OUTLET_ID,
+                        restId = StarTouchSetup.REST_ID,
+                        covers = value.dinInDialogueState.coversCount.toInt(),
+                        userId = StarTouchSetup.USER_ID,
+                        dateTime = StarTouchSetup.SYSTEM_DATE
                     )
-                    else manageChecksUseCase.openNewCheckWithChecksOpen(
-                        OpenNewCheck(
-                            tableId = value.tableId,
-                            tableName = value.tableName,
-                            serverId = value.dinInDialogueState.serverId,
-                            workStationId = StarTouchSetup.WORK_STATION_ID,
-                            outletId = StarTouchSetup.OUTLET_ID,
-                            restId = StarTouchSetup.REST_ID,
-                            covers = value.dinInDialogueState.coversCount.toInt(),
-                            userId = StarTouchSetup.USER_ID,
-                            dateTime = StarTouchSetup.SYSTEM_DATE,
-                            checkId = value.tablesDetails.find { it.tableId == value.tableId }?.checkId
-                        )
+                )
+                else manageChecksUseCase.openNewCheckWithChecksOpen(
+                    OpenNewCheck(
+                        tableId = value.tableId,
+                        tableName = value.tableName,
+                        serverId = value.dinInDialogueState.serverId,
+                        workStationId = StarTouchSetup.WORK_STATION_ID,
+                        outletId = StarTouchSetup.OUTLET_ID,
+                        restId = StarTouchSetup.REST_ID,
+                        covers = value.dinInDialogueState.coversCount.toInt(),
+                        userId = StarTouchSetup.USER_ID,
+                        dateTime = StarTouchSetup.SYSTEM_DATE,
+                        checkId = value.tablesDetails.find { it.tableId == value.tableId }?.checkId
                     )
-                },
-                onSuccess = { check ->
-                    launchDelayed(500) {
-                        updateState {
-                            it.copy(
-                                isLoading = false,
-                                errorMessage = "",
-                                errorDinInState = null,
-                                dinInDialogueState = DinInDialogueState(),
-                                validation = false,
-                                isTableGuest = false
-                            )
-                        }
-                        sendNewEffect(
-                            DinInUiEffect.NavigateToOrderScreen(
-                                check.id,
-                                emptyList(),
-                                false,
-                                check.serial
-                            )
-                        )
-                    }
-                },
-                onError = { errorState ->
+                )
+            }, onSuccess = { check ->
+                launchDelayed(500) {
                     updateState {
                         it.copy(
                             isLoading = false,
-                            errorState = errorState,
-                            showErrorScreen = false,
+                            errorMessage = "",
                             errorDinInState = null,
-                            isTableGuest = false,
-                            dinInDialogueState = it.dinInDialogueState.copy(
-                                isLoading = false,
-                                isLoadingButton = false,
-                            ),
-                            errorDialogueIsVisible = true,
-                            errorMessage = when (errorState) {
-                                is ErrorState.NetworkError -> errorState.message.toString()
-                                is ErrorState.NotFound -> errorState.message.toString()
-                                is ErrorState.ServerError -> errorState.message.toString()
-                                is ErrorState.PermissionDenied -> errorState.message.toString()
-                                is ErrorState.UnknownError -> errorState.message.toString()
-                                is ErrorState.EmptyData -> errorState.message.toString()
-                                is ErrorState.ValidationError -> errorState.message.toString()
-                                is ErrorState.ValidationNetworkError -> errorState.message.toString()
-                                else -> "Logon Error"
-                            }
+                            dinInDialogueState = DinInDialogueState(),
+                            validation = false,
+                            isTableGuest = false
                         )
                     }
+                    sendNewEffect(
+                        DinInUiEffect.NavigateToOrderScreen(
+                            check.id, emptyList(), false, check.serial
+                        )
+                    )
                 }
-            )
+            }, onError = { errorState ->
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        errorState = errorState,
+                        showErrorScreen = false,
+                        errorDinInState = null,
+                        isTableGuest = false,
+                        dinInDialogueState = it.dinInDialogueState.copy(
+                            isLoading = false,
+                            isLoadingButton = false,
+                        ),
+                        errorDialogueIsVisible = true,
+                        errorMessage = when (errorState) {
+                            is ErrorState.NetworkError -> errorState.message.toString()
+                            is ErrorState.NotFound -> errorState.message.toString()
+                            is ErrorState.ServerError -> errorState.message.toString()
+                            is ErrorState.PermissionDenied -> errorState.message.toString()
+                            is ErrorState.UnknownError -> errorState.message.toString()
+                            is ErrorState.EmptyData -> errorState.message.toString()
+                            is ErrorState.ValidationError -> errorState.message.toString()
+                            is ErrorState.ValidationNetworkError -> errorState.message.toString()
+                            else -> "Logon Error"
+                        }
+                    )
+                }
+            })
         }
     }
 
@@ -254,172 +242,254 @@ class DinInScreenModel(
                 exit = false,
                 errorDinInState = null,
                 dinInDialogueState = it.dinInDialogueState.copy(
-                    isVisible = true,
-                    isLoading = true,
-                    isLoadingButton = false,
-                    isSuccess = false
+                    isVisible = true, isLoading = true, isLoadingButton = false, isSuccess = false
                 ),
                 tableId = tableId,
                 tableName = tableName
             )
         }
-        tryToExecute(
-            function = {
-                manageDinInUseCase.getAllOnlineUsers(
-                    StarTouchSetup.OUTLET_ID,
-                    StarTouchSetup.REST_ID,
-                    StarTouchSetup.USER_ID
-                )
-            },
-            onSuccess = { assignChecks ->
-                if (assignChecks.isEmpty()) {
-                    updateState {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = "",
-                            errorDinInState = null,
-                            dinInDialogueState = it.dinInDialogueState.copy(
-                                isVisible = true,
-                                isLoading = false,
-                                isLoadingButton = false,
-                                isSuccess = true,
-                                serverId = StarTouchSetup.USER_ID,
-                                assignDrawers = emptyList()
-                            ),
-                        )
-                    }
-                    StarTouchSetup.SERVER_ID = StarTouchSetup.USER_ID
-                } else {
-                    updateState {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = "",
-                            errorDinInState = null,
-                            dinInDialogueState = it.dinInDialogueState.copy(
-                                isVisible = true,
-                                isLoading = false,
-                                isLoadingButton = false,
-                                assignDrawers = assignChecks.map { assignCheck ->
-                                    assignCheck.toAssignDrawerState()
-                                }
-                            ),
-                        )
-                    }
-                }
-            },
-            onError = { errorState ->
+        tryToExecute(function = {
+            manageDinInUseCase.getAllOnlineUsers(
+                StarTouchSetup.OUTLET_ID, StarTouchSetup.REST_ID, StarTouchSetup.USER_ID
+            )
+        }, onSuccess = { assignChecks ->
+            if (assignChecks.isEmpty()) {
                 updateState {
                     it.copy(
                         isLoading = false,
-                        errorDinInState = errorState,
-                        dinInDialogueState = DinInDialogueState(),
-                        errorDialogueIsVisible = true,
-                        errorMessage = when (errorState) {
-                            is ErrorState.NetworkError -> errorState.message.toString()
-                            is ErrorState.NotFound -> errorState.message.toString()
-                            is ErrorState.ServerError -> errorState.message.toString()
-                            is ErrorState.UnknownError -> errorState.message.toString()
-                            is ErrorState.PermissionDenied -> errorState.message.toString()
-                            is ErrorState.EmptyData -> errorState.message.toString()
-                            is ErrorState.ValidationError -> errorState.message.toString()
-                            is ErrorState.ValidationNetworkError -> errorState.message.toString()
-                            else -> "Logon Error"
-                        }
+                        errorMessage = "",
+                        errorDinInState = null,
+                        dinInDialogueState = it.dinInDialogueState.copy(
+                            isVisible = true,
+                            isLoading = false,
+                            isLoadingButton = false,
+                            isSuccess = true,
+                            serverId = StarTouchSetup.USER_ID,
+                            assignDrawers = emptyList()
+                        ),
+                    )
+                }
+                StarTouchSetup.SERVER_ID = StarTouchSetup.USER_ID
+            } else {
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "",
+                        errorDinInState = null,
+                        dinInDialogueState = it.dinInDialogueState.copy(isVisible = true,
+                            isLoading = false,
+                            isLoadingButton = false,
+                            assignDrawers = assignChecks.map { assignCheck ->
+                                assignCheck.toAssignDrawerState()
+                            }),
                     )
                 }
             }
-        )
+        }, onError = { errorState ->
+            updateState {
+                it.copy(
+                    isLoading = false,
+                    errorDinInState = errorState,
+                    dinInDialogueState = DinInDialogueState(),
+                    errorDialogueIsVisible = true,
+                    errorMessage = when (errorState) {
+                        is ErrorState.NetworkError -> errorState.message.toString()
+                        is ErrorState.NotFound -> errorState.message.toString()
+                        is ErrorState.ServerError -> errorState.message.toString()
+                        is ErrorState.UnknownError -> errorState.message.toString()
+                        is ErrorState.PermissionDenied -> errorState.message.toString()
+                        is ErrorState.EmptyData -> errorState.message.toString()
+                        is ErrorState.ValidationError -> errorState.message.toString()
+                        is ErrorState.ValidationNetworkError -> errorState.message.toString()
+                        else -> "Logon Error"
+                    }
+                )
+            }
+        })
     }
 
+    private fun checkIfMutlipleChecksInTable(tableId: Int, doWhenChooseOneCheck: (Long) -> Unit) {
+        tryToExecute(function = {
+            manageChecksUseCase.getAllChecksByTableId(
+                tableId = tableId.toInt(),
+                checkId = state.value.tablesDetails.find { it.tableId == tableId.toInt() }?.checkId
+                    ?: 0L,
+                StarTouchSetup.OUTLET_ID,
+                StarTouchSetup.REST_ID,
+                serverId = StarTouchSetup.USER_ID,
+                userId = StarTouchSetup.USER_ID,
+            )
+        }, onSuccess = { checks ->
+            if (checks.size == 1) doWhenChooseOneCheck(checks[0].id)
+            else {
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "",
+                        errorDinInState = null,
+                        dinInDialogueState = it.dinInDialogueState.copy(
+                            isVisible = true,
+                            isLoading = false,
+                            isLoadingButton = false,
+                        ),
+                    )
+                }
+                if (checks.isEmpty()) {
+                    updateState {
+                        it.copy(
+                            errorDialogueIsVisible = false,
+                            errorDinInState = null,
+                            errorMessage = ""
+                        )
+                    }
+                    onConfirmButtonClick()
+                } else {
+                    updateState {
+                        it.copy(dinInDialogueState = it.dinInDialogueState.copy(checks = checks.map { check ->
+                            AssignCheckState(
+                                id = check.id,
+                                name = check.checkSerial.toString(),
+                                status = check.myStatus,
+                                tableName = check.myTable,
+                                date = check.myDateTime + " " + check.createDate
+                            )
+                        }))
+                    }
+                }
+            }
+            updateState { it.copy(selectedDininOption = null) }
+
+        }, onError = { errorState ->
+            updateState {
+                it.copy(
+                    isLoading = false,
+                    errorDinInState = errorState,
+                    dinInDialogueState = DinInDialogueState(),
+                    errorDialogueIsVisible = true,
+                    errorMessage = when (errorState) {
+                        is ErrorState.NetworkError -> errorState.message.toString()
+                        is ErrorState.NotFound -> errorState.message.toString()
+                        is ErrorState.ServerError -> errorState.message.toString()
+                        is ErrorState.UnknownError -> errorState.message.toString()
+                        is ErrorState.EmptyData -> errorState.message.toString()
+                        is ErrorState.ValidationError -> errorState.message.toString()
+                        is ErrorState.PermissionDenied -> errorState.message.toString()
+                        is ErrorState.ValidationNetworkError -> errorState.message.toString()
+                        else -> "Logon Error"
+                    }
+                )
+            }
+        })
+    }
+
+
     override fun onSingleSelectTableOption(tableId: Int) {
-        /* TODO Implement the function ya kamel*/
-        tryToExecute(
-            function = {
+        updateState {
+            it.copy(
+                tableIdToMove = tableId, dinInDialogueState = it.dinInDialogueState.copy(
+                    isVisible = true,
+                    isLoading = true,
+                    isSuccess = false,
+                    isLoadingButton = false,
+                    serverId = 0,
+                    isNamedTable = false
+                )
+            )
+        }
+        checkIfMutlipleChecksInTable(tableId) { checkId ->
+            tryToExecute(function = {
                 when (state.value.selectedDininOption) {
                     DininOption.DisableTable -> {
-                        manageDininOptionsUseCase.disableTable(tableId, state.value.checkId)
                     }
 
                     DininOption.EnableTable -> {
-                        manageDininOptionsUseCase.enableTable(tableId, state.value.checkId)
                     }
 
                     DininOption.SplitCheck -> {
-                        manageDininOptionsUseCase.splitCheck(tableId, state.value.checkId)
 
                     }
 
                     DininOption.UnSplitCheck -> {
-                        manageDininOptionsUseCase.unSplitCheck(tableId, state.value.checkId)
 
                     }
 
                     DininOption.UnCombineCheck -> {
-                        manageDininOptionsUseCase.unCombineCheck(tableId, state.value.checkId)
 
                     }
 
                     DininOption.Void -> {
-                        manageDininOptionsUseCase.void(tableId, state.value.checkId)
 
                     }
 
                     DininOption.SplitAndPay -> {
-                        manageDininOptionsUseCase.splitAndPay(tableId, state.value.checkId)
 
                     }
 
                     DininOption.ShareItem -> {
-                        manageDininOptionsUseCase.shareItem(tableId, state.value.checkId)
 
                     }
 
                     DininOption.MoveItemToNewCheck -> {
-                        manageDininOptionsUseCase.moveItemToNewCheck(tableId, state.value.checkId)
 
-                    }
-
-                    else -> {}
-                }
-            },
-            onSuccess = {
-                retry()
-                updateState { it.copy(selectedDininOption = null) }
-            },
-            onError = ::onError
-        )
-    }
-
-    override fun onMutliSelectTableOption(selectedTablesIds: List<Int>) {
-        /* TODO Implement the function ya kamel*/
-        tryToExecute(
-            function = {
-                when (state.value.selectedDininOption) {
-                    DininOption.MoveTableChecks -> {
-                        manageDininOptionsUseCase.moveTableChecks(selectedTablesIds, state.value.checkId)
-                    }
-
-                    DininOption.CombineCheck -> {
-                        manageDininOptionsUseCase.combineCheck(selectedTablesIds, state.value.checkId)
                     }
 
                     DininOption.MoveItem -> {
-                        manageDininOptionsUseCase.moveItem(selectedTablesIds, state.value.checkId)
-
+                        tryToExecute(function = {
+                            manageDininButtonsUseCase.getTableItems(
+                                tableId = tableId.toLong(), checkId = checkId
+                            )
+                        }, onSuccess = { items ->
+                            updateState {
+                                it.copy(
+                                    isLoading = false,
+                                    moveItemsDialogueIsVisible = true,
+                                    tableItems = items,
+                                    tableIdToMove = tableId,
+                                    checkIdToMove = checkId,
+                                    dinInDialogueState = it.dinInDialogueState.copy(
+                                        isVisible = false,
+                                        isLoading = false,
+                                        isSuccess = false,
+                                        isLoadingButton = false,
+                                        serverId = 0,
+                                        isNamedTable = true
+                                    )
+                                )
+                            }
+                        }, onError = ::onError
+                        )
                     }
 
                     else -> {}
                 }
-            },
-            onSuccess = {
-                retry()
+            }, onSuccess = {
+                //retry()
                 updateState { it.copy(selectedDininOption = null) }
-            },
-            onError = ::onError
+            }, onError = ::onError
+            )
+        }
+    }
+
+    override fun onMutliSelectTableOption(selectedTablesIds: List<Int>) {/* TODO Implement the function ya kamel*/
+        tryToExecute(function = {
+            when (state.value.selectedDininOption) {
+                DininOption.MoveTableChecks -> {
+                }
+
+                DininOption.CombineCheck -> {
+                }
+
+                else -> {}
+            }
+        }, onSuccess = {
+            retry()
+            updateState { it.copy(selectedDininOption = null) }
+        }, onError = ::onError
         )
     }
 
     private fun onError(errorState: ErrorState) {
+        println(errorState)
         updateState {
             it.copy(
                 isLoading = false,
@@ -465,31 +535,124 @@ class DinInScreenModel(
     }
 
     override fun onClickCheck(id: Long, serial: Int) {
-        tryToExecute(
-            function = {
-                manageChecksUseCase.reOpenCheck(id)
-            },
-            onSuccess = { items ->
+        if (state.value.waitingForChooseCheckToMove) {
+            tryToExecute(function = {
+                manageDininButtonsUseCase.moveItems(
+                    fromCheckId = state.value.checkIdToMove,
+                    toCheckId = id ?: throw NotFoundException("checkId Not Found"),
+                    itemSerials = state.value.selectedItemToMove
+                )
+            }, onSuccess = {
+                retry()
                 updateState {
                     it.copy(
                         isLoading = false,
-                        errorMessage = "",
-                        errorDinInState = null,
+                        waitingForChooseCheckToMove = false,
                         dinInDialogueState = it.dinInDialogueState.copy(
                             isVisible = false,
                             isLoading = false,
-                            isLoadingButton = false,
                             isSuccess = false,
-                            assignDrawers = emptyList(),
-                            checks = emptyList()
-                        ),
-                        checkId = id
+                            isLoadingButton = false,
+                            serverId = 0,
+                            isNamedTable = false
+                        )
                     )
                 }
-                sendNewEffect(DinInUiEffect.NavigateToOrderScreen(id, items, true, serial))
-            },
-            onError = ::onError
-        )
+            }, onError = ::onError
+            )
+
+        } else {
+            when (state.value.selectedDininOption) {
+                DininOption.DisableTable -> {
+                }
+
+                DininOption.EnableTable -> {
+                }
+
+                DininOption.SplitCheck -> {
+
+                }
+
+                DininOption.UnSplitCheck -> {
+
+                }
+
+                DininOption.UnCombineCheck -> {
+
+                }
+
+                DininOption.Void -> {
+
+                }
+
+                DininOption.SplitAndPay -> {
+
+                }
+
+                DininOption.ShareItem -> {
+
+                }
+
+                DininOption.MoveItemToNewCheck -> {
+
+                }
+
+                DininOption.MoveItem -> {
+                    tryToExecute(function = {
+                        manageDininButtonsUseCase.getTableItems(
+                            tableId = state.value.tableIdToMove.toLong(), checkId = id
+                        )
+                    }, onSuccess = { items ->
+                        updateState {
+                            it.copy(
+                                isLoading = false,
+                                moveItemsDialogueIsVisible = true,
+                                tableItems = items,
+                                checkIdToMove = id,
+                                dinInDialogueState = it.dinInDialogueState.copy(
+                                    isVisible = false,
+                                    isLoading = false,
+                                    isSuccess = false,
+                                    isLoadingButton = false,
+                                    serverId = 0,
+                                    isNamedTable = true
+                                )
+                            )
+                        }
+                    }, onError = ::onError
+                    )
+                }
+
+                else -> {
+                    tryToExecute(function = {
+                        manageChecksUseCase.reOpenCheck(id)
+                    }, onSuccess = { items ->
+                        updateState {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = "",
+                                errorDinInState = null,
+                                dinInDialogueState = it.dinInDialogueState.copy(
+                                    isVisible = false,
+                                    isLoading = false,
+                                    isLoadingButton = false,
+                                    isSuccess = false,
+                                    assignDrawers = emptyList(),
+                                    checks = emptyList()
+                                ),
+                                checkId = id
+                            )
+                        }
+                        sendNewEffect(
+                            DinInUiEffect.NavigateToOrderScreen(
+                                id, items, items != emptyList<FireItems>(), serial
+                            )
+                        )
+                    }, onError = ::onError
+                    )
+                }
+            }
+        }
     }
 
     override fun onCoversCountChanged(covers: String) {
@@ -527,7 +690,75 @@ class DinInScreenModel(
                 tableId = 0,
                 tableName = "0",
                 validation = false,
-                isTableGuest = false
+                isTableGuest = false,
+                moveItemsDialogueIsVisible = false,
+                chooseTableDialogueIsVisible = false,
+                selectedItemToMove = emptyList(),
+            )
+        }
+    }
+
+    override fun onClickOkMoveItemsDialogue(selectedItems: List<Int>) {
+        if (selectedItems.isEmpty()) onError(ErrorState.ValidationError("You should select at least one item"))
+        else if (state.value.tableItems.size == selectedItems.size) onError(
+            ErrorState.ValidationError(
+                "You couldn't choose all items"
+            )
+        )
+        else updateState {
+            it.copy(
+                moveItemsDialogueIsVisible = false,
+                chooseTableDialogueIsVisible = true,
+                selectedItemToMove = selectedItems
+            )
+        }
+    }
+
+    override fun onClickOkAfterChooseTableDialogue(table: TableDetailsState) {
+        updateState {
+            it.copy(
+                dinInDialogueState = it.dinInDialogueState.copy(
+                    isVisible = true,
+                    isLoading = true,
+                    isSuccess = false,
+                    isLoadingButton = false,
+                    serverId = 0,
+                    isNamedTable = false
+                )
+            )
+        }
+
+        if (table.coversCount == 1) {
+            tryToExecute(function = {
+                manageDininButtonsUseCase.moveItems(
+                    fromCheckId = state.value.checkIdToMove,
+                    toCheckId = table.checkId ?: throw NotFoundException("checkId Not Found"),
+                    itemSerials = state.value.selectedItemToMove
+                )
+            }, onSuccess = {
+                retry()
+                updateState {
+                    it.copy(
+                        isLoading = false, dinInDialogueState = it.dinInDialogueState.copy(
+                            isVisible = false,
+                            isLoading = false,
+                            isSuccess = false,
+                            isLoadingButton = false,
+                            serverId = 0,
+                            isNamedTable = false
+                        )
+                    )
+                }
+            }, onError = ::onError
+            )
+        } else {
+            checkIfMutlipleChecksInTable(tableId = table.tableId) {}
+            updateState { it.copy(waitingForChooseCheckToMove = true) }
+        }
+
+        updateState {
+            it.copy(
+                moveItemsDialogueIsVisible = false, chooseTableDialogueIsVisible = false
             )
         }
     }
@@ -535,8 +766,7 @@ class DinInScreenModel(
     override fun showErrorDialogue() {
         updateState {
             it.copy(
-                isLoading = false,
-                errorDialogueIsVisible = true
+                isLoading = false, errorDialogueIsVisible = true
             )
         }
     }
@@ -616,121 +846,105 @@ class DinInScreenModel(
                 errorMessage = "",
                 errorDinInState = null,
                 dinInDialogueState = it.dinInDialogueState.copy(
-                    isVisible = true,
-                    isLoading = true,
-                    isLoadingButton = false,
-                    isSuccess = false
+                    isVisible = true, isLoading = true, isLoadingButton = false, isSuccess = false
                 ),
                 tableId = tableId.toInt(),
             )
         }
         if (state.value.roomId != 0) {
-            tryToExecute(
-                function = {
-                    manageChecksUseCase.getAllChecksByTableId(
-                        tableId = tableId.toInt(),
-                        checkId = state.value.tablesDetails.find { it.tableId == tableId.toInt() }?.checkId
-                            ?: 0L,
-                        StarTouchSetup.OUTLET_ID,
-                        StarTouchSetup.REST_ID,
-                        serverId = StarTouchSetup.USER_ID,
-                        userId = StarTouchSetup.USER_ID,
-                    )
-                },
-                onSuccess = { checks ->
-                    if (checks.size == 1) onClickCheck(checks[0].id, checks[0].checkSerial)
-                    else {
-                        updateState {
-                            it.copy(
-                                isLoading = false,
-                                errorMessage = "",
-                                errorDinInState = null,
-                                dinInDialogueState = it.dinInDialogueState.copy(
-                                    isVisible = true,
-                                    isLoading = false,
-                                    isLoadingButton = false,
-                                ),
-                            )
-                        }
-                        if (checks.isEmpty()) {
-                            updateState {
-                                it.copy(
-                                    errorDialogueIsVisible = false,
-                                    errorDinInState = null,
-                                    errorMessage = ""
-                                )
-                            }
-                            onConfirmButtonClick()
-                        } else updateState {
-                            it.copy(
-                                dinInDialogueState = it.dinInDialogueState.copy(checks = checks.map { check ->
-                                    AssignCheckState(
-                                        id = check.id,
-                                        name = check.checkSerial.toString(),
-                                        status = check.myStatus,
-                                        tableName = check.myTable,
-                                        date = check.myDateTime + " " + check.createDate
-                                    )
-                                }
-                                )
-                            )
-                        }
-                    }
-                },
-                onError = { errorState ->
-                    updateState {
-                        it.copy(
-                            isLoading = false,
-                            errorDinInState = errorState,
-                            dinInDialogueState = DinInDialogueState(),
-                            errorDialogueIsVisible = true,
-                            errorMessage = when (errorState) {
-                                is ErrorState.NetworkError -> errorState.message.toString()
-                                is ErrorState.NotFound -> errorState.message.toString()
-                                is ErrorState.ServerError -> errorState.message.toString()
-                                is ErrorState.UnknownError -> errorState.message.toString()
-                                is ErrorState.EmptyData -> errorState.message.toString()
-                                is ErrorState.ValidationError -> errorState.message.toString()
-                                is ErrorState.PermissionDenied -> errorState.message.toString()
-                                is ErrorState.ValidationNetworkError -> errorState.message.toString()
-                                else -> "Logon Error"
-                            }
-                        )
-                    }
-                }
-            )
-        } else {
-            tryToExecute(
-                function = {
-                    manageChecksUseCase.reOpenCheck(tableId, 0)
-                },
-                onSuccess = { items ->
+            tryToExecute(function = {
+                manageChecksUseCase.getAllChecksByTableId(
+                    tableId = tableId.toInt(),
+                    checkId = state.value.tablesDetails.find { it.tableId == tableId.toInt() }?.checkId
+                        ?: 0L,
+                    StarTouchSetup.OUTLET_ID,
+                    StarTouchSetup.REST_ID,
+                    serverId = StarTouchSetup.USER_ID,
+                    userId = StarTouchSetup.USER_ID,
+                )
+            }, onSuccess = { checks ->
+                if (checks.size == 1) onClickCheck(checks[0].id, checks[0].checkSerial)
+                else {
                     updateState {
                         it.copy(
                             isLoading = false,
                             errorMessage = "",
                             errorDinInState = null,
                             dinInDialogueState = it.dinInDialogueState.copy(
-                                isVisible = false,
+                                isVisible = true,
                                 isLoading = false,
                                 isLoadingButton = false,
-                                isSuccess = false,
-                                assignDrawers = emptyList(),
-                                checks = emptyList()
                             ),
-                            checkId = tableId,
                         )
                     }
-                    sendNewEffect(
-                        DinInUiEffect.NavigateToOrderScreen(
-                            tableId,
-                            items,
-                            true,
-                            tableId.toString().takeLast(5).toInt()
-                        )
+                    if (checks.isEmpty()) {
+                        updateState {
+                            it.copy(
+                                errorDialogueIsVisible = false,
+                                errorDinInState = null,
+                                errorMessage = ""
+                            )
+                        }
+                        onConfirmButtonClick()
+                    } else updateState {
+                        it.copy(dinInDialogueState = it.dinInDialogueState.copy(checks = checks.map { check ->
+                            AssignCheckState(
+                                id = check.id,
+                                name = check.checkSerial.toString(),
+                                status = check.myStatus,
+                                tableName = check.myTable,
+                                date = check.myDateTime + " " + check.createDate
+                            )
+                        }))
+                    }
+                }
+            }, onError = { errorState ->
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        errorDinInState = errorState,
+                        dinInDialogueState = DinInDialogueState(),
+                        errorDialogueIsVisible = true,
+                        errorMessage = when (errorState) {
+                            is ErrorState.NetworkError -> errorState.message.toString()
+                            is ErrorState.NotFound -> errorState.message.toString()
+                            is ErrorState.ServerError -> errorState.message.toString()
+                            is ErrorState.UnknownError -> errorState.message.toString()
+                            is ErrorState.EmptyData -> errorState.message.toString()
+                            is ErrorState.ValidationError -> errorState.message.toString()
+                            is ErrorState.PermissionDenied -> errorState.message.toString()
+                            is ErrorState.ValidationNetworkError -> errorState.message.toString()
+                            else -> "Logon Error"
+                        }
                     )
-                },
-                onError = ::onError
+                }
+            })
+        } else {
+            tryToExecute(function = {
+                manageChecksUseCase.reOpenCheck(tableId, 0)
+            }, onSuccess = { items ->
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "",
+                        errorDinInState = null,
+                        dinInDialogueState = it.dinInDialogueState.copy(
+                            isVisible = false,
+                            isLoading = false,
+                            isLoadingButton = false,
+                            isSuccess = false,
+                            assignDrawers = emptyList(),
+                            checks = emptyList()
+                        ),
+                        checkId = tableId,
+                    )
+                }
+                sendNewEffect(
+                    DinInUiEffect.NavigateToOrderScreen(
+                        tableId, items, true, tableId.toString().takeLast(5).toInt()
+                    )
+                )
+            }, onError = ::onError
             )
         }
     }
@@ -751,47 +965,42 @@ class DinInScreenModel(
                 errorMessage = "",
             )
         }
-        tryToExecute(
-            function = {
-                manageDinInUseCase.getAllTablesGuest(
-                    StarTouchSetup.OUTLET_ID,
-                    StarTouchSetup.REST_ID
+        tryToExecute(function = {
+            manageDinInUseCase.getAllTablesGuest(
+                StarTouchSetup.OUTLET_ID, StarTouchSetup.REST_ID
+            )
+        }, onSuccess = { tables ->
+            updateState {
+                it.copy(
+                    isLoading = false,
+                    errorMessage = "",
+                    errorDinInState = null,
+                    showErrorScreen = false,
+                    tablesDetails = tables.map { table ->
+                        table.toTableDetailsState()
+                    },
+                    roomId = 0
                 )
-            },
-            onSuccess = { tables ->
-                updateState {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = "",
-                        errorDinInState = null,
-                        showErrorScreen = false,
-                        tablesDetails = tables.map { table ->
-                            table.toTableDetailsState()
-                        },
-                        roomId = 0
-                    )
-                }
-            },
-            onError = { errorState ->
-                updateState {
-                    it.copy(
-                        isLoading = false,
-                        errorDinInState = errorState,
-                        tablesDetails = emptyList(),
-                        errorMessage = when (errorState) {
-                            is ErrorState.NetworkError -> errorState.message.toString()
-                            is ErrorState.NotFound -> errorState.message.toString()
-                            is ErrorState.ServerError -> errorState.message.toString()
-                            is ErrorState.UnknownError -> errorState.message.toString()
-                            is ErrorState.EmptyData -> errorState.message.toString()
-                            is ErrorState.PermissionDenied -> errorState.message.toString()
-                            is ErrorState.ValidationNetworkError -> errorState.message.toString()
-                            else -> "Logon Error"
-                        }
-                    )
-                }
             }
-        )
+        }, onError = { errorState ->
+            updateState {
+                it.copy(
+                    isLoading = false,
+                    errorDinInState = errorState,
+                    tablesDetails = emptyList(),
+                    errorMessage = when (errorState) {
+                        is ErrorState.NetworkError -> errorState.message.toString()
+                        is ErrorState.NotFound -> errorState.message.toString()
+                        is ErrorState.ServerError -> errorState.message.toString()
+                        is ErrorState.UnknownError -> errorState.message.toString()
+                        is ErrorState.EmptyData -> errorState.message.toString()
+                        is ErrorState.PermissionDenied -> errorState.message.toString()
+                        is ErrorState.ValidationNetworkError -> errorState.message.toString()
+                        else -> "Logon Error"
+                    }
+                )
+            }
+        })
     }
 
     override fun onCreateTableGuest() {
@@ -802,9 +1011,7 @@ class DinInScreenModel(
                 exit = false,
                 errorDinInState = null,
                 dinInDialogueState = it.dinInDialogueState.copy(
-                    isVisible = true,
-                    isLoading = false,
-                    isNamedTable = true
+                    isVisible = true, isLoading = false, isNamedTable = true
                 ),
                 tableId = 0,
                 isTableGuest = true
@@ -821,53 +1028,50 @@ class DinInScreenModel(
                 errorMessage = "",
             )
         }
-        tryToExecute(
-            function = {
-                manageDinInUseCase.getTablesDataByRoomId(
-                    StarTouchSetup.OUTLET_ID,
-                    StarTouchSetup.REST_ID,
-                    id
+        tryToExecute(function = {
+            manageDinInUseCase.getTablesDataByRoomId(
+                StarTouchSetup.OUTLET_ID, StarTouchSetup.REST_ID, id
+            )
+        }, onSuccess = { tables ->
+            updateState {
+                it.copy(
+                    isLoading = false,
+                    errorMessage = "",
+                    errorDinInState = null,
+                    showErrorScreen = false,
+                    tablesDetails = tables.map { table ->
+                        table.toTableDetailsState()
+                    },
+                    roomId = id
                 )
-            },
-            onSuccess = { tables ->
-                updateState {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = "",
-                        errorDinInState = null,
-                        showErrorScreen = false,
-                        tablesDetails = tables.map { table ->
-                            table.toTableDetailsState()
-                        },
-                        roomId = id
-                    )
-                }
-            },
-            onError = { errorState ->
-                updateState {
-                    it.copy(
-                        isLoading = false,
-                        errorDinInState = errorState,
-                        tablesDetails = emptyList(),
-                        errorMessage = when (errorState) {
-                            is ErrorState.NetworkError -> errorState.message.toString()
-                            is ErrorState.NotFound -> errorState.message.toString()
-                            is ErrorState.ServerError -> errorState.message.toString()
-                            is ErrorState.UnknownError -> errorState.message.toString()
-                            is ErrorState.EmptyData -> errorState.message.toString()
-                            is ErrorState.PermissionDenied -> errorState.message.toString()
-                            is ErrorState.ValidationNetworkError -> errorState.message.toString()
-                            else -> "Unknown error"
-                        }
-                    )
-                }
             }
-        )
+        }, onError = { errorState ->
+            updateState {
+                it.copy(
+                    isLoading = false,
+                    errorDinInState = errorState,
+                    tablesDetails = emptyList(),
+                    errorMessage = when (errorState) {
+                        is ErrorState.NetworkError -> errorState.message.toString()
+                        is ErrorState.NotFound -> errorState.message.toString()
+                        is ErrorState.ServerError -> errorState.message.toString()
+                        is ErrorState.UnknownError -> errorState.message.toString()
+                        is ErrorState.EmptyData -> errorState.message.toString()
+                        is ErrorState.PermissionDenied -> errorState.message.toString()
+                        is ErrorState.ValidationNetworkError -> errorState.message.toString()
+                        else -> "Unknown error"
+                    }
+                )
+            }
+        })
     }
 
     override fun onEnterTableName() {
-        if (state.value.dinInDialogueState.tableName.isEmpty())
-            onError(errorState = ErrorState.ValidationError("Enter table name"))
+        if (state.value.dinInDialogueState.tableName.isEmpty()) onError(
+            errorState = ErrorState.ValidationError(
+                "Enter table name"
+            )
+        )
         else {
             updateState {
                 it.copy(
@@ -887,14 +1091,12 @@ class DinInScreenModel(
     }
 
     override fun onMenuItemClick(menuItem: MenuItem) {
-        if (state.value.selectedDininOption != menuItem.option)
-            updateState {
-                it.copy(
-                    selectedDininOption = menuItem.option,
-                )
-            }
-        else
-            updateState { it.copy(selectedDininOption = null) }
+        if (state.value.selectedDininOption != menuItem.option) updateState {
+            it.copy(
+                selectedDininOption = menuItem.option,
+            )
+        }
+        else updateState { it.copy(selectedDininOption = null) }
 
 
         println("selected Fab item = " + state.value.selectedDininOption)
@@ -918,48 +1120,41 @@ class DinInScreenModel(
                 errorMessage = "",
             )
         }
-        tryToExecute(
-            function = {
-                setupUseCase.getAllRoomsByOutletAndRestId(
-                    StarTouchSetup.OUTLET_ID,
-                    StarTouchSetup.REST_ID
-                )
-            },
-            onSuccess = { rooms ->
-                updateState {
-                    it.copy(
-                        isLoading = false,
-                        errorDinInState = null,
-                        errorMessage = "",
-                        rooms = rooms.map { room ->
-                            room.toState()
-                        }.sortedByDescending { roomSorted ->
-                            roomSorted.id == StarTouchSetup.MAIN_ROOM_ID
-                        }
-                    )
-                }
-            },
-            onError = { errorState ->
-                updateState {
-                    it.copy(
-                        isLoading = false,
-                        errorDinInState = errorState,
-                        dinInDialogueState = DinInDialogueState(),
-                        errorDialogueIsVisible = true,
-                        errorMessage = when (errorState) {
-                            is ErrorState.NetworkError -> errorState.message.toString()
-                            is ErrorState.NotFound -> errorState.message.toString()
-                            is ErrorState.ServerError -> errorState.message.toString()
-                            is ErrorState.PermissionDenied -> errorState.message.toString()
-                            is ErrorState.UnknownError -> errorState.message.toString()
-                            is ErrorState.EmptyData -> errorState.message.toString()
-                            is ErrorState.ValidationError -> errorState.message.toString()
-                            is ErrorState.ValidationNetworkError -> errorState.message.toString()
-                            else -> "Unknown error"
-                        }
-                    )
-                }
+        tryToExecute(function = {
+            setupUseCase.getAllRoomsByOutletAndRestId(
+                StarTouchSetup.OUTLET_ID, StarTouchSetup.REST_ID
+            )
+        }, onSuccess = { rooms ->
+            updateState {
+                it.copy(isLoading = false,
+                    errorDinInState = null,
+                    errorMessage = "",
+                    rooms = rooms.map { room ->
+                        room.toState()
+                    }.sortedByDescending { roomSorted ->
+                        roomSorted.id == StarTouchSetup.MAIN_ROOM_ID
+                    })
             }
-        )
+        }, onError = { errorState ->
+            updateState {
+                it.copy(
+                    isLoading = false,
+                    errorDinInState = errorState,
+                    dinInDialogueState = DinInDialogueState(),
+                    errorDialogueIsVisible = true,
+                    errorMessage = when (errorState) {
+                        is ErrorState.NetworkError -> errorState.message.toString()
+                        is ErrorState.NotFound -> errorState.message.toString()
+                        is ErrorState.ServerError -> errorState.message.toString()
+                        is ErrorState.PermissionDenied -> errorState.message.toString()
+                        is ErrorState.UnknownError -> errorState.message.toString()
+                        is ErrorState.EmptyData -> errorState.message.toString()
+                        is ErrorState.ValidationError -> errorState.message.toString()
+                        is ErrorState.ValidationNetworkError -> errorState.message.toString()
+                        else -> "Unknown error"
+                    }
+                )
+            }
+        })
     }
 }

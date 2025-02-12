@@ -11,6 +11,8 @@ interface DinInInteractionListener {
     fun onCoversCountChanged(covers: String)
     fun onTableNameChanged(tableName: String)
     fun onDismissDinInDialogue()
+    fun onClickOkMoveItemsDialogue(selectedItems: List<Int>)
+    fun onClickOkAfterChooseTableDialogue(checkId: TableDetailsState)
     fun showErrorDialogue()
     fun onDismissErrorDialogue()
     fun showErrorScreen()

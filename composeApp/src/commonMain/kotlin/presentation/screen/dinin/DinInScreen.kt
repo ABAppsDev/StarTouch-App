@@ -7,6 +7,7 @@ import abapps_startouch.composeapp.generated.resources.ic_profile_filled
 import abapps_startouch.composeapp.generated.resources.invoice
 import abapps_startouch.composeapp.generated.resources.table
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,8 +15,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -25,14 +29,18 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.IconButton
 import androidx.compose.material.TextButton
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -56,6 +64,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
@@ -70,10 +79,13 @@ import com.beepbeep.designSystem.ui.composable.StTextField
 import com.beepbeep.designSystem.ui.composable.StThreeDotLoadingIndicator
 import com.beepbeep.designSystem.ui.composable.animate.FadeAnimation
 import com.beepbeep.designSystem.ui.theme.Theme
+import domain.entity.FireItems
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import presentation.screen.composable.AppScaffold
 import presentation.screen.composable.Chair
+import presentation.screen.composable.EICheckBox
 import presentation.screen.composable.ErrorDialogue
 import presentation.screen.composable.MenuItem
 import presentation.screen.composable.MutliFabState
@@ -127,6 +139,19 @@ class DinInScreen : Screen {
                 onDismissRequest = dinInScreenModel::onDismissWarningDialogue,
                 onClickConfirmButton = dinInScreenModel::onConfirmButtonClick,
                 onClickDismissButton = dinInScreenModel::onDismissWarningDialogue
+            )
+        }
+
+        FadeAnimation(state.moveItemsDialogueIsVisible) {
+            MoveItemsDialogue(
+                dinInScreenModel,
+                orderItemState = state.tableItems
+            )
+        }
+        FadeAnimation(state.chooseTableDialogueIsVisible) {
+            ChooseMovedItemsTableDialogue(
+                dinInScreenModel,
+                state
             )
         }
 
@@ -251,42 +276,43 @@ private fun OnRender(
                                 )
                             }
                         } else {
-//                            IconButton(onClick = {
-//                                isDropDownMenuExpanded = !isDropDownMenuExpanded
-//                                if (isDropDownMenuExpanded && mutliFabState == MutliFabState.EXPANDED)
-//                                    mutliFabState = MutliFabState.COLLAPSED
-//
-//                            }) {
-//                                Icon(
-//                                    painterResource(Res.drawable.baseline_more_vert_24),
-//                                    contentDescription = null,
-//                                    tint = Color.White
-//                                )
-//                            }
+                            IconButton(onClick = {
+                                isDropDownMenuExpanded = !isDropDownMenuExpanded
+                                if (isDropDownMenuExpanded && mutliFabState == MutliFabState.EXPANDED)
+                                    mutliFabState = MutliFabState.COLLAPSED
+
+                            }) {
+                                Icon(
+                                    painterResource(Res.drawable.baseline_more_vert_24),
+                                    contentDescription = null,
+                                    tint = Color.White
+                                )
+                            }
                         }
                     }
                 )
-                Row(
-                    Modifier.fillMaxWidth()
-                        .padding(top = 16.dp, bottom = 4.dp, start = 16.dp, end = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    StChip(
-                        label = Resources.strings.createTableGuest,
-                        isSelected = true,
-                        onClick = { listener.onCreateTableGuest() },
-                        painter = painterResource(Res.drawable.table)
-                    )
-                    StChip(
-                        label = Resources.strings.showAllTableGuest,
-                        isSelected = isSelected,
-                        onClick = {
-                            isSelected = true
-                            if (state.roomId != 0) listener.onClickTableGuest()
-                        },
-                    )
-                }
+                if (state.selectedDininOption == null)
+                    Row(
+                        Modifier.fillMaxWidth()
+                            .padding(top = 16.dp, bottom = 4.dp, start = 16.dp, end = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        StChip(
+                            label = Resources.strings.createTableGuest,
+                            isSelected = true,
+                            onClick = { listener.onCreateTableGuest() },
+                            painter = painterResource(Res.drawable.table)
+                        )
+                        StChip(
+                            label = Resources.strings.showAllTableGuest,
+                            isSelected = isSelected,
+                            onClick = {
+                                isSelected = true
+                                if (state.roomId != 0) listener.onClickTableGuest()
+                            },
+                        )
+                    }
                 LazyRow(
                     contentPadding = PaddingValues(16.dp),
                     modifier = Modifier.align(Alignment.End)
@@ -311,13 +337,13 @@ private fun OnRender(
             }
         }
 
-//        DininDropDownMenu(
-//            items = dropDownMenuItem,
-//            isExpand = isDropDownMenuExpanded,
-//            onDismiss = { isDropDownMenuExpanded = !isDropDownMenuExpanded },
-//            onMenuItemClick = listener::onMenuItemClick
-//
-//        )
+        DininDropDownMenu(
+            items = dropDownMenuItem,
+            isExpand = isDropDownMenuExpanded,
+            onDismiss = { isDropDownMenuExpanded = !isDropDownMenuExpanded },
+            onMenuItemClick = listener::onMenuItemClick
+
+        )
 //        MutliFabView(
 //            fabMenuitems,
 //            onMenuItemClick = listener::onMenuItemClick,
@@ -353,9 +379,15 @@ private fun TablesGrid(
         verticalArrangement = Arrangement.spacedBy(24.dp),
         contentPadding = PaddingValues(8.dp)
     ) {
-        items(state.tablesDetails) { table ->
+        items(state.tablesDetails.filter { table ->
+            if (state.selectedDininOption == DininOption.MoveItem)
+                table.covers > 0 || table.openCheckDate != "null"
+            else
+                true
+        }) { table ->
             ChooseTable(
                 table = table,
+                isModeApplied = state.selectedDininOption,
                 onLongClick = {
                     if (state.selectedDininOption == null && table.enabled) {
                         if (state.roomId != 0)
@@ -384,6 +416,7 @@ private fun TablesGrid(
                     DininOption.SplitAndPay,
                     DininOption.ShareItem,
                     DininOption.MoveItemToNewCheck,
+                    DininOption.MoveItem,
                     -> {
                         listener.onSingleSelectTableOption(table.tableId)
                     }
@@ -472,6 +505,183 @@ private fun DinInDialogue(
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MoveItemsDialogue(
+    dinInInteractionListener: DinInInteractionListener,
+    isLoading: Boolean = false,
+    orderItemState: List<FireItems> = emptyList(),
+    modifier: Modifier = Modifier
+) {
+    var selectedItems by remember { mutableStateOf<List<Int>>(emptyList()) }
+
+    StDialogue(
+        onDismissRequest = dinInInteractionListener::onDismissDinInDialogue,
+        modifier = modifier
+    ) {
+        Text(
+            text = Resources.strings.selectItems,
+            style = Theme.typography.headline,
+            color = Theme.colors.contentPrimary,
+        )
+        Box(contentAlignment = Alignment.BottomCenter) {
+            LazyColumn(
+                modifier = Modifier.fillMaxHeight().padding(top = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                contentPadding = PaddingValues(bottom = 64.dp)
+            ) {
+                items(orderItemState) { item ->
+                    Row {
+                        EICheckBox(
+                            "",
+                            isChecked = selectedItems.contains(item.serial),
+                            onCheck = {
+                                if (it)
+                                    selectedItems += item.serial?:0
+                                else
+                                    selectedItems -= item.serial?:0
+                            },
+                        )
+                        Card(
+                            modifier = modifier.bounceClick {
+                                if (selectedItems.contains(item.serial))
+                                    selectedItems -= item.serial?:0
+                                else
+                                    selectedItems += item.serial?:0
+                            },
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1F1D2B)),
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(
+                                    modifier = Modifier.weight(1f),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Image(
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .clip(CircleShape),
+                                        painter = painterResource(DrawableResource("dish.png")),
+                                        contentDescription = "item image"
+                                    )
+                                    Column(modifier = Modifier.padding(start = 8.dp)) {
+                                        Text(
+                                            text = item.name ?: "",
+                                            color = Color.White,
+                                            style = Theme.typography.title
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "${item.price}",
+                                            color = Theme.colors.contentSecondary,
+                                            style = Theme.typography.titleMedium
+                                        )
+                                    }
+                                }
+                                Text(
+                                    text = "${item.totalPrice}",
+                                    color = Color.White,
+                                    style = Theme.typography.titleMedium
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 40.dp)
+                        .background(Theme.colors.background),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    StOutlinedButton(
+                        title = Resources.strings.cancel,
+                        onClick = {
+                            dinInInteractionListener.onDismissDinInDialogue()
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                    StButton(
+                        title = Resources.strings.ok,
+                        onClick = {
+                            dinInInteractionListener.onClickOkMoveItemsDialogue(selectedItems)
+                        },
+                        modifier = Modifier.weight(1f),
+                        isLoading = isLoading,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ChooseMovedItemsTableDialogue(
+    dinInInteractionListener: DinInInteractionListener,
+    state: DinInState,
+    isLoading: Boolean = false,
+    modifier: Modifier = Modifier
+) {
+    StDialogue(
+        onDismissRequest = dinInInteractionListener::onDismissDinInDialogue,
+        modifier = modifier
+    ) {
+
+        Text(
+            text = Resources.strings.tableName,
+            style = Theme.typography.headline,
+            color = Theme.colors.contentPrimary,
+        )
+        Box(contentAlignment = Alignment.BottomCenter) {
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(120.dp),
+                modifier = Modifier.fillMaxHeight().padding(top = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(24.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp, end = 8.dp, start = 8.dp)
+            ) {
+                items(state.tablesDetails.filter { table -> table.covers > 0 || table.openCheckDate != "null" }) { table ->
+                    ChooseTable(
+                        table = table,
+                        tableSize = 120.dp,
+                        onLongClick = {
+
+                        },
+                        id = state.roomId,
+                        onClick = {
+                            dinInInteractionListener.onClickOkAfterChooseTableDialogue(table)
+                        }
+                    )
+                }
+            }
+
+            SetLayoutDirection(layoutDirection = LayoutDirection.Ltr) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 40.dp)
+                        .background(Theme.colors.background),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    StOutlinedButton(
+                        title = Resources.strings.cancel,
+                        onClick = {
+                            dinInInteractionListener.onDismissDinInDialogue()
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -716,11 +926,13 @@ private fun ChooseTable(
     table: TableDetailsState,
     id: Int,
     modifier: Modifier = Modifier,
+    tableSize: Dp = 120.dp,
+    isModeApplied: DininOption? = null,
     onLongClick: () -> Unit = {},
     onClick: () -> Unit = {},
 ) {
     Chair(
-        tableSize = 120.dp,
+        tableSize = tableSize,
         tableColor = Theme.colors.contentPrimary,
         covers = table.covers.toString(),
         openTime = table.openCheckDate ?: "",
@@ -730,6 +942,7 @@ private fun ChooseTable(
         printed = table.printed,
         hasOrders = table.covers > 0 || table.openCheckDate != "null",
         enabled = table.enabled,
+        isModeApplied = isModeApplied != null,
         modifier = modifier
             .combinedClickable(
                 onLongClick = {
@@ -739,6 +952,7 @@ private fun ChooseTable(
                         onClick()
                 },
             ) {
+                if (isModeApplied == DininOption.MoveItem) onClick()
                 if (table.checksCount > 0) onLongClick() else if (id != 0) onClick()
             }
     )
