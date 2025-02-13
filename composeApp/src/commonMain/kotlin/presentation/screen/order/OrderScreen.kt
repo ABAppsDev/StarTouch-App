@@ -45,6 +45,7 @@ import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.PullRefreshState
@@ -57,8 +58,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -129,7 +132,7 @@ class OrderScreen(
     private val items: List<FireItems>,
     private val isReopened: Boolean
 ) : Screen {
-    @OptIn(ExperimentalMaterialApi::class)
+    @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val screenModel: OrderScreenModel =
@@ -219,7 +222,17 @@ class OrderScreen(
                         },
                         title = "${Resources.strings.checkNumber} : $checkNumber",
                         isBackIconVisible = state.itemModifiersState.isEmpty(),
-                        painterResource = painterResource(Res.drawable.ic_back)
+                        painterResource = painterResource(Res.drawable.ic_back),
+                        actions = {
+                            if (state.itemModifiersState.isEmpty() && !state.isSearchBarVisible)
+                                IconButton(onClick = screenModel::onClickSearch) {
+                                    Icon(
+                                        Icons.Filled.Search,
+                                        "",
+                                        tint = Color.White
+                                    )
+                                }
+                        }
                     )
                 },
                 floatingActionButton = {
@@ -339,9 +352,62 @@ class OrderScreen(
                             }
                         }
                     }
+                    FadeAnimation(state.isSearchBarVisible) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth()
+                                .padding(top = it.calculateTopPadding())
+
+                        ) {
+                            OutlinedTextField(
+                                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                                value = state.searchValue,
+                                placeholder = {
+                                    Text(
+                                        "",
+                                        style = Theme.typography.caption,
+                                        color = Theme.colors.contentTertiary
+                                    )
+                                },
+                                onValueChange = screenModel::onSearchValueChange,
+                                shape = RoundedCornerShape(Theme.radius.medium),
+                                textStyle = Theme.typography.body.copy(Theme.colors.contentPrimary),
+                                maxLines = 1,
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Filled.Search,
+                                        "",
+                                        tint = Color.White
+                                    )
+                                },
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    unfocusedBorderColor = Theme.colors.contentBorder.copy(
+                                        alpha = 0.1f
+                                    ),
+                                    focusedBorderColor = Theme.colors.contentTertiary.copy(
+                                        alpha = 0.2f
+                                    ),
+                                    errorBorderColor = Theme.colors.primary.copy(alpha = 0.5f),
+                                    errorCursorColor = Theme.colors.primary,
+                                    cursorColor = Theme.colors.contentTertiary,
+                                ),
+                            )
+                        }
+                    }
                     FadeAnimation(state.itemsState.isNotEmpty()) {
                         ItemsList(
-                            state.itemsState,
+                            state.itemsState.mapNotNull {
+                                if (state.isSearchBarVisible || state.searchValue.isNotBlank()) {
+                                    // Include the item only if its name contains the search value
+                                    if (it.name.contains(state.searchValue, ignoreCase = true)) {
+                                        it
+                                    } else {
+                                        null
+                                    }
+                                } else {
+                                    // If the search bar is not visible or the search value is blank, include all items
+                                    it
+                                }
+                            },
                             onClickItem = screenModel::onClickItem,
                             id = state.selectedItemId,
                             onChooseItem = screenModel::onChooseItem,

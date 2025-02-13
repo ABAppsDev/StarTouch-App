@@ -18,6 +18,11 @@ interface IOrderGateway {
         checkId: Long,
     ): List<Item>
 
+    suspend fun getAllItemsWithoutPreset(
+        outletID: Int,
+        restID: Int,
+    ): List<Item>
+
     suspend fun checkItemHasModifiers(
         restID: Int,
         itemID: Int,

@@ -49,6 +49,7 @@ class OrderScreenModel(
                 itemChildrenState = emptyList(),
                 itemModifiersState = emptyList(),
                 isPresetVisible = false,
+                isSearchBarVisible = false,
                 errorState = null,
                 errorMessage = "",
                 showErrorScreen = false
@@ -89,6 +90,7 @@ class OrderScreenModel(
                 errorState = null,
                 showErrorScreen = false,
                 isPresetVisible = false,
+                isSearchBarVisible = false,
                 presetItemsState = emptyList(),
             )
         }
@@ -263,6 +265,7 @@ class OrderScreenModel(
                 errorState = null,
                 showErrorScreen = false,
                 isPresetVisible = false,
+                isSearchBarVisible = false,
                 itemsState = if (items.isNotEmpty()) emptyList() else state.value.itemsState,
                 itemChildrenState = emptyList(),
                 currentModifierGroupIndex = 0,
@@ -314,6 +317,7 @@ class OrderScreenModel(
                     itemChildrenState = emptyList(),
                     itemModifiersState = emptyList(),
                     isPresetVisible = false,
+                    isSearchBarVisible = false,
                     qty = 0f,
                 )
             }
@@ -358,6 +362,7 @@ class OrderScreenModel(
                         itemChildrenState = emptyList(),
                         itemModifiersState = emptyList(),
                         isPresetVisible = false,
+                        isSearchBarVisible = false,
                         qty = 0f,
                     )
                 }
@@ -570,6 +575,7 @@ class OrderScreenModel(
             it.copy(
                 isFinishOrder = true,
                 isPresetVisible = false,
+                isSearchBarVisible = false,
                 itemsState = emptyList(),
                 itemChildrenState = emptyList(),
                 itemModifiersState = emptyList(),
@@ -697,11 +703,58 @@ class OrderScreenModel(
         updateState { it.copy(showErrorScreen = true) }
     }
 
+    override fun onSearchValueChange(value: String) {
+        updateState {
+            it.copy(
+                searchValue = value,
+            )
+        }
+    }
+
+    override fun onClickSearch() {
+        updateState {
+            it.copy(
+                isLoading = true,
+                errorMessage = "",
+                errorState = null,
+                itemsState = emptyList(),
+                showErrorScreen = false,
+            )
+        }
+        tryToExecute(
+            function = {
+                manageOrder.getAllItemsWithoutPreset(
+                    StarTouchSetup.OUTLET_ID,
+                    StarTouchSetup.REST_ID,
+                )
+            },
+            onSuccess = { items ->
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "",
+                        errorState = null,
+                        isPresetVisible = false,
+                        isSearchBarVisible = true,
+                        itemsState = items.map { item ->
+                            item.toItemState()
+                        }
+                    )
+                }
+            },
+            onError = { error ->
+                updateState { it.copy(itemsState = emptyList()) }
+                onError(error)
+            }
+        )
+    }
+
     override fun onClickIconBack() {
         updateState {
             it.copy(
                 isFinishOrder = false,
                 isPresetVisible = false,
+                isSearchBarVisible = false,
                 itemsState = emptyList(),
                 itemChildrenState = emptyList(),
                 itemModifiersState = emptyList(),

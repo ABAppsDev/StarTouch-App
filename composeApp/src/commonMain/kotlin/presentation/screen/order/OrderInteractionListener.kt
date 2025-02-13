@@ -13,6 +13,8 @@ interface OrderInteractionListener {
     fun onClickClose()
     fun showErrorScreen()
     fun onClickIconBack()
+    fun onClickSearch()
+    fun onSearchValueChange(value:String)
     fun onClickModifyLastItem(id: Int, serial: Int)
     fun onChooseItem(itemId: Int)
     fun onDismissDialogue()

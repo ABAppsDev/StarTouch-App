@@ -12,7 +12,7 @@ interface DinInInteractionListener {
     fun onTableNameChanged(tableName: String)
     fun onDismissDinInDialogue()
     fun onClickOkMoveItemsDialogue(selectedItems: List<Int>)
-    fun onClickOkAfterChooseTableDialogue(checkId: TableDetailsState)
+    fun onClickOkAfterChooseTableDialogue(table: TableDetailsState)
     fun showErrorDialogue()
     fun onDismissErrorDialogue()
     fun showErrorScreen()

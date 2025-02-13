@@ -357,7 +357,6 @@ class DinInScreenModel(
                     }
                 }
             }
-            updateState { it.copy(selectedDininOption = null) }
 
         }, onError = { errorState ->
             updateState {
@@ -464,7 +463,6 @@ class DinInScreenModel(
                 }
             }, onSuccess = {
                 //retry()
-                updateState { it.copy(selectedDininOption = null) }
             }, onError = ::onError
             )
         }
@@ -548,6 +546,7 @@ class DinInScreenModel(
                     it.copy(
                         isLoading = false,
                         waitingForChooseCheckToMove = false,
+                        selectedDininOption = null,
                         dinInDialogueState = it.dinInDialogueState.copy(
                             isVisible = false,
                             isLoading = false,
@@ -561,7 +560,8 @@ class DinInScreenModel(
             }, onError = ::onError
             )
 
-        } else {
+        }
+        else {
             when (state.value.selectedDininOption) {
                 DininOption.DisableTable -> {
                 }
@@ -693,6 +693,7 @@ class DinInScreenModel(
                 isTableGuest = false,
                 moveItemsDialogueIsVisible = false,
                 chooseTableDialogueIsVisible = false,
+                selectedDininOption = null,
                 selectedItemToMove = emptyList(),
             )
         }
@@ -727,8 +728,10 @@ class DinInScreenModel(
                 )
             )
         }
+        println("MARWAN ${table}")
 
-        if (table.coversCount == 1) {
+        if (table.checksCount == 1) {
+            println("MARWAN ITS ONE COVER")
             tryToExecute(function = {
                 manageDininButtonsUseCase.moveItems(
                     fromCheckId = state.value.checkIdToMove,
@@ -739,7 +742,10 @@ class DinInScreenModel(
                 retry()
                 updateState {
                     it.copy(
-                        isLoading = false, dinInDialogueState = it.dinInDialogueState.copy(
+                        isLoading = false,
+                        waitingForChooseCheckToMove = false,
+                        selectedDininOption = null,
+                        dinInDialogueState = it.dinInDialogueState.copy(
                             isVisible = false,
                             isLoading = false,
                             isSuccess = false,
@@ -751,7 +757,8 @@ class DinInScreenModel(
                 }
             }, onError = ::onError
             )
-        } else {
+        }
+        else {
             checkIfMutlipleChecksInTable(tableId = table.tableId) {}
             updateState { it.copy(waitingForChooseCheckToMove = true) }
         }
@@ -886,7 +893,8 @@ class DinInScreenModel(
                             )
                         }
                         onConfirmButtonClick()
-                    } else updateState {
+                    }
+                    else updateState {
                         it.copy(dinInDialogueState = it.dinInDialogueState.copy(checks = checks.map { check ->
                             AssignCheckState(
                                 id = check.id,
@@ -919,7 +927,8 @@ class DinInScreenModel(
                     )
                 }
             })
-        } else {
+        }
+        else {
             tryToExecute(function = {
                 manageChecksUseCase.reOpenCheck(tableId, 0)
             }, onSuccess = { items ->

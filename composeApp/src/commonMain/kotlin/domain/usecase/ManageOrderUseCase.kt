@@ -24,6 +24,13 @@ class ManageOrderUseCase(
         return orderGateway.getAllItems(outletID, restID, presetID, checkId)
     }
 
+    suspend fun getAllItemsWithoutPreset(
+        outletID: Int,
+        restID: Int,
+    ): List<Item> {
+        return orderGateway.getAllItemsWithoutPreset(outletID, restID)
+    }
+
     suspend fun checkItemHasModifiers(
         restID: Int,
         itemID: Int,

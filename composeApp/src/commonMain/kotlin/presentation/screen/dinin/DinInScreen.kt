@@ -67,6 +67,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -516,6 +517,21 @@ private fun MoveItemsDialogue(
 ) {
     var selectedItems by remember { mutableStateOf<List<Int>>(emptyList()) }
 
+    val orderItemMapped = orderItemState.mapIndexedNotNull { index, item ->
+        if (item.isModifier) {
+            null
+        } else {
+            var modifiers = ""
+            var itemIndex = 1
+
+            while (index + itemIndex < orderItemState.size && orderItemState[index + itemIndex].isModifier) {
+                modifiers += orderItemState[index + itemIndex].name + " + "
+                itemIndex++
+            }
+            item to modifiers.dropLast(3).trim()
+        }
+    }
+
     StDialogue(
         onDismissRequest = dinInInteractionListener::onDismissDinInDialogue,
         modifier = modifier
@@ -532,24 +548,25 @@ private fun MoveItemsDialogue(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 contentPadding = PaddingValues(bottom = 64.dp)
             ) {
-                items(orderItemState) { item ->
+                items(orderItemMapped) { order ->
+                    val item = order.first
                     Row {
                         EICheckBox(
                             "",
                             isChecked = selectedItems.contains(item.serial),
                             onCheck = {
                                 if (it)
-                                    selectedItems += item.serial?:0
+                                    selectedItems += item.serial ?: 0
                                 else
-                                    selectedItems -= item.serial?:0
+                                    selectedItems -= item.serial ?: 0
                             },
                         )
                         Card(
                             modifier = modifier.bounceClick {
                                 if (selectedItems.contains(item.serial))
-                                    selectedItems -= item.serial?:0
+                                    selectedItems -= item.serial ?: 0
                                 else
-                                    selectedItems += item.serial?:0
+                                    selectedItems += item.serial ?: 0
                             },
                             colors = CardDefaults.cardColors(containerColor = Color(0xFF1F1D2B)),
                         ) {
@@ -571,11 +588,21 @@ private fun MoveItemsDialogue(
                                         contentDescription = "item image"
                                     )
                                     Column(modifier = Modifier.padding(start = 8.dp)) {
-                                        Text(
-                                            text = item.name ?: "",
-                                            color = Color.White,
-                                            style = Theme.typography.title
-                                        )
+                                        Row(modifier = Modifier) {
+                                            Text(
+                                                text = item.name ?: "",
+                                                color = Color.White,
+                                                style = Theme.typography.title
+                                            )
+                                            if (order.second != "")
+                                                Text(
+                                                    text = " + " + order.second,
+                                                    color = Color.Gray,
+                                                    style = Theme.typography.title.copy(
+                                                        fontSize = 12.sp
+                                                    )
+                                                )
+                                        }
                                         Spacer(modifier = Modifier.height(4.dp))
                                         Text(
                                             text = "${item.price}",

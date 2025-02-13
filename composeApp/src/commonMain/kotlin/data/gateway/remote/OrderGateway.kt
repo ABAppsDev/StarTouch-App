@@ -40,6 +40,15 @@ class OrderGateway(client: HttpClient) : BaseGateway(client), IOrderGateway {
         }.data?.map { it.toEntity() } ?: throw NotFoundException("Items not found")
     }
 
+    override suspend fun getAllItemsWithoutPreset(outletID: Int, restID: Int): List<Item> {
+        return tryToExecute<ServerResponse<List<ItemDto>>> {
+            get("/allItems") {
+                parameter("outletID", outletID)
+                parameter("restID", restID)
+            }
+        }.data?.map { it.toEntity() } ?: throw NotFoundException("Items not found")
+    }
+
     override suspend fun checkItemHasChildren(
         outletID: Int,
         itemID: Int,
